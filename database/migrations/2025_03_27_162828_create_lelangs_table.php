@@ -13,8 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lelangs', function (Blueprint $table) {
-            $table->id();
-            $table->string('kode_lelang')->unique();
+            $table->string('kode_lelang')->unique()->primary();
             $table->string('nama_produk_lelang');
             $table->text('keterangan')->nullable();
             $table->integer('harga_dibuka');

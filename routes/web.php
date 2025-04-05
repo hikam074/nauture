@@ -10,10 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// main page
-Route::get('/', function () {
-    return view('welcome');
-});
+
+// dashboard
+Route::get('/', [C_Dashboard::class, 'index'])
+    ->name('dashboard');
 
 // mengarahkan ke login page
 Route::get('/login', function () {
@@ -25,29 +25,52 @@ Route::get('/login', function () {
 Route::post('/login', [C_Login::class, 'authenticate'])
     ->name('login.process');
 
-// dashboard
-Route::get('/dashboard', [C_Dashboard::class, 'index'])
-    ->name('dashboard');
-
 // ke katalog
-Route::get('/katalog', function () {
-    $katalogs = M_Katalog::all();
-    return view('katalog.index', ["katalogs" =>$katalogs]);
-    });
-
-// ke show.katalog
-Route::get('/katalog/{id}', [C_katalog::class, 'show'])
-    ->name('katalog.show');
+Route::get('/katalog', [C_Katalog::class, 'index'])
+    ->name('katalog.index');
 
 // ke add.katalog (hanya untuk pegawai)
 Route::get('/katalog/add', [C_Katalog::class, 'create'])
-    ->middleware(['auth', 'role:pegawai'])
+    ->middleware('auth')
+    ->middleware('role:pegawai')
     ->name('katalog.add');
 
-// Proses tambah katalog (hanya untuk pegawai)
-Route::post('/katalog', [C_Katalog::class, 'store'])
-    ->middleware(['auth', 'role:pegawai'])
+// Proses post tambah katalog (hanya untuk pegawai)
+Route::post('/katalog/add', [C_Katalog::class, 'store'])
+    ->middleware('auth')
+    ->middleware('role:pegawai')
     ->name('katalog.store');
+
+// ke show.katalog
+Route::get('/katalog/{id}', [C_Katalog::class, 'show'])
+    ->name('katalog.show');
+
+// hapus katalog
+Route::delete('/katalog/{id}', [C_Katalog::class, 'destroy'])
+    ->middleware('auth')
+    ->middleware('role:pegawai')
+    ->name('katalog.destroy');
+
+// ke edit.katalog
+Route::get('/katalog/{id}/edit', [C_Katalog::class, 'edit'])
+    ->name('katalog.edit');
+
+Route::post('/katalog/{id}/edit', [C_Katalog::class, 'update'])
+    ->middleware('auth')
+    ->middleware('role:pegawai')
+    ->name('katalog.update');
+
+// restore katalog
+Route::patch('/katalog/{id}/restore', [C_Katalog::class, 'restore'])
+    ->middleware('auth')
+    ->middleware('role:pegawai')
+    ->name('katalog.restore');
+
+
+
+
+
+
 
 // Logout
 Route::post('/logout', [C_Login::class, 'logout'])

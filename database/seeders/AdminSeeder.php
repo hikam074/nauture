@@ -50,5 +50,18 @@ class AdminSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+
+        if (!DB::table('users')->where('email', '2@2')->exists()) {
+            DB::table('users')->insert([
+                'name' => '2 Pegawai',
+                'email' => '2@2',
+                'password' => Hash::make('2'),
+                'role_id' => 2,
+                'isSuspended' => false,
+
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

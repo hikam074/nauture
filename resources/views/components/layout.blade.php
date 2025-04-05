@@ -9,15 +9,20 @@
 <body>
     <header>
         <nav>
-            <span>NauTure</span>
-            <a href="/katalog/">Katalog</a>
-            <a href="/lelang/">Lelang</a>
+            <a href="{{ route('dashboard') }}">NauTure</a>
+            <a href="{{ route('katalog.index') }}">Katalog</a>
+             <a href="{{-- {{ route('lelang.index') }} --}}">Lelang</a>
+            @if (!Auth::check())
+                <a href="{{ route('login') }}">Login/Register</a>
+            @else
+                <a href="{{-- {{ route('profile.show') }} --}}">Profil</a>
+            @endif
         </nav>
     </header>
 
     <main class="container">
         {{ $slot }}
     </main>
-    
+
 </body>
 </html>

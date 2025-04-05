@@ -12,10 +12,23 @@ class C_Katalog extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $katalogs = M_Katalog::all();
-        return view('katalog.index', ['katalogs' => $katalogs]);
+        $filter = $request->query('filter');
+        $query = M_katalog::query();
+
+        if ($filter === 'deleted') {
+            $query->onlyTrashed(); // produk yang dihapus
+        } elseif ($filter === 'all') {
+            $query->withTrashed(); // produk aktif dan dihapus
+        } else {
+            // Default: produk belum dihapus
+            $query->whereNull('deleted_at');
+        }
+
+        $katalogs = $query->paginate(10);
+
+        return view('katalog.index', compact('katalogs'));
     }
 
     /**
@@ -23,11 +36,8 @@ class C_Katalog extends Controller
      */
     public function create()
     {
-        dd(Auth::check());
         if (!Auth::check()) {
-              dd('Login berhasil, redirecting to katalog...');  // Debugging point
             return redirect()->route('login');
-            return view('katalog.add');
         }
         return view('katalog.add');
     }
@@ -49,7 +59,7 @@ class C_Katalog extends Controller
             $fotoPath = $request->file('foto_produk')->store('katalogs', 'public');
 
             // Simpan data produk ke database
-            \App\Models\M_Katalog::create([
+            M_Katalog::create([
                 'nama_produk' => $request->nama_produk,
                 'deskripsi_produk' => $request->deskripsi_produk,
                 'harga_perkilo' => $request->harga_perkilo,
@@ -70,7 +80,7 @@ class C_Katalog extends Controller
     public function show(string $id)
     {
         // Cari data katalog berdasarkan ID
-        $katalog = \App\Models\M_Katalog::findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
+        $katalog = M_Katalog::withTrashed()->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
 
         // Kirim data ke view 'katalog.show'
         return view('katalog.show', ['katalog' => $katalog]);
@@ -81,7 +91,8 @@ class C_Katalog extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $katalog = M_Katalog::findOrFail($id);
+        return view('katalog.add', compact('katalog'));
     }
 
     /**
@@ -89,7 +100,17 @@ class C_Katalog extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_produk' => 'required|string|max:255',
+            'deskripsi_produk' => 'nullable|string',
+            'harga_perkilo' => 'required|integer',
+            'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $katalog = M_Katalog::findOrFail($id);
+        $katalog->update($request->all());
+
+        return redirect()->route('katalog.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
     /**
@@ -97,6 +118,38 @@ class C_Katalog extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $katalog = M_Katalog::findOrFail($id);
+        $katalog->delete(); // soft delete
+
+        return redirect()->route('katalog.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    // Menampilkan produk yang terhapus
+    public function trashed()
+    {
+        $katalog = M_Katalog::onlyTrashed()->get(); // Ambil produk yang dihapus
+        return view('products.trashed', compact('products'));
+    }
+
+    // Mengembalikan produk yang dihapus
+    public function restore($id)
+    {
+        if (!$id) {
+            return redirect()->route('katalog.index')->with('error', 'ID tidak ditemukan.');
+        }
+
+        $katalog = M_Katalog::onlyTrashed()->findOrFail($id);
+        $katalog->restore(); // Mengembalikan produk
+
+        return redirect()->route('katalog.index')->with('success', 'Produk berhasil dikembalikan.');
+    }
+
+    // Menghapus permanen produk
+    public function forceDelete($id)
+    {
+        $katalog = M_Katalog::onlyTrashed()->findOrFail($id);
+        $katalog->forceDelete(); // Hapus permanen
+
+        return redirect()->route('katalog.index')->with('success', 'Produk berhasil dihapus permanen.');
     }
 }

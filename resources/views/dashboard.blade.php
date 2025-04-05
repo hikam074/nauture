@@ -17,11 +17,12 @@
         <div class="katalog-carousel">
             @foreach($katalogs->take(5) as $katalog)
             <div class="katalog-item">
-                <img src="{{ asset('storage/katalog/' . $katalog->gambar) }}" alt="{{ $katalog->nama_produk }}">
+                <img src="{{ asset('storage/' . $katalog->foto_produk) }}" alt="{{ $katalog->nama_produk }}" width="150">
                 <p>{{ $katalog->nama_produk }}</p>
                 <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}" class="btn-detail">Detail</a>
             </div>
             @endforeach
+            <a href="{{ route('katalog.index') }}">Lihat Lebih Banyak...</a>
         </div>
     </section>
 
