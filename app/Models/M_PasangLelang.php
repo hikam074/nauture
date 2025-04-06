@@ -16,9 +16,17 @@ class M_PasangLelang extends Model
         'kode_lelang',
         'user_id',
     ];
+
+    // reference this kode_lelang ke lelangs kode_lelang
     public function lelang()
     {
         return $this->belongsTo(M_Lelang::class, 'kode_lelang', 'kode_lelang');
+    }
+
+    // reference this user_id ke user id
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
 }

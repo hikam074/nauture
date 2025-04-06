@@ -9,4 +9,5 @@ class M_Saldo extends Model
     protected $table = 'saldos';
 
     protected $fillable = ['saldo'];
+    
 }

@@ -10,8 +10,4 @@ class M_StatusTransaksi extends Model
 
     protected $fillable = ['nama_status_transaksi'];
 
-    public function transaksi()
-    {
-        return $this->hasMany(M_Transaksi::class, 'status_transaksi_id');
-    }
 }

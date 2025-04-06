@@ -19,18 +19,14 @@ class M_Lelang extends Model
         'tanggal_dibuka',
         'tanggal_ditutup',
         'foto_produk',
-        'foto_produk',
+        'pemenang_id',
         'katalog_id',
     ];
 
-    public function pasangLelang()
+    // reference this katalog_id ke katalogs id
+    public function katalog()
     {
-        return $this->hasMany(M_PasangLelang::class, 'kode_lelang', 'kode_lelang');
-    }
-
-    public function transaksi()
-    {
-        return $this->hasMany(M_Transaksi::class, 'kode_lelang');
+        return $this->belongsTo(M_Katalog::class, 'katalog_id');
     }
 
 }

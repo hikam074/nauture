@@ -14,8 +14,9 @@ class M_Monitoring extends Model
         'pegawai_id',
     ];
 
-    public function pengajuan_dana()
+    // reference this pegawai_id ke user id
+    public function pegawai()
     {
-        return $this->hasMany(M_PengajuanDana::class, 'monitoring_id');
+        return $this->belongsTo(User::class, 'pegawai_id');
     }
 }

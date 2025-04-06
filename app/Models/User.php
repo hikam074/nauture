@@ -6,25 +6,31 @@ use App\Models\M_Role;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = [
+
+     protected $table = 'users';
+
+     protected $fillable = [
         'name',
         'email',
         'password',
         'role_id'=> 3,
         'isSuspended',
+        'alamat',
+        'no_telp',
     ];
 
     /**
@@ -49,11 +55,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    // role
+
+    // reference this role_id ke roles id
     public function role()
     {
         return $this->belongsTo(M_Role::class, 'role_id');
     }
+
+    // method mencari role ybs
     public function hasRole($role)
     {
         return $this->role->name === $role;
