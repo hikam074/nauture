@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('status_pengajuans', function (Blueprint $table) {
+        Schema::create('saldos', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_status_pengajuan')->unique();
-            
+            $table->integer('saldo');
+
             $table->timestamps();
         });
     }
@@ -24,6 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('status_pengajuans');
+        // hapus tabel
+        Schema::dropIfExists('saldos');
     }
 };

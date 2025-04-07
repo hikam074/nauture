@@ -12,21 +12,19 @@ class M_PasangLelang extends Model
     protected $table = 'pasang_lelangs';
 
     protected $fillable = [
-        'harga_pengajuan',
-        'kode_lelang',
+        'lelang_id',
         'user_id',
+        'harga_pengajuan',
     ];
 
-    // reference this kode_lelang ke lelangs kode_lelang
+    // reference this lelang_id ke lelangs id
     public function lelang()
     {
-        return $this->belongsTo(M_Lelang::class, 'kode_lelang', 'kode_lelang');
+        return $this->belongsTo(M_Lelang::class, 'lelang_id');
     }
-
-    // reference this user_id ke user id
+    // reference this user_id ke users id
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
-
 }

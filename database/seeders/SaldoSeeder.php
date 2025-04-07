@@ -14,10 +14,12 @@ class SaldoSeeder extends Seeder
      */
     public function run(): void
     {
-        // MASUKKAN SALDO AWAL
+        // masukkan saldo awal
         $saldo = 0;
 
         M_Saldo::firstOrCreate([
+            'id' => 1,
+        ], [
             'saldo' => $saldo
         ]);
     }

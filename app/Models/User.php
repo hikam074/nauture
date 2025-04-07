@@ -28,7 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id'=> 3,
-        'isSuspended',
+        'isSuspended'=>false,
         'alamat',
         'no_telp',
     ];
@@ -56,15 +56,36 @@ class User extends Authenticatable
         ];
     }
 
-    // reference this role_id ke roles id
-    public function role()
-    {
-        return $this->belongsTo(M_Role::class, 'role_id');
-    }
-
     // method mencari role ybs
     public function hasRole($role)
     {
         return $this->role->name === $role;
+    }
+
+    // reference this role_id ke roles id
+    public function role()
+    {
+        return $this->belongsTo(M_Role::class);
+    }
+
+    // deklarasi this user_id bisa punya banyak user_id di pasang_lelangs
+    public function pasangLelang()
+    {
+        return $this->hasMany(M_PasangLelang::class);
+    }
+    // deklarasi this user_id bisa punya banyak user_id di monitorings
+    public function monitoring()
+    {
+        return $this->hasMany(M_Monitoring::class);
+    }
+    // deklarasi this user_id bisa punya banyak user_id di log_masuks
+    public function logMasuk()
+    {
+        return $this->hasMany(M_LogMasuk::class);
+    }
+    // deklarasi this user_id bisa punya banyak user_id di log_keluars
+    public function logKeluar()
+    {
+        return $this->hasMany(M_LogKeluar::class);
     }
 }

@@ -19,4 +19,9 @@ class M_Katalog extends Model
         'foto_produk',
     ];
 
+    // deklarasi this katalog_id bisa punya banyak katalog_id di lelangs
+    public function lelang()
+    {
+        return $this->hasMany(M_Lelang::class);
+    }
 }

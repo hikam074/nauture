@@ -11,18 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pasang_lelangs', function (Blueprint $table) {
+        Schema::create('monitorings', function (Blueprint $table) {
             $table->id();
-            $table->integer('harga_pengajuan');
-            $table->string('kode_lelang');
             $table->unsignedBigInteger('user_id');
-            $table->softDeletes();  //deleted_at
+            $table->text('deskripsi');
+            $table->string('foto_monitoring');
+            $table->softDeletes();  // deleted_at
 
             $table->timestamps();
 
-            // references kode_lelang ke tabel lelangs
-            $table->foreign('kode_lelang')->references('kode_lelang')->on('lelangs')->onDelete('cascade');
-            // references id ke tabel users
+            // reference user_id ke users
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -32,6 +30,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pasang_lelangs');
+        // hapus reference ke users
+        Schema::table('monitorings', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
+        });
+
+        // hapus tabel
+        Schema::dropIfExists('monitorings');
     }
 };

@@ -14,13 +14,17 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // Pastikan role yang sama tidak dibuat dua kali
-        $roles = ['owner', 'pegawai', 'customer'];
+        $arr = [
+            'owner',
+            'pegawai',
+            'customer'
+        ];
 
-        foreach ($roles as $index => $roleName) {
+        foreach ($arr as $index => $name) {
             M_Role::firstOrCreate([
                 'id' => $index + 1, // ID akan dimulai dari 1
             ], [
-                'nama_role' => $roleName
+                'nama_role' => $name
             ]);
         }
     }

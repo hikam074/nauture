@@ -21,6 +21,7 @@ class AdminSeeder extends Seeder
                 'password' => Hash::make('owner'),
                 'role_id' => 1,
                 'isSuspended' => false,
+                'no_telp' => '101010101010',
 
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -33,6 +34,7 @@ class AdminSeeder extends Seeder
                 'password' => Hash::make('pegawai'),
                 'role_id' => 2,
                 'isSuspended' => false,
+                'no_telp' => '202020202020',
 
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -45,6 +47,7 @@ class AdminSeeder extends Seeder
                 'password' => Hash::make('customer'),
                 'role_id' => 3,
                 'isSuspended' => false,
+                'no_telp' => '303030303030',
 
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -58,6 +61,7 @@ class AdminSeeder extends Seeder
                 'password' => Hash::make('2'),
                 'role_id' => 2,
                 'isSuspended' => false,
+                'no_telp' => '212121212121',
 
                 'created_at' => now(),
                 'updated_at' => now(),

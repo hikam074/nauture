@@ -20,8 +20,13 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        // buat akun admin
+        // jalankan seeder untuk input data & enum
         $this->call(RoleSeeder::class);
         $this->call(AdminSeeder::class);
+        $this->call(RoleSeeder::class);
+        $this->call(SaldoSeeder::class);
+        $this->call(MetodePembayaranSeeder::class);
+        $this->call(StatusPengajuanSeeder::class);
+        $this->call(StatusTransaksiSeeder::class);
     }
 }

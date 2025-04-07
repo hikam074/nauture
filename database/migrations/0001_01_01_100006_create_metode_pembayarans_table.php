@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
+        Schema::create('metode_pembayarans', function (Blueprint $table) {
             $table->id();
-            $table->integer('rating');
-            $table->text('ulasan');
-            $table->integer('kode_transaksi');
+            $table->string('kode_metode_pembayaran')->unique();
+            $table->string('nama_metode_pembayaran')->unique();
 
             $table->timestamps();
-
-            // references ke transaksis
-            $table->foreign('kode_transaksi')->references('kode_transaksi')->on('transaksis')->onDelete('cascade');
         });
     }
 
@@ -29,6 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ratings');
+        // hapus tabel
+        Schema::dropIfExists('metode_pembayarans');
     }
 };

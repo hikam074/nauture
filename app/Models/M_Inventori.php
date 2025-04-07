@@ -17,4 +17,9 @@ class M_Inventori extends Model
         'foto_inventori'
     ];
 
+    // deklarasi this inventori_id bisa punya banyak inventori_id di pengajuan_danas
+    public function pengajuanDana()
+    {
+        return $this->hasMany(M_PengajuanDana::class);
+    }
 }

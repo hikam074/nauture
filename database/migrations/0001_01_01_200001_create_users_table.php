@@ -16,15 +16,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('role_id')->default(3);
+            $table->unsignedBigInteger('role_id')->default(3);  // FK ke roles
             $table->boolean('isSuspended')->default(false);
-            $table->softDeletes();  // deleted_at
+            $table->string('alamat')->nullable();
+            $table->string('no_telp')->unique();
+            $table->softDeletes();   // deleted_at
 
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-            // references ke role
+            // reference role_id ke roles
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
 
@@ -49,6 +51,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // hapus reference ke roles
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['role_id']);
+            $table->dropColumn('role_id');
+        });
+
+        // hapus tabel
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');

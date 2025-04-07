@@ -11,6 +11,13 @@ class M_Role extends Model
 
     protected $table = 'roles';
 
-    protected $fillable = ['nama_role'];
+    protected $fillable = [
+        'nama_role'
+    ];
 
+    // deklarasi this role_id bisa punya banyak role_id di users
+    public function user()
+    {
+        return $this->hasMany(User::class);
+    }
 }

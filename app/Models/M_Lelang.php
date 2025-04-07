@@ -18,15 +18,35 @@ class M_Lelang extends Model
         'harga_dibuka',
         'tanggal_dibuka',
         'tanggal_ditutup',
-        'foto_produk',
         'pemenang_id',
+        'foto_produk',
         'katalog_id',
     ];
 
     // reference this katalog_id ke katalogs id
     public function katalog()
     {
-        return $this->belongsTo(M_Katalog::class, 'katalog_id');
+        return $this->belongsTo(M_Katalog::class);
+    }
+    // reference this pemenang_id ke pasang_lelangs id
+    public function pemenang()
+    {
+        return $this->belongsTo(M_PasangLelang::class);
     }
 
+    // deklarasi this lelang_id bisa punya banyak lelang_id di pasang_lelangs
+    public function pasangLelang()
+    {
+        return $this->hasMany(M_PasangLelang::class);
+    }
+    // deklarasi this lelang_id bisa punya banyak lelang_id di transaksis
+    public function transaksi()
+    {
+        return $this->hasMany(M_Transaksi::class);
+    }
+    // deklarasi this lelang_id bisa punya banyak lelang_id di notifications
+    public function notification()
+    {
+        return $this->hasMany(M_Notification::class);
+    }
 }

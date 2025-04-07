@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('deskripsi_produk')->nullable();
             $table->integer('harga_perkilo');
             $table->string('foto_produk');
-            $table->softDeletes();  //deleted_at
+            $table->softDeletes();  // deleted_at
 
             $table->timestamps();
         });

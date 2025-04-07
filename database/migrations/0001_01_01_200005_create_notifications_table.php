@@ -14,16 +14,17 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('lelang_id');    // FK ke lelangs
             $table->string('title_notif');
             $table->string('body_notif')->nullable();
             $table->string('link_click_action');
             $table->string('image_notif')->nullable();
-            $table->string('kode_lelang');
+            $table->softDeletes();  // deleted_at
 
             $table->timestamps();
 
-            // references ke tabel lelangs
-            $table->foreign('kode_lelang')->references('kode_lelang')->on('lelangs')->onDelete('cascade');
+            // reference lelang_id ke lelangs
+            $table->foreign('lelang_id')->references('id')->on('lelangs')->onDelete('cascade');
         });
     }
 
@@ -32,6 +33,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // hapus reference ke lelangs
+        Schema::table('notifications', function (Blueprint $table) {
+            $table->dropForeign(['lelang_id']);
+            $table->dropColumn('lelang_id');
+        });
        // Hapus folder notifications dan isinya
         if (Storage::disk('public')->exists('notifications')) {
             Storage::disk('public')->deleteDirectory('notifications');
