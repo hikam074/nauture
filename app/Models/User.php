@@ -27,8 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'=> 3,
-        'isSuspended'=>false,
+        'role_id',
+        'isSuspended',
         'alamat',
         'no_telp',
     ];
