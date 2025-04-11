@@ -8,27 +8,36 @@ use Illuminate\Validation\ValidationException;
 
 class C_Login extends Controller
 {
+    public function show(Request $request) {
+        return view('auth.login');
+    }
+
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+        $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-                // dd('Login berhasil, redirecting to dashboard...');  // Debugging point
-            return redirect()->route('dashboard');
+
+            return response()->json([
+                'success' => true,
+                'redirect' => route('homepage'),
+            ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => 'Email atau password salah.',
-        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Email atau password salah',
+        ], 422);
     }
 
-    public function dashboard()
+    public function homepage()
     {
-        return view('dashboard');
+        return view('homepage');
     }
 
     public function logout(Request $request)

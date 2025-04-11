@@ -26,18 +26,19 @@
         </div>
     </section>
 
-    {{-- <section class="lelang">
+    <section class="lelang">
         <div class="lelang-head">
             <h2>Produk Lelang</h2>
         </div>
         <div class="lelang-carousel">
             @foreach($lelangs->take(5) as $lelang)
             <div class="lelang-item">
-                <img src="{{ asset('storage/lelang/' . $lelang->gambar) }}" alt="{{ $lelang->nama_produk }}">
-                <p>{{ $lelang->nama_produk }}</p>
+                <img src="{{ asset('storage/' . $lelang->katalog->foto_produk) }}" alt="{{ $lelang->katalog->nama_produk }}" width="150">
+                <p>{{ $lelang->nama_produk_lelang }}</p>
                 <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}" class="btn-detail">Detail</a>
             </div>
             @endforeach
+            <a href="{{ route('lelang.index') }}">Lihat Lebih Banyak...</a>
         </div>
-    </section> --}}
+    </section>
 </x-layout>

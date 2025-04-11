@@ -15,12 +15,18 @@ class M_Lelang extends Model
         'kode_lelang',
         'nama_produk_lelang',
         'keterangan',
+        'jumlah_kg',
         'harga_dibuka',
         'tanggal_dibuka',
         'tanggal_ditutup',
         'pemenang_id',
         'foto_produk',
         'katalog_id',
+    ];
+
+    protected $casts = [
+        'tanggal_dibuka' => 'datetime',
+        'tanggal_ditutup' => 'datetime',
     ];
 
     // reference this katalog_id ke katalogs id

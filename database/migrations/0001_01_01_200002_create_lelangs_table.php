@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('kode_lelang')->unique();
             $table->string('nama_produk_lelang');
             $table->text('keterangan')->nullable();
+            $table->integer('jumlah_kg');
             $table->integer('harga_dibuka');
             $table->datetime('tanggal_dibuka');
             $table->datetime('tanggal_ditutup');

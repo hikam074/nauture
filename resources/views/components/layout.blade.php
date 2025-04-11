@@ -9,13 +9,18 @@
 <body>
     <header>
         <nav>
-            <a href="{{ route('dashboard') }}">NauTure</a>
+            <a href="{{ route('homepage') }}">NauTure</a>
             <a href="{{ route('katalog.index') }}">Katalog</a>
-             <a href="{{-- {{ route('lelang.index') }} --}}">Lelang</a>
+             <a href="{{ route('lelang.index') }}">Lelang</a>
             @if (!Auth::check())
                 <a href="{{ route('login') }}">Login/Register</a>
             @else
+
                 <a href="{{-- {{ route('profile.show') }} --}}">Profil</a>
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" style="background: none; border: none; color: blue; cursor: pointer;">Logout</button>
+                </form>
             @endif
         </nav>
     </header>

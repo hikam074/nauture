@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\M_Katalog;
@@ -151,5 +152,21 @@ class C_Katalog extends Controller
         $katalog->forceDelete(); // Hapus permanen
 
         return redirect()->route('katalog.index')->with('success', 'Produk berhasil dihapus permanen.');
+    }
+
+    // api
+    public function getKatalog($id): JsonResponse
+    {
+        $katalog = M_Katalog::find($id);
+
+        if ($katalog) {
+            return response()->json([
+                'id' => $katalog->id,
+                'nama_produk' => $katalog->nama_produk,
+                'foto_produk' => $katalog->foto_produk, // Pastikan kolom ini benar
+            ]);
+        } else {
+            return response()->json(['error' => 'Katalog tidak ditemukan'], 404);
+        }
     }
 }
