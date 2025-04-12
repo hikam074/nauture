@@ -33,7 +33,6 @@
             <div class="password">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-input" id="password" name="password" required>
-                <p id="error-message">err</p>
             </div>
             <div class="remember-me-container">
                 <label class="remember-me-inline">

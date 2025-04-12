@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.querySelector("form");
     const errorMessage = document.getElementById("error-message");
@@ -21,9 +23,14 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!response.ok) {
                 const data = await response.json();
                 if (data.message) {
-                    errorMessage.textContent = data.message; // Ubah teks menjadi pesan error
-                    errorMessage.style.visibility = "visible"; // Tampilkan pesan error
-                    alert(data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Coba Lagi',
+                        text: data.message,
+                        confirmButtonText: 'Coba Lagi',
+                        width: '400px',
+                        heightAuto: false,
+                    })
                 }
             } else {
                 const data = await response.json();
@@ -33,6 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             console.error("Something went wrong:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Kesalahan Tidak Terduga',
+                text: 'Terjadi masalah pada jaringan. Silakan coba lagi.',
+                confirmButtonText: 'OK',
+                width: '400px',
+                heightAuto: false,
+            });
         } finally {
             submitButton.disabled = false; // Aktifkan kembali tombol
         }

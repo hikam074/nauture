@@ -68,11 +68,6 @@ input:focus {
 #signup {
     color: #638B35;
 }
-#error-message {
-    margin: 0;
-    visibility: hidden;
-    color: red;
-}
 
 .remember-me-container {
     padding-top: 1rem;

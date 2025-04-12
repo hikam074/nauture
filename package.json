@@ -19,6 +19,7 @@
   "homepage": "https://github.com/hikam074/nautureBreeze#readme",
   "dependencies": {
     "laravel-vite-plugin": "^1.2.0",
+    "sweetalert2": "^11.17.2",
     "vite": "^6.2.6"
   },
   "scripts": {
