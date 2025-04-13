@@ -14,25 +14,32 @@ class C_Login extends Controller
 
     public function authenticate(Request $request)
     {
+        // ambil var
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
         $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
+        // Periksa apakah email ada di database
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
 
-            return response()->json([
-                'success' => true,
-                'redirect' => route('homepage'),
-            ]);
+        if (!$user) {
+            $request->session()->flash('error', 'Email tidak ditemukan, silahkan periksa lagi');
+            return redirect()->back()->withInput($request->except('password'));
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Email atau password salah',
-        ], 422);
+        // Periksa password
+        if (!Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
+            $request->session()->flash('error', 'Password tidak cocok. Silahkan coba lagi.');
+            return redirect()->back()->withInput($request->except('password'));
+        }
+
+        // Login berhasil
+        $request->session()->regenerate();
+        $request->session()->flash('success', 'Login berhasil!');
+        return redirect()->route('homepage');
+
     }
 
     public function homepage()

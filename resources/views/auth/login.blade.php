@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>NauTure: Login</title>
-    @vite('resources/css/auth.css')
-    @vite('resources/js/auth.js')
+    @vite('resources/css/auth-login.css')
     @vite('resources/css/global.css')
+    @vite('resources/js/app.js')
+    @vite('resources/css/app.css')
+    @include('includes.toastr')
     <style>
         body {
             background-image: url("{{ asset('images/backgrounds/signinBG.png') }}") !important;
@@ -22,13 +23,13 @@
 
     <div class='container'>
         <a href="{{ route('homepage') }}"><img id="homelink" src="images/logos/homeLogo.png" alt="[alt]NauTure-Home"></a>
-        <h3 id="title">Log In</h3>
+        <h1 id="title">Log In</h1>
         <p id="ucapan">Selamat Datang Kembali! Silahkan Log-in ke akun anda</p>
         <form action="{{ route('login.process') }}" method="POST">
             @csrf
             <div class="email">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-input" id="email" name="email" required>
+                <input type="email" class="form-input" id="email" name="email" value="{{ old('email') }}" required>
             </div>
             <div class="password">
                 <label for="password" class="form-label">Password</label>

@@ -6,8 +6,10 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/global.css',
-                'resources/css/auth.css',
-                'resources/js/auth.js',
+                'resources/css/auth-login.css',
+                'resources/css/auth-register.css',
+                'resources/js/auth-login.js',
+                'resources/js/auth-register.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
         }),
