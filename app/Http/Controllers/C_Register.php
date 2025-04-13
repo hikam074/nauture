@@ -65,7 +65,7 @@ class C_Register extends Controller
             $request->session()->regenerate();
             // Redirect ke homepage
             $request->session()->flash('success', 'Berhasil Registrasi!');
-            return redirect()->route('homepage');
+            return redirect()->intended(route('homepage'));
         } catch (\Exception $e) {
             $request->session()->flash('error', 'Terjadi kesalahan sistem : Tidak dapat memproses registrasi. Silakan coba lagi.');
             return redirect()->back()->withInput($request->except('password'));

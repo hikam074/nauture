@@ -38,7 +38,7 @@ class C_Login extends Controller
         // Login berhasil
         $request->session()->regenerate();
         $request->session()->flash('success', 'Login berhasil!');
-        return redirect()->route('homepage');
+        return redirect()->intended(route('homepage'));
 
     }
 
