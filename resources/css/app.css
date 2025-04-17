@@ -1,4 +1,5 @@
-/* @import 'tailwindcss'; */
+@import "tailwindcss";
+@source "../views";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -12,7 +13,9 @@
 
 
 /* Kustomisasi untuk tipe toast */
-@import "~toastr/toastr.css";
+/* @import "~toastr/toastr.css"; */
+@import 'toastr/build/toastr.min.css';
+
 .toast-success {
     background-color: #28a745 !important; /* Hijau sukses */
     color: white !important;

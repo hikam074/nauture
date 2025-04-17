@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/hikam074/nautureBreeze#readme",
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.8.4",
     "laravel-vite-plugin": "^1.2.0",
     "sweetalert2": "^11.17.2",
+    "tailwindcss": "^4.1.4",
     "toastr": "^2.1.4",
     "vite": "^6.2.6"
   },
@@ -28,4 +30,5 @@
     "dev": "vite",
     "build": "vite build"
   }
+  
 }
