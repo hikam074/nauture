@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <nav class="flex items-center justify-between bg-[#CEED82] pl-8 py-3">
+        <nav class="fixed top-0 left-0 right-0 z-50 bg-[#CEED82] pl-8 py-3 flex items-center justify-between">
             <!-- Logo -->
             <a href="{{ route('homepage') }}" class="flex items-center">
                 <img id="homelink" src="/images/logos/homeLogo.png" alt="[alt]NauTure-Home" class="h-8">
@@ -80,13 +80,8 @@
             </div>
         </nav>
     </header>
-    @if (Auth::user()->name)
-    <p>Selamat datang, {{ Auth::user()->name }}!</p>
-    @else
-    <p>Selamat datang, Pengunjung!</p>
-    @endif
 
-    <main class="container">
+    <main class="container mx-auto px-4 pt-[4rem]">
         {{ $slot }}
     </main>
 
