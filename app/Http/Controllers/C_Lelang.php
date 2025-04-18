@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -19,31 +20,55 @@ class C_Lelang
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter');
-        $query = M_Lelang::with('katalog'); // Load relasi katalog
+        $filter = $request->query('filter', 'active'); // Default 'active' jika tidak ada filter.
+        $sortBy = $request->query('sort_by', 'date_added'); // Default 'date_added' jika tidak ada sort.
+        $katalogIds = $request->get('katalog_id', []); // Filter berdasarkan banyak katalog_id yang dipilih.
 
-        if ($filter === 'deleted') {
-            // Lelang yang dihapus tetapi tidak memiliki pemenang
-            $query->onlyTrashed()->whereNull('pemenang_id');
-        } elseif ($filter === 'completed') {
-            // Lelang yang selesai (dihapus dan memiliki pemenang)
-            $query->onlyTrashed()->whereNotNull('pemenang_id');
-        } elseif ($filter === 'active') {
-            // Lelang yang masih berlangsung
-            $query->whereNull('deleted_at');
-        } elseif ($filter === 'all') {
-            // Semua lelang, termasuk aktif dan dihapus
-            $query->withTrashed();
-        } else {
-            // Default: Lelang yang masih berlangsung
-            $query->whereNull('deleted_at');
+        // Jika 'Semua Katalog' dipilih (katalog_id kosong), ambil semua katalog_id
+        if (in_array('', $katalogIds)) {
+            $katalogIds = M_Katalog::pluck('id')->toArray(); // Ambil semua katalog ID
         }
 
-        $lelangs = $query->paginate(10);
+        $query = M_Lelang::with(['katalog', 'pasangLelang' => function ($q) {
+            $q->select('lelang_id', DB::raw('MAX(harga_pengajuan) as highest_bid'));
+        }]);
 
-        return view('lelang.index', compact('lelangs'));
+
+        // Filter berdasarkan status
+        if ($filter === 'deleted') {
+            $query->onlyTrashed()->whereNull('pemenang_id');
+        } elseif ($filter === 'completed') {
+            $query->onlyTrashed()->whereNotNull('pemenang_id');
+        } elseif ($filter === 'active') {
+            $query->whereNull('deleted_at');
+        } elseif ($filter === 'all') {
+            $query->withTrashed();
+        } else {
+            $query->whereNull('deleted_at'); // Default: Lelang yang masih berlangsung.
+        }
+
+        // Filter berdasarkan katalog (jika ada katalog yang dipilih)
+        if (!empty($katalogIds)) {
+            $query->whereIn('katalog_id', $katalogIds); // Menambahkan filter berdasarkan beberapa katalog_id
+        }
+
+        // Logika sort berdasarkan pilihan
+        if ($sortBy === 'date_added') {
+            $query->orderBy('created_at', 'asc'); // Mengurutkan berdasarkan tanggal ditambahkan
+        } elseif ($sortBy === 'alphabetical') {
+            $query->orderBy('nama_produk_lelang', 'asc'); // Mengurutkan berdasarkan nama produk secara abjad
+        } elseif ($sortBy === 'highest_bid') {
+            $query->orderBy('harga_dibuka', 'desc'); // Mengurutkan berdasarkan harga tertinggi
+        }
+
+        // Pagination dengan query string diteruskan
+        $lelangs = $query->paginate(12)->appends($request->query());
+
+        // Ambil semua katalog untuk filter dropdown
+        $allKatalogs = M_Katalog::all(); // Ambil semua katalog
+
+        return view('lelang.index', compact('lelangs', 'filter', 'sortBy', 'allKatalogs', 'katalogIds'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -210,7 +235,7 @@ class C_Lelang
             }
 
             // Simpan file baru
-            $filePath = $request->file('foto_produk')->store('foto_produk', 'public');
+            $filePath = $request->file('foto_produk')->store('lelangs', 'public');
             $lelang->foto_produk = $filePath;
         }
 

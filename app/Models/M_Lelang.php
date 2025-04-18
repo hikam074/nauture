@@ -43,7 +43,7 @@ class M_Lelang extends Model
     // deklarasi this lelang_id bisa punya banyak lelang_id di pasang_lelangs
     public function pasangLelang()
     {
-        return $this->hasMany(M_PasangLelang::class);
+        return $this->hasMany(M_PasangLelang::class, "lelang_id");
     }
     // deklarasi this lelang_id bisa punya banyak lelang_id di transaksis
     public function transaksi()

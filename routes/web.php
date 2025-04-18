@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\C_PasangLelang;
 use App\Http\Controllers\C_Homepage;
 use App\Http\Controllers\C_Katalog;
 use App\Http\Controllers\C_Lelang;
@@ -57,7 +58,7 @@ Route::delete('/katalog/{id}', [C_Katalog::class, 'destroy'])
 Route::get('/katalog/{id}/edit', [C_Katalog::class, 'edit'])
     ->name('katalog.edit');
 // submit hasil edit.katalog (hanya untuk pegawai)
-Route::post('/katalog/{id}/edit', [C_Katalog::class, 'update'])
+Route::put('/katalog/{id}/edit', [C_Katalog::class, 'update'])
     ->middleware('auth')
     ->middleware('role:pegawai')
     ->name('katalog.update');
@@ -66,6 +67,7 @@ Route::patch('/katalog/{id}/restore', [C_Katalog::class, 'restore'])
     ->middleware('auth')
     ->middleware('role:pegawai')
     ->name('katalog.restore');
+
 
 // ke lelang
 Route::get('/lelang', [C_Lelang::class, 'index'])
@@ -80,15 +82,15 @@ Route::get('/api/katalog/{id}', [C_Katalog::class, 'getKatalog'])
     ;
 // Proses post tambah lelang (hanya untuk pegawai)
 Route::post('/lelang/add', [C_Lelang::class, 'store'])
-->middleware('auth')
-->middleware('role:pegawai')
-->name('lelang.store');
+    ->middleware('auth')
+    ->middleware('role:pegawai')
+    ->name('lelang.store');
 // ke show.lelang
 Route::get('/lelang/{id}', [C_Lelang::class, 'show'])
     ->name('lelang.show');
 // ke edit.lelang (hanya untuk pegawai)
 Route::get('/lelang/{id}/edit', [C_Lelang::class, 'edit'])
-->name('lelang.edit');
+    ->name('lelang.edit');
 // submit hasil edit.lelang (hanya untuk pegawai)
 Route::put('/lelang/{id}/edit', [C_Lelang::class, 'update'])
     ->middleware('auth')
@@ -104,6 +106,18 @@ Route::patch('/lelang/{id}/restore', [C_Lelang::class, 'restore'])
     ->middleware('auth')
     ->middleware('role:pegawai')
     ->name('lelang.restore');
+// ke form.lelang (hanya untuk customer)
+Route::get('/lelang/{id}/bid', [C_PasangLelang::class, 'create'])
+    ->middleware('auth')
+    ->middleware('role:customer')
+    ->name('lelang.form');
+// proses post pasang bid lelang (hanya untuk customer)
+Route::post('/lelang/{id}/bid', [C_PasangLelang::class, 'store'])
+    ->middleware('auth')
+    ->middleware('role:customer')
+    ->name('lelang.bid');
+
+
 
 
 // Logout

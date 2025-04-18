@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 return new class extends Migration
 {
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->boolean('isSuspended')->default(false);
             $table->string('alamat')->nullable();
             $table->string('no_telp')->unique();
+            $table->string('foto_profil')->nullable();
             $table->softDeletes();   // deleted_at
 
             $table->timestamp('email_verified_at')->nullable();
@@ -56,6 +58,10 @@ return new class extends Migration
             $table->dropForeign(['role_id']);
             $table->dropColumn('role_id');
         });
+        // Hapus folder users dan isinya
+        if (Storage::disk('public')->exists('users')) {
+            Storage::disk('public')->deleteDirectory('users');
+        }
 
         // hapus tabel
         Schema::dropIfExists('users');

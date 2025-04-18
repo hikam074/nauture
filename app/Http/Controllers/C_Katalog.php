@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\M_Katalog;
 
@@ -15,21 +16,31 @@ class C_Katalog extends Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter');
-        $query = M_katalog::query();
+        $kategori = $request->get('kategori', 'all'); // Default 'all' jika tidak ada kategori.
+        $sortBy = $request->get('sort_by', 'date_added'); // Default 'date_added' jika tidak ada sort.
 
-        if ($filter === 'deleted') {
-            $query->onlyTrashed(); // produk yang dihapus
-        } elseif ($filter === 'all') {
-            $query->withTrashed(); // produk aktif dan dihapus
-        } else {
-            // Default: produk belum dihapus
-            $query->whereNull('deleted_at');
+        $katalogs = M_Katalog::query();
+
+        // Filter berdasarkan kategori
+        if ($kategori === 'active') {
+            $katalogs = $katalogs->whereNull('deleted_at'); // Produk tersedia.
+        } elseif ($kategori === 'deleted') {
+            $katalogs = $katalogs->onlyTrashed(); // Produk dihapus.
+        } elseif ($kategori === 'all') {
+            $katalogs = $katalogs->withTrashed(); // semua.
         }
 
-        $katalogs = $query->paginate(10);
+        // Logika sort berdasarkan pilihan
+        if ($sortBy === 'date_added') {
+            $katalogs = $katalogs->orderBy('created_at', 'asc'); // Mengurutkan berdasarkan tanggal ditambahkan
+        } elseif ($sortBy === 'alphabetical') {
+            $katalogs = $katalogs->orderBy('nama_produk', 'asc'); // Mengurutkan berdasarkan nama produk secara abjad
+        }
 
-        return view('katalog.index', compact('katalogs'));
+        // Pagination dengan query string diteruskan.
+        $katalogs = $katalogs->paginate(12)->appends($request->query());
+
+        return view('katalog.index', compact('katalogs', 'kategori', 'sortBy'));
     }
 
     /**
@@ -105,11 +116,35 @@ class C_Katalog extends Controller
             'nama_produk' => 'required|string|max:255',
             'deskripsi_produk' => 'nullable|string',
             'harga_perkilo' => 'required|integer',
-            'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'selected_image' => 'nullable|string',
         ]);
 
         $katalog = M_Katalog::findOrFail($id);
-        $katalog->update($request->all());
+
+        // Jika pengguna memilih gambar baru untuk diunggah
+        if ($request->input('selected_image') !== 'new') {
+            // Jika pengguna memilih gambar lama (dari selector)
+            $katalog->foto_produk = $request->input('selected_image');
+        }
+        elseif (($request->hasFile('foto_produk'))) {
+            // Hapus foto lama jika ada
+            if ($katalog->foto_produk && Storage::exists($katalog->foto_produk)) {
+                Storage::delete($katalog->foto_produk);
+            }
+
+            // Simpan foto baru
+            $fotoPath = $request->file('foto_produk')->store('katalogs');
+            $katalog->foto_produk = $fotoPath;
+        }
+
+        // Perbarui atribut lainnya
+        $katalog->nama_produk = $request->input('nama_produk');
+        $katalog->deskripsi_produk = $request->input('deskripsi_produk');
+        $katalog->harga_perkilo = $request->input('harga_perkilo');
+
+        // Simpan perubahan
+        $katalog->save();
 
         return redirect()->route('katalog.index')->with('success', 'Produk berhasil diperbarui.');
     }

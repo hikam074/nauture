@@ -10,9 +10,9 @@
             @endif
 
             <p class="text-lg mb-4 text-center">Dengan NauTure, pelelangan hasil panen dapat diakses kapan saja dan dimana saja</p>
-            <button class="font-bold px-4 py-2 bg-[#CEF17B] hover:bg-white text-[#0F3714] rounded-lg shadow-lg transition duration-300 hover:shadow-xl transform hover:scale-102">
+            <a class="font-bold px-4 py-2 bg-[#CEF17B] hover:bg-white text-[#0F3714] rounded-lg shadow-lg transition duration-300 hover:shadow-xl transform hover:scale-102" href="{{ route('lelang.index') }}">
                 Menuju Lelang Sekarang!
-            </button>
+            </a>
         </div>
     </section>
 
@@ -104,5 +104,25 @@
 
     </section>
 
+    <section class="bg-[#BEE0C7]">
+        <div class="w-[90%] mx-auto mt-8 flex flex-col items-top gap-12 p-6 md:flex-row">
+            <!-- Gambar Fill -->
+            <img src="/images/assets/aboutFill.png" alt="About Fill" class="w-full md:w-1/4 h-auto object-contain rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+
+            <!-- Div 2 (Gabungan Div1 dan Deskripsi) -->
+            <div class="flex-1 flex flex-col gap-4">
+            <!-- Div1 (About Us dan Logo) -->
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-semibold">About Us</h3>
+                <img src="/images/logos/roundLogo.png" alt="Logo" class="w-16 h-16 object-contain" />
+            </div>
+
+            <!-- Deskripsi -->
+            <p class="text-base text-gray-600">
+                NauTure adalah sebuah website yang memudahkan proses pelelangan hasil panen yang dilakukan secara real-time selama 24 jam. Anda dapat melakukannya kapan saja dan dimana saja tanpa melalui perantara, sehingga proses jual beli dapat menjadi lebih efisien.
+            </p>
+            </div>
+        </div>
+      </section>
 
 </x-layout>

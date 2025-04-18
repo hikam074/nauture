@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\M_Lelang;
 
 class C_PasangLelang
 {
@@ -17,9 +20,17 @@ class C_PasangLelang
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(string $id)
     {
-        //
+        // pastikan sudah login
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        // Ambil semua data katalog
+        $lelang = M_Lelang::FindOrFail($id);
+
+        return view('lelang.form', compact('lelang'));
     }
 
     /**

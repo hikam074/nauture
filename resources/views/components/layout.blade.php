@@ -7,7 +7,7 @@
     <title>NauTure</title>
     @vite('resources/css/app.css')
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
     <header>
         <nav class="fixed top-0 left-0 right-0 z-50 bg-[#CEED82] pl-8 py-3 flex items-center justify-between">
             <!-- Logo -->
@@ -53,9 +53,9 @@
                             </li>
                         </ul>
                         <div class="py-2">
-                            <form action="{{ route('logout') }}" method="POST" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                            <form action="{{ route('logout') }}" method="POST" class="block px-4 py-2 text-sm text-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                                 @csrf
-                                <button type="submit" class="hover:text-gray-300 focus:outline-none">
+                                <button type="submit" class="w-[100%] hover:text-gray-300 focus:outline-none">
                                     Log out
                                 </button>
                             </form>
@@ -81,9 +81,17 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-4 pt-[4rem]">
+    <main class="container mx-auto pt-[4rem] text-[#0F3714] flex-grow">
         {{ $slot }}
     </main>
+
+    <footer
+        class="bg-[#638B35] p-8 mt-auto"
+        >
+        <p>ini footer kocak</p>
+        <p>ini footer kocak</p>
+        <p>ini footer kocak</p>
+    </footer>
 
     <script>
         const dropdownButton = document.getElementById('dropdownInformationButton');
