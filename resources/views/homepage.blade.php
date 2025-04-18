@@ -10,35 +10,35 @@
             @endif
 
             <p class="text-lg mb-4 text-center">Dengan NauTure, pelelangan hasil panen dapat diakses kapan saja dan dimana saja</p>
-            <button class="font-bold px-4 py-2 bg-[#CEF17B] hover:bg-[#0F3714] text-[#0F3714] hover:text-white rounded-lg shadow-lg transition duration-300 hover:shadow-xl">
+            <button class="font-bold px-4 py-2 bg-[#CEF17B] hover:bg-white text-[#0F3714] rounded-lg shadow-lg transition duration-300 hover:shadow-xl transform hover:scale-102">
                 Menuju Lelang Sekarang!
             </button>
         </div>
     </section>
 
     <section class="katalog w-[90%] mx-auto mt-4">
-        <!-- Header Katalog -->
-        <div class="katalog-head flex justify-between items-center">
-            <!-- Judul Katalog -->
-            <h2 class="text-xl font-bold pl-3">Produk Kami</h2>
+    <!-- Header Katalog -->
+    <div class="katalog-head flex justify-between items-center">
+        <!-- Judul Katalog -->
+        <h2 class="text-xl font-bold pl-3">Produk Kami</h2>
 
-            <div class="flex space-x-4">
-                <!-- Link Lihat Lebih Banyak -->
-                <a href="{{ route('katalog.index') }}"
-                    class="px-4 py-2 text-sm font-medium border border-[#0F3714] rounded-lg shadow-lg hover:bg-[#0F3714] hover:text-white transition hover:shadow-xl"
-                    >
-                    Lihat Lebih Banyak...
+        <div class="flex items-center space-x-4">
+            <!-- Link Lihat Lebih Banyak -->
+            <a href="{{ route('katalog.index') }}"
+            class="px-4 py-2 text-sm font-medium border border-[#0F3714] rounded-lg shadow-lg hover:bg-[#0F3714] hover:text-white transition hover:shadow-xl">
+                Lihat Lebih Banyak...
+            </a>
+
+            <!-- Tombol Tambah Produk -->
+            @if (Auth::check() && Auth::user()->email && Auth::user()->name && Auth::user()->role->nama_role == 'pegawai')
+                <a href="{{ route('katalog.add') }}"
+                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
+                    Tambah Produk
                 </a>
-
-                <!-- Tombol Tambah Produk -->
-                @if (Auth::check() && Auth::user()->email && Auth::user()->name && Auth::user()->role->nama_role == 'pegawai')
-                    <a href="{{ route('katalog.add') }}"
-                       class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
-                        Tambah Produk
-                    </a>
-                @endif
-            </div>
+            @endif
         </div>
+    </div>
+
 
         <!-- Cards Katalog -->
         <div class="relative overflow-hidden p-2">
@@ -65,7 +65,7 @@
         <!-- Header Lelang -->
         <div class="lelang-head flex justify-between items-center">
             <!-- Judul Lelang -->
-            <h2 class="text-xl font-bold pl-3">Produk Lelang</h2>
+            <h2 class="text-xl font-bold pl-3">Lelang Aktif</h2>
 
             <div class="flex items-center space-x-4">
                 <!-- Link Lihat Lebih Banyak -->

@@ -71,7 +71,7 @@
                     </a>
                     <!-- register button -->
                     <a href="{{ route('register') }}"
-                       class="bg-white text-[#0F3714] px-6 py-2 pl-10 -ml-8 rounded-full shadow-lg z-0 hover:bg-[#638B35] hover:text-white hover:shadow-xl transition duration-200"
+                       class="bg-[#638B35] text-white px-6 py-2 pl-10 -ml-8 rounded-full shadow-lg z-0 hover:bg-white hover:text-[#0F3714] hover:shadow-xl transition duration-200"
                        >
                         Register
                     </a>
