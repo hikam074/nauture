@@ -3,8 +3,8 @@
     <section class="welcoming">
         <div class="w-[90%] max-w-6xl mx-auto rounded-lg mt-4 h-[180px] relative bg-cover bg-center flex flex-col justify-center items-center text-white"
              style="background-image: url('/images/assets/homepageFill.png');">
-            @if ((Auth::check()) && (session('email') && session('name')))
-                <h1 class="text-2xl font-bold mb-2">Selamat Datang, {{ session('name') }}!</h1>
+            @if (Auth::user())
+                <h1 class="text-2xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}!</h1>
             @else
                 <h1 class="text-2xl font-bold mb-2">Selamat Datang, Pengunjung!</h1>
             @endif
@@ -32,7 +32,7 @@
             <!-- Tombol Tambah Produk -->
             @if (Auth::check() && Auth::user()->email && Auth::user()->name && Auth::user()->role->nama_role == 'pegawai')
                 <a href="{{ route('katalog.add') }}"
-                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
+                class="px-4 py-2 text-sm font-medium text-white bg-[#0F3714] shadow-lg rounded-lg hover:bg-black transition">
                     Tambah Produk
                 </a>
             @endif
@@ -77,7 +77,7 @@
                 <!-- Tombol Tambah Lelang -->
                 @if (Auth::check() && Auth::user()->email && Auth::user()->name && Auth::user()->role->nama_role == 'pegawai')
                     <a href="{{ route('lelang.add') }}"
-                       class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
+                       class="px-4 py-2 text-sm font-medium text-white bg-[#0F3714] rounded-lg shadow-lg hover:bg-black transition">
                         Tambah Lelang
                     </a>
                 @endif
@@ -104,7 +104,7 @@
 
     </section>
 
-    <section class="bg-[#BEE0C7]">
+    <section class="bg-[#BEE0C7] mb-12">
         <div class="w-[90%] mx-auto mt-8 flex flex-col items-top gap-12 p-6 md:flex-row">
             <!-- Gambar Fill -->
             <img src="/images/assets/aboutFill.png" alt="About Fill" class="w-full md:w-1/4 h-auto object-contain rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />

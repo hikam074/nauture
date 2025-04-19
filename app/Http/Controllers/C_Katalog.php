@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\M_Katalog;
+use App\Models\M_Lelang;
 
 class C_Katalog extends Controller
 {
@@ -59,15 +61,28 @@ class C_Katalog extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Validasi input
+        $validator = Validator::make($request->all(), [
             'nama_produk' => 'required|string|max:255',
             'deskripsi_produk' => 'nullable|string',
             'harga_perkilo' => 'required|integer',
             'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'nama_produk.required' => 'Nama produk wajib diisi!',
+            'harga_perkilo.required' => 'Harga perkilo wajib diisi!',
+            'foto_produk.required' => 'Foto produk wajib diisi!',
         ]);
 
+        // Jika validasi gagal
+        if ($validator->fails()) {
+            // Kirim error kembalikan ke halaman sebelumnya
+            return redirect()->back()
+                ->withErrors($validator) // Kirim error validasi ke error bag
+                ->withInput(); // Kirim input sebelumnya agar tetap terisi
+        }
+
         try {
-            // Simpan foto ke folder 'katalogs' di dalam storage
+            // Simpan file foto ke dalam folder storage
             $fotoPath = $request->file('foto_produk')->store('katalogs', 'public');
 
             // Simpan data produk ke database
@@ -77,12 +92,16 @@ class C_Katalog extends Controller
                 'harga_perkilo' => $request->harga_perkilo,
                 'foto_produk' => $fotoPath,
             ]);
-            // berhasil disimpan
-            session()->flash('success', 'Produk berhasil ditambahkan!');
-            return redirect('/katalog');
+
+            // Kirim pesan sukses ke session
+            $request->session()->flash('success', 'Produk berhasil ditambahkan!');
+            return redirect()->route('katalog.index');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menambahkan produk!');
+            // Tangkap error runtime dan kirim pesan error ke session
+            $request->session()->flash('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput(); // Tetap isi form dengan data sebelumnya
         }
     }
 
@@ -121,21 +140,53 @@ class C_Katalog extends Controller
         ]);
 
         $katalog = M_Katalog::findOrFail($id);
+        // dd($request->foto_produk, $request->selected_image);
 
-        // Jika pengguna memilih gambar baru untuk diunggah
+        // makai gambar lama
         if ($request->input('selected_image') !== 'new') {
-            // Jika pengguna memilih gambar lama (dari selector)
-            $katalog->foto_produk = $request->input('selected_image');
+
         }
-        elseif (($request->hasFile('foto_produk'))) {
+        else {
+            $basenameLama = basename($katalog->foto_produk);
             // Hapus foto lama jika ada
             if ($katalog->foto_produk && Storage::exists($katalog->foto_produk)) {
                 Storage::delete($katalog->foto_produk);
             }
 
-            // Simpan foto baru
-            $fotoPath = $request->file('foto_produk')->store('katalogs');
+            // Simpan foto baru ke folder katalog
+            $fotoPath = $request->file('foto_produk')->store('katalogs', 'public');
             $katalog->foto_produk = $fotoPath;
+
+            // Ambil basename file untuk dicari di folder lelangs
+            $basenameFoto = basename($fotoPath);
+
+            // Cari semua lelang yang menggunakan gambar dengan basename yang sama
+            // $lelangs = M_Lelang::where('foto_produk', 'like', "lelangs/%$basenameLama")->get();
+
+            // if ($lelangs->isNotEmpty()) {
+                // foreach ($lelangs as $lelang) {
+                    // Hapus gambar lama di folder lelangs
+                    if (Storage::exists('lelangs/'. $basenameLama)) {
+                        Storage::delete('lelangs/'. $basenameLama);
+                    }
+
+                    // Salin gambar baru ke folder lelangs
+                    $destinationPath = 'lelangs/' . $basenameFoto;
+                    Storage::copy($fotoPath, $destinationPath);
+
+                    // Update path di database lelangs
+                    $lelangs = M_Lelang::where('foto_produk', 'like', "lelangs/$basenameLama")->get();
+                    foreach ($lelangs as $lelang) {
+                        $lelang->foto_produk = $destinationPath;
+                        $lelang->save();
+                    }
+                // }
+            // } else {
+                // Jika tidak ada lelang yang memakai gambar ini, salin gambar baru ke folder lelangs
+                // $destinationPath = 'lelangs/' . $basenameFoto;
+                // Storage::copy($fotoPath, $destinationPath);
+            // }
+
         }
 
         // Perbarui atribut lainnya

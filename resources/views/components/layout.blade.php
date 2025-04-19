@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>NauTure</title>
+    @vite('resources/css/global.css')
+    @vite('resources/js/app.js')
     @vite('resources/css/app.css')
+    @include('includes.toastr')
 </head>
 <body class="flex flex-col min-h-screen">
     <header>
@@ -85,9 +88,7 @@
         {{ $slot }}
     </main>
 
-    <footer
-        class="bg-[#638B35] p-8 mt-auto"
-        >
+    <footer class="bg-[#638B35] p-8 mt-auto">
         <p>ini footer kocak</p>
         <p>ini footer kocak</p>
         <p>ini footer kocak</p>

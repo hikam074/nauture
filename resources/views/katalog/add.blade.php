@@ -4,17 +4,6 @@
             {{ isset($katalog) ? 'Ubah Detail Produk' : 'Tambahkan Produk' }}
         </h1>
 
-        @if ($errors->any())
-            <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
-                <p><strong>Ada kesalahan dalam input:</strong></p>
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ isset($katalog) ? route('katalog.update', $katalog->id) : route('katalog.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
@@ -94,6 +83,7 @@
     </div>
 
     <script>
+
         document.addEventListener('DOMContentLoaded', () => {
             // Set the initial selected image to the current image, if available
             const currentImage = document.getElementById('currentImage');
@@ -140,4 +130,5 @@
         }
         console.log(document.getElementById('selected_image').value);
     </script>
+
 </x-layout>

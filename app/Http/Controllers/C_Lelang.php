@@ -100,7 +100,16 @@ class C_Lelang
             'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'katalog_id' => 'required|exists:katalogs,id',
             'current_img' => 'nullable|string', // URL gambar jika dari katalog
-        ]);
+            'selected_image' => 'required|string', // validasi terpilih
+        ], [
+            'nama_produk_lelang.required' => 'Nama produk lelang wajib diisi!',
+            'jumlah_kg.required' => 'Jumlah kilogram wajib diisi!',
+            'harga_dibuka.required' => 'Harga dibuka wajib diisi!',
+            'tanggal_dibuka.required' => 'Tanggal dibuka wajib diisi!',
+            'tanggal_ditutup.required' => 'Tanggal ditutup wajib diisi!',
+            'katalog_id.required' => 'Katalog produk wajib diisi!',
+            'katalog_id.exists' => 'Katalog yang dipilih tidak valid!',
+        ]); //dd($request->selected_image, $request->current_img);
 
         // Hitung jumlah lelang hari ini untuk katalog tertentu
         $currentDate = Carbon::now()->format('Y-m-d');
@@ -118,10 +127,10 @@ class C_Lelang
 
         // Simpan file foto ke folder `lelangs`
         $fotoProdukPath = null;
-        if ($request->hasFile('foto_produk')) {
+        if ($request->hasFile('foto_produk') && $request->selected_image == 'foto unggahan baru') {
             // Jika ada file upload, simpan langsung ke folder `lelangs`
             $fotoProdukPath = $request->file('foto_produk')->store('lelangs', 'public');
-        } elseif ($request->current_img) { //dd($request->current_img);
+        } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
             // Jika menggunakan gambar dari katalog, salin ke folder `lelangs`
             $imageUrl = str_replace(url('/storage'), '', $request->current_img); // Menghapus URL base jika ada
             $sourcePath = public_path('storage' . $imageUrl);
@@ -130,7 +139,9 @@ class C_Lelang
                 $destinationPath = public_path('storage/' . $newFileName);
                 copy($sourcePath, $destinationPath);
                 $fotoProdukPath = $newFileName; // Simpan path baru
+                // $fotoProdukPath = $request->current_img; // Simpan path baru
             }
+            //dd($request->selected_image, $fotoProdukPath);
         }
 
         // Simpan data lelang
@@ -210,6 +221,9 @@ class C_Lelang
             ],
             'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'katalog_id' => 'nullable|exists:katalogs,id', // Validasi foreign key ke tabel katalog
+            'current_img' => 'nullable|string', // URL gambar jika dari katalog
+            'currentEdit_img' => 'nullable|string', // URL gambar saat ini (mode edit)
+            'selected_image' => 'required|string', // validasi terpilih
         ]);
 
         // Update data lelang
@@ -228,12 +242,31 @@ class C_Lelang
         $lelang->katalog_id = $request->katalog_id;
 
         // Proses file foto jika ada
-        if ($request->hasFile('foto_produk')) {
-            // Hapus file lama jika ada
-            if ($lelang->foto_produk && Storage::exists('public/' . $lelang->foto_produk)) {
-                Storage::delete('public/' . $lelang->foto_produk);
-            }
+        // dd($request->foto_produk, $request->current_img, $request->currentEdit_img, $request->selected_image);
 
+        // foto dari katalog baru
+        if ($request->selected_image == 'foto dari katalog') {
+            //Hapus file lama jika ada
+            // if (Storage::exists('lelangs/' . basename($lelang->foto_produk))) {
+            //     Storage::delete('lelangs/' . basename($lelang->foto_produk));
+            // }
+            // Salin file dari katalog ke folder lelangs
+            $katalog = M_Katalog::find($request->katalog_id);
+            $sourcePath = $katalog->foto_produk;
+            $destinationPath = 'lelangs/' . basename($katalog->foto_produk);
+            Storage::copy($sourcePath, $destinationPath);
+            // Simpan file baru
+            // $filePath = $request->file('currentEdit_img')->store('lelangs', 'public');
+            $lelang->foto_produk = 'lelangs/' . basename($katalog->foto_produk);
+            // dd($lelang->foto_produk);
+        // foto saat ini, tidak ada perubahan
+        } elseif ($request->selected_image == 'foto saat ini') {
+        // foto unggahan baru
+        } elseif ($request->selected_image == 'foto unggahan baru') {
+            // Hapus file lama jika ada
+            // if (Storage::exists('lelangs/' . basename($lelang->foto_produk))) {
+            //     Storage::delete('lelangs/' . basename($lelang->foto_produk));
+            // }
             // Simpan file baru
             $filePath = $request->file('foto_produk')->store('lelangs', 'public');
             $lelang->foto_produk = $filePath;

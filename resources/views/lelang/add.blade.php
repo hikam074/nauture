@@ -89,6 +89,7 @@
                                 class="w-32 h-32 object-cover cursor-pointer border-2 border-gray-300"
                                 onclick="selectImage(this, 'Foto Saat Ini')" data-origin="foto saat ini">
                         </div>
+                        <input type="hidden" name="currentEdit_img" id="currentEditImage" value="{{ $lelang->foto_produk }}">
                         @endif
 
                         <!-- Foto dari Katalog -->
@@ -110,6 +111,7 @@
                         </div>
                     </div>
                     <input type="hidden" name="selected_image" id="selectedImage" value="{{ $lelang->foto_produk ?? '' }}">
+                    <input type="hidden" name="current_img" id="currentImage" value="{{ $lelang->foto_produk ?? '' }}">
                 </div>
 
                 <div class="text-center">
@@ -157,6 +159,7 @@
                 katalogFoto.src = fotoURL;
                 if (fotoURL == '') {
                     katalogFoto.classList.add('hidden');
+                    document.getElementById('currentImage').value = '';
                     if (defaultImage) {
                         selectImage(defaultImage, 'Foto Saat Ini');
                     } else {
@@ -165,6 +168,7 @@
                 } else  {
                     katalogFoto.classList.remove('hidden');
                     selectImage(katalogFoto, 'Foto Dari Katalog');
+                    document.getElementById('currentImage').value = fotoURL;
                 }
             });
         });
@@ -179,11 +183,13 @@
             const selectedImage = document.getElementById('selectedImage');
             selectedImage.value = imageElement.dataset.origin || '';
             document.getElementById('teksFotoDipilih').innerText = teks;
+            console.log(document.getElementById('selectedImage').value);
         }
 
         // Pratinjau Foto Baru
         function previewImage(event) {
             const uploadedImg = document.getElementById('uploadedImg');
+            const katalogFoto = document.getElementById('katalogFoto');
             const defaultImage = document.querySelector('[data-origin="foto saat ini"]');
             // Cek jika ada file yang dipilih
             if (event.target.files && event.target.files[0]) {
@@ -204,8 +210,10 @@
                 uploadedImg.src = '#';
                 if (defaultImage) {
                     selectImage(defaultImage, 'Foto Saat Ini');
+                } else if (katalogFoto) {
+                    selectImage(katalogFoto, 'Foto Dari Katalog');
                 } else  {
-                    document.getElementById('selected_image').value = '';
+                    document.getElementById('selectedImage').value = '';
                     document.getElementById('teksFotoDipilih').innerText = null;
                 }
             }
