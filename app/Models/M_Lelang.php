@@ -32,7 +32,7 @@ class M_Lelang extends Model
     // reference this katalog_id ke katalogs id
     public function katalog()
     {
-        return $this->belongsTo(M_Katalog::class);
+        return $this->belongsTo(M_Katalog::class, 'katalog_id');
     }
     // reference this pemenang_id ke pasang_lelangs id
     public function pemenang()
@@ -43,7 +43,7 @@ class M_Lelang extends Model
     // deklarasi this lelang_id bisa punya banyak lelang_id di pasang_lelangs
     public function pasangLelang()
     {
-        return $this->hasMany(M_PasangLelang::class, "lelang_id");
+        return $this->hasMany(M_PasangLelang::class, 'lelang_id');
     }
     // deklarasi this lelang_id bisa punya banyak lelang_id di transaksis
     public function transaksi()

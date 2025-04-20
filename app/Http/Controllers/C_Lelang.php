@@ -29,10 +29,7 @@ class C_Lelang
             $katalogIds = M_Katalog::pluck('id')->toArray(); // Ambil semua katalog ID
         }
 
-        $query = M_Lelang::with(['katalog', 'pasangLelang' => function ($q) {
-            $q->select('lelang_id', DB::raw('MAX(harga_pengajuan) as highest_bid'));
-        }]);
-
+        $query = M_Lelang::with(['katalog', 'pasangLelang']);
 
         // Filter berdasarkan status
         if ($filter === 'deleted') {
@@ -47,6 +44,9 @@ class C_Lelang
             $query->whereNull('deleted_at'); // Default: Lelang yang masih berlangsung.
         }
 
+        // Ambil data di tabel `pasang_lelangs` jika ada
+        $query->with('pasangLelang');
+
         // Filter berdasarkan katalog (jika ada katalog yang dipilih)
         if (!empty($katalogIds)) {
             $query->whereIn('katalog_id', $katalogIds); // Menambahkan filter berdasarkan beberapa katalog_id
@@ -60,15 +60,26 @@ class C_Lelang
         } elseif ($sortBy === 'highest_bid') {
             $query->orderBy('harga_dibuka', 'desc'); // Mengurutkan berdasarkan harga tertinggi
         }
-
         // Pagination dengan query string diteruskan
         $lelangs = $query->paginate(12)->appends($request->query());
+        // dd($query->toSql(), $query->getBindings(), $query->get());
+
+
+        // Query untuk mendapatkan penawaran tertinggi (top bid)
+        $topBid = M_Lelang::with(['pasangLelang' => function ($q) {
+            $q->orderBy('harga_pengajuan', 'desc')->first();
+        }])->whereHas('pasangLelang', function ($q) {
+            $q->orderBy('harga_pengajuan', 'desc');
+        })->first();
 
         // Ambil semua katalog untuk filter dropdown
         $allKatalogs = M_Katalog::all(); // Ambil semua katalog
 
-        return view('lelang.index', compact('lelangs', 'filter', 'sortBy', 'allKatalogs', 'katalogIds'));
+
+
+        return view('lelang.index', compact('lelangs', 'filter', 'sortBy', 'allKatalogs', 'katalogIds', 'topBid'));
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -124,6 +135,7 @@ class C_Lelang
             $request->katalog_id,
             $lelangCountToday + 1
         );
+        dd($lelangCountToday);
 
         // Simpan file foto ke folder `lelangs`
         $fotoProdukPath = null;

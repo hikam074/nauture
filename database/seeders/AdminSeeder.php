@@ -72,7 +72,7 @@ class AdminSeeder extends Seeder
                 'name' => '3 Customer',
                 'email' => '3@3',
                 'password' => Hash::make('3'),
-                'role_id' => 2,
+                'role_id' => 3,
                 'isSuspended' => false,
                 'no_telp' => '313131313131',
 

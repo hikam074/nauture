@@ -98,6 +98,7 @@
         const dropdownButton = document.getElementById('dropdownInformationButton');
         const dropdownMenu = document.getElementById('dropdownInformation');
 
+        if (dropdownButton && dropdownMenu) {
         dropdownButton.addEventListener('click', () => {
             dropdownMenu.classList.toggle('hidden'); // Menampilkan atau menyembunyikan menu
         });
@@ -107,7 +108,7 @@
             if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
                 dropdownMenu.classList.add('hidden'); // Menyembunyikan menu
             }
-        });
+        });}
     </script>
 
 </body>

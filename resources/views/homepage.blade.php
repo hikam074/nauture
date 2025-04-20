@@ -94,7 +94,7 @@
                     >
                         <img src="{{ asset('storage/' . $lelang->katalog->foto_produk) }}" alt="{{ $lelang->katalog->nama_produk }}" class="w-full h-40 object-cover rounded-md">
                         <h2 class="text-center text-[#0F3714] text-lg font-semibold mt-2">{{ $lelang->nama_produk_lelang }}</h2>
-                        <p class="text-center text-[#0F3714] font-thin text-xs">Harga Awal: Rp{{ number_format($lelang->harga_awal, 0, ',', '.') }}</p>
+                        <p class="text-center text-[#0F3714] font-thin text-xs">Harga Awal: Rp{{ number_format($lelang->harga_dibuka, 0, ',', '.') }}</p>
                     </div>
                 @empty
                     <p>Produk Lelang Kosong.</p>
