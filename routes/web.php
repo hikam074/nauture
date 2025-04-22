@@ -96,27 +96,20 @@ Route::put('/lelang/{id}/edit', [C_Lelang::class, 'update'])
     ->middleware('auth')
     ->middleware('role:pegawai')
     ->name('lelang.update');
-// hapus lelang (hanya untuk pegawai)
-Route::delete('/lelang/{id}', [C_Lelang::class, 'destroy'])
+// hapus lelang (hanya untuk pegawai) || batal pasang bid lelang (hanya untuk customer)
+Route::delete('/lelang/{id}', [C_Lelang::class, 'handleDelete'])
     ->middleware('auth')
-    ->middleware('role:pegawai')
     ->name('lelang.destroy');
 // restore lelang (hanya untuk pegawai)
 Route::patch('/lelang/{id}/restore', [C_Lelang::class, 'restore'])
     ->middleware('auth')
     ->middleware('role:pegawai')
     ->name('lelang.restore');
-// ke form.lelang (hanya untuk customer)
-Route::get('/lelang/{id}/bid', [C_PasangLelang::class, 'create'])
-    ->middleware('auth')
-    ->middleware('role:customer')
-    ->name('lelang.form');
 // proses post pasang bid lelang (hanya untuk customer)
-Route::post('/lelang/{id}/bid', [C_PasangLelang::class, 'store'])
+Route::post('/lelang/{id}', [C_PasangLelang::class, 'store'])
     ->middleware('auth')
     ->middleware('role:customer')
     ->name('lelang.bid');
-
 
 
 

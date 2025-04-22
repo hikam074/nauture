@@ -38,9 +38,16 @@
                                 @php
                                     $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
                                 @endphp
-                                <p class="py-2">
-                                    Nama: {{ $topBid->user->name }}<br>
-                                    Harga: Rp {{ number_format($topBid->harga_pengajuan, 0, ',', '.') }}
+                                <p class="py-2 flex items-center space-x-3">
+                                    @if ($topBid->user->foto_profil)
+                                        <img src="{{ asset('storage/' . $topBid->user->foto_profil) }}" alt="Foto Profil {{ $topBid->user->name }}" class="w-10 h-10 rounded-full">
+                                    @else
+                                        <img src="{{ asset('images/assets/defaultAvatar.svg') }}" alt="Foto Profil Default" class="w-10 h-10 rounded-full">
+                                    @endif
+                                    <span>
+                                        Penawaran tertinggi oleh <strong>{{ $topBid->user->name }}</strong><br>
+                                        Tawaran : <strong>Rp {{ number_format($topBid->harga_pengajuan, 0, ',', '.') }}</strong>
+                                    </span>
                                 </p>
                             @else
                                 <p class="text-gray-500">Belum ada penawaran.</p>
@@ -51,31 +58,40 @@
 
                 {{-- Div 2: Countdown dan Tombol Aksi --}}
                 <div class="">
+                    @php
+                        // Ambil tawaran dari user yang sedang login untuk lelang ini
+                        $userBids = $lelang->pasangLelang->where('user_id', Auth::id())->first();
+                    @endphp
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-lg font-medium">Lelang berakhir pada</p>
+                        @if (!is_null($userBids))
+                            <p class="text-sm font-medium text-gray-700">Tawaran anda saat ini : <strong>Rp {{ number_format($userBids->harga_pengajuan, 0, ',', '.') }}</strong></p>
+                        @endif
+                    </div>
 
-                    <p class="mb-3">Lelang berakhir pada</p>
                     <div class="flex items-center justify-between">
                         {{-- Countdown --}}
                         <div class="flex gap-2 items-center">
                             <div id="countdown" class="flex gap-2">
-                                {{-- hari --}}
+                                {{-- Hari --}}
                                 <div class="border text-center py-2 px-3 rounded-lg">
                                     <span id="days" class="text-xl">00</span>
                                     <p class="text-sm text-gray-500">Hari</p>
                                 </div>
                                 <div class="flex items-center justify-center">:</div>
-                                {{-- jam --}}
+                                {{-- Jam --}}
                                 <div class="border text-center py-2 px-3 rounded-lg">
                                     <span id="hours" class="text-xl">00</span>
                                     <p class="text-sm text-gray-500">Jam</p>
                                 </div>
                                 <div class="flex items-center justify-center">:</div>
-                                {{-- menit --}}
+                                {{-- Menit --}}
                                 <div class="border text-center py-2 px-3 rounded-lg">
                                     <span id="minutes" class="text-xl">00</span>
                                     <p class="text-sm text-gray-500">Menit</p>
                                 </div>
                                 <div class="flex items-center justify-center">:</div>
-                                <!-- detik -->
+                                {{-- Detik --}}
                                 <div class="border text-center py-2 px-3 rounded-lg">
                                     <span id="seconds" class="text-xl">00</span>
                                     <p class="text-sm text-gray-500">Detik</p>
@@ -85,7 +101,7 @@
 
                         <div class="flex gap-2">
                             {{-- Tombol aksi --}}
-                            @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
+                            @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                                 @if ($lelang->trashed())
                                     <form action="{{ route('lelang.restore', $lelang->id) }}" method="POST" class="inline">
                                         @csrf
@@ -107,15 +123,47 @@
                                     </form>
                                 @endif
                             @elseif ((!Auth::check() || (Auth::user()->role->nama_role == 'customer')))
-                                <button href="{{ route('lelang.form', $lelang->id) }}" class="px-4 py-[1rem] text-sm font-medium text-white text-center bg-[#255B22] rounded-lg hover:bg-[#0F3714] transition"
-                                    onclick="document.getElementById('bidForm').classList.remove('hidden')" id="toggleLelang">
-                                    Pasang Tawaran
-                                </button>
+                                @if ($lelang->trashed())
+                                    {{-- Tombol dummy abu-abu untuk lelang yang sudah dihapus --}}
+                                    <button
+                                        class="px-4 py-[1rem] text-sm font-medium text-white text-center bg-gray-400 rounded-lg transition"
+                                        disabled>
+                                        Lelang Dihapus
+                                    </button>
+                                @elseif (is_null($userBids))
+                                    {{-- Tombol hijau untuk pasang tawaran --}}
+                                    <button
+                                        class="px-4 py-[1rem] text-sm font-medium text-white text-center bg-[#255B22] hover:bg-[#0F3714] rounded-lg transition"
+                                        onclick="document.getElementById('bidForm').classList.remove('hidden')"
+                                        id="toggleLelang">
+                                        Pasang Tawaran
+                                    </button>
+                                @else
+                                    {{-- Tombol biru untuk ubah tawaran --}}
+                                    <button
+                                        class="px-4 py-[1rem] text-sm font-medium text-white text-center bg-blue-500 hover:bg-blue-600 rounded-lg transition"
+                                        onclick="document.getElementById('bidForm').classList.remove('hidden'); fillBidForm({{ $userBids->harga_pengajuan ?? '0' }})"
+                                        id="toggleLelang">
+                                        Ubah Tawaran
+                                    </button>
+                                    {{-- Tombol merah untuk batalkan tawaran --}}
+                                    <form action="{{ route('lelang.destroy', ['id' => $lelang->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin membatalkan tawaran ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button
+                                            type="submit"
+                                            class="px-4 py-[1rem] text-sm font-medium text-white text-center bg-red-500 hover:bg-red-600 rounded-lg transition">
+                                            Batalkan Tawaran
+                                        </button>
+                                    </form>
+                                @endif
                             @endif
                         </div>
                     </div>
+
                     <p class="font-light mt-3 text-gray-500">{{ $lelang->tanggal_dibuka->format('d M Y, H:i') }} - {{ $lelang->tanggal_ditutup->format('d M Y, H:i') }}</p>
                 </div>
+
 
                 {{-- Div 3: Penawar --}}
                 <div class="">
@@ -123,16 +171,29 @@
                     <ul>
                         @if ($lelang->pasangLelang->isNotEmpty())
                             @foreach ($lelang->pasangLelang->sortByDesc('harga_pengajuan')->take(3) as $bid)
-                            <li class="py-2 border-b flex justify-between">
-                                <span>{{ $bid->user->name }}</span>
-                                <span>Rp {{ number_format($bid->harga_pengajuan, 0, ',', '.') }}</span>
-                            </li>
+                                <li class="py-2 border-b flex justify-between items-center">
+                                    <div class="flex items-center space-x-3">
+                                        @if ($bid->user->foto_profil)
+                                            <img src="{{ asset('storage/' . $bid->user->foto_profil) }}" alt="Foto Profil {{ $bid->user->name }}" class="w-10 h-10 rounded-full">
+                                        @else
+                                            <img src="{{ asset('images/assets/defaultAvatar.svg') }}" alt="Foto Profil Default" class="w-10 h-10 rounded-full">
+                                        @endif
+                                        <div>
+                                            <span class="font-semibold">{{ $bid->user->name }}</span><br>
+                                            <span class="text-gray-600">Rp {{ number_format($bid->harga_pengajuan, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ $bid->updated_at ? $bid->updated_at->format('d M Y, H:i') : $bid->created_at->format('d M Y, H:i') }}
+                                    </div>
+                                </li>
                             @endforeach
                         @else
                             <p class="text-gray-500">Belum ada penawaran.</p>
                         @endif
                     </ul>
                 </div>
+
             </div>
         </div>
     </div>
@@ -174,11 +235,13 @@
             }
 
             // Event untuk membuka popup
-            toggleButton.addEventListener("click", function () {
-                bidForm.classList.remove("hidden");
-                bidForm.classList.add("flex");
-                updateCountdown(); // Memastikan nilai waktu langsung diperbarui saat popup dibuka
-            });
+            if (toggleButton) {
+                toggleButton.addEventListener("click", function () {
+                    bidForm.classList.remove("hidden");
+                    bidForm.classList.add("flex");
+                    updateCountdown(); // Memastikan nilai waktu langsung diperbarui saat popup dibuka
+                });
+            }
 
             // Interval untuk memperbarui countdown
             const timer = setInterval(updateCountdown, 1000);

@@ -15,11 +15,21 @@
         <p class="text-gray-500 mb-4 text-sm">Tawaran akan ditambah dengan ongkos kirim ketika anda<br>memenangkan lelang ini</p>
 
 
-        <form {{-- action="{{ route('form.submit') }}"--}} method="POST">
+        <form action="{{ route('lelang.bid', $lelang->id) }}" method="POST">
             @csrf
             <div class="mb-4">
-                <label for="hargaPenawaran" class="block text-lg">Masukkan Penawaran</label>
-                <input type="text" id="hargaPenawaran" name="harga_penawaran" class="mt-2 p-2 w-full rounded-md border border-black shadow-sm" required>
+                <label for="harga_pengajuan" class="block text-lg">Masukkan Penawaran</label>
+                <div class="relative">
+                    <input
+                        type="number"
+                        id="harga_pengajuan"
+                        name="harga_pengajuan"
+                        class="mt-2 p-2 w-full rounded-md border border-black shadow-sm"
+                        value=""
+                        required>
+                    <p id="formattedNominal" class="text-gray-600 mt-1 text-sm"></p>
+                </div>
+                <input type="hidden" name="lelang_id" id="lelangID" value="{{ $lelang->id}}">
             </div>
             <p class="mb-3 text-lg">Lelang berakhir pada</p>
             <div class="flex justify-between gap-2">
@@ -64,8 +74,7 @@
                         onclick="document.getElementById('bidForm').classList.add('hidden'); document.getElementById('bidForm').classList.remove('flex')">
                         Kembali
                     </button>
-                    <button id="submit" type="submit" class="px-6 py-[1rem] text-sm font-medium text-white text-center bg-[#255B22] rounded-lg hover:bg-[#0F3714] transition"
-                    onclick="">
+                    <button id="submit" type="submit" class="px-6 py-[1rem] text-sm font-medium text-white text-center bg-[#255B22] rounded-lg hover:bg-[#0F3714] transition">
                         Pasang
                     </button>
                 </div>
@@ -77,29 +86,40 @@
 </div>
 
 <script>
-    const inputHargaPenawaran = document.getElementById('hargaPenawaran');
+    const inputHargaPengajuan = document.getElementById('harga_pengajuan');
+    const formattedNominal = document.getElementById('formattedNominal');
 
-    // Format input saat user mengetik
-    inputHargaPenawaran.addEventListener('input', function () {
-        const cursorPosition = this.selectionStart; // Simpan posisi kursor
+    // Format input saat user mengetik dan tampilkan di elemen teks
+    inputHargaPengajuan.addEventListener('input', function () {
         const rawValue = this.value.replace(/\D/g, ''); // Hanya angka
         const formattedValue = new Intl.NumberFormat('id-ID').format(rawValue); // Format dengan pemisah ribuan
-        this.value = formattedValue;
 
-        // Kembalikan posisi kursor
-        this.setSelectionRange(cursorPosition, cursorPosition);
+        // Tampilkan nilai diformat di bawah input
+        formattedNominal.textContent = rawValue ? `Nominal: Rp ${formattedValue}` : '';
     });
 
     // Kirim angka tanpa format titik
-    inputHargaPenawaran.addEventListener('blur', function () {
+    inputHargaPengajuan.addEventListener('blur', function () {
         const rawValue = this.value.replace(/\D/g, ''); // Hapus format titik
         this.dataset.rawValue = rawValue; // Simpan nilai asli sebagai data-raw-value
     });
 
     // Tangkap nilai asli saat formulir dikirimkan
     document.forms[0].addEventListener('submit', function (event) {
-        inputHargaPenawaran.value = inputHargaPenawaran.dataset.rawValue || ''; // Ubah kembali ke angka mentah
-        console.log(inputHargaPenawaran.value); // Cetak variabel ke console
+        inputHargaPengajuan.value = inputHargaPengajuan.dataset.rawValue || ''; // Ubah kembali ke angka mentah
+        console.log(inputHargaPengajuan.value); // Cetak variabel ke console
     });
+
+    function fillBidForm(bidValue) {
+        const bidInput = document.getElementById('harga_pengajuan');
+        const formattedNominal = document.getElementById('formattedNominal');
+
+        // Isi nilai lama ke input
+        bidInput.value = bidValue;
+
+        // Format nilai untuk ditampilkan di bawah input
+        const formattedValue = new Intl.NumberFormat('id-ID').format(bidValue);
+        formattedNominal.textContent = bidValue ? `Nominal: Rp ${formattedValue}` : '';
+    }
 
 </script>

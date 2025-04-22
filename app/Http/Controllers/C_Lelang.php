@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\M_Lelang;
+use App\Models\M_PasangLelang;
 use App\Models\M_Katalog;
 
 use Illuminate\Support\Facades\Auth;
@@ -102,7 +103,7 @@ class C_Lelang
     public function store(Request $request)
     {
         $request->validate([
-            'nama_produk_lelang' => 'required|string|max:255',
+            'nama_produk_lelang' => 'required|string|max:128',
             'keterangan' => 'nullable|string',
             'jumlah_kg' => 'required|numeric|min:0',
             'harga_dibuka' => 'required|numeric|min:0',
@@ -300,6 +301,22 @@ class C_Lelang
         $lelang->delete(); // soft delete
 
         return redirect()->route('lelang.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    // menghandle delete apakah delete lelang atau pasangLelang
+    public function handleDelete($id)
+    {
+        $userRole = Auth::user()->role->nama_role;
+
+        if ($userRole === 'pegawai') {
+            return $this->destroy($id);
+        } elseif ($userRole === 'customer') {
+            return app()->call([C_PasangLelang::class, 'forceDelete'], ['id' => $id]);
+        }
+
+        else {
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     // Menampilkan produk yang terhapus

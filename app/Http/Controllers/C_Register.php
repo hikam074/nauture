@@ -17,10 +17,10 @@ class C_Register extends Controller
     {
         // Validasi input
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'no_telp' => 'required|string|max:13|unique:users',
+            'name' => 'required|string|max:128',
+            'email' => 'required|string|email|max:128|unique:users',
+            'password' => 'required|string|min:8|max:128',
+            'no_telp' => 'required|string|max:19|unique:users',
         ],
         // pesan error validasi
         [
@@ -31,7 +31,7 @@ class C_Register extends Controller
             'password.min' => 'Password harus minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak sesuai.',
             'no_telp.required' => 'Nomor telepon wajib diisi.',
-            'no_telp.max' => 'Nomor telepon tidak boleh lebih dari 13 karakter.',
+            'no_telp.max' => 'Nomor telepon tidak boleh lebih dari 19 karakter.',
             'no_telp.unique' => 'Nomor telepon ini sudah digunakan.',
         ]);
 
@@ -64,7 +64,7 @@ class C_Register extends Controller
             Auth::login($user);
             $request->session()->regenerate();
             // Redirect ke homepage
-            $request->session()->flash('success', 'Berhasil Registrasi!');
+            $request->session()->flash('success', 'Registrasi Berhasil!');
             return redirect()->intended(route('homepage'));
         } catch (\Exception $e) {
             $request->session()->flash('error', 'Terjadi kesalahan sistem : Tidak dapat memproses registrasi. Silakan coba lagi.');

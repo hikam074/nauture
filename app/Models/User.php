@@ -65,7 +65,7 @@ class User extends Authenticatable
     // reference this role_id ke roles id
     public function role()
     {
-        return $this->belongsTo(M_Role::class);
+        return $this->belongsTo(M_Role::class, 'role_id');
     }
 
     // deklarasi this user_id bisa punya banyak user_id di pasang_lelangs

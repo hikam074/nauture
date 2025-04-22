@@ -63,7 +63,7 @@ class C_Katalog extends Controller
     {
         // Validasi input
         $validator = Validator::make($request->all(), [
-            'nama_produk' => 'required|string|max:255',
+            'nama_produk' => 'required|string|max:128',
             'deskripsi_produk' => 'nullable|string',
             'harga_perkilo' => 'required|integer',
             'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',

@@ -115,7 +115,7 @@
                                     <img src="{{ asset('storage/' . $lelang->foto_produk) }}" alt="{{ $lelang->nama_produk_lelang }}" class="w-full h-40 object-cover rounded-md">
                                     <h2 class="text-center text-[#0F3714] text-lg font-semibold mt-2">{{ $lelang->nama_produk_lelang }}</h2>
                                     @if($lelang->pasangLelang->isNotEmpty())
-                                        <p>Penawaran Tertinggi : Rp{{ number_format($lelang->tawaran->max('nominal_tawaran'), 0, ',', '.') }}</p>
+                                        {{-- <p>Penawaran Tertinggi : Rp{{ number_format($lelang->tawaran->max('nominal_tawaran'), 0, ',', '.') }}</p> --}}
                                     @else
                                         <p class="text-center text-[#0F3714] font-thin text-xs">Dibuka Mulai : Rp{{ number_format($lelang->harga_dibuka, 0, ',', '.') }}</p>
                                     @endif
@@ -138,7 +138,7 @@
                                         @else
                                             <div class="flex justify-between items-center">
                                                 {{-- Tombol bid --}}
-                                                <a href="{{ route('lelang.form', $lelang->id) }}" class="px-4 py-2 text-sm font-medium text-white text-center bg-blue-500 rounded-lg hover:bg-blue-600 transition">
+                                                <a href="{{ route('lelang.index', $lelang->id) }}" class="px-4 py-2 text-sm font-medium text-white text-center bg-blue-500 rounded-lg hover:bg-blue-600 transition">
                                                     Pasang<br>Tawaran
                                                 </a>
                                                 {{-- Tombol detail --}}
