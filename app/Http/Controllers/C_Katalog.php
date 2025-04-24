@@ -18,7 +18,7 @@ class C_Katalog extends Controller
      */
     public function index(Request $request)
     {
-        $kategori = $request->get('kategori', 'all'); // Default 'all' jika tidak ada kategori.
+        $kategori = $request->get('kategori', 'active'); // Default 'all' jika tidak ada kategori.
         $sortBy = $request->get('sort_by', 'date_added'); // Default 'date_added' jika tidak ada sort.
 
         $katalogs = M_Katalog::query();

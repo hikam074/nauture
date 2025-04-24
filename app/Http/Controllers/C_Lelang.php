@@ -136,7 +136,7 @@ class C_Lelang
             $request->katalog_id,
             $lelangCountToday + 1
         );
-        dd($lelangCountToday);
+        // dd($lelangCountToday);
 
         // Simpan file foto ke folder `lelangs`
         $fotoProdukPath = null;
@@ -311,11 +311,13 @@ class C_Lelang
         if ($userRole === 'pegawai') {
             return $this->destroy($id);
         } elseif ($userRole === 'customer') {
-            return app()->call([C_PasangLelang::class, 'forceDelete'], ['id' => $id]);
+            // Membuat instance controller C_PasangLelang dan memanggil forceDelete
+            $pasangLelangController = new C_PasangLelang();
+            return $pasangLelangController->forceDelete($id);
         }
 
         else {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action [C_Lelang::handleDelete]');
         }
     }
 

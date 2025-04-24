@@ -1,17 +1,15 @@
-
 <div id="bidForm" class="fixed inset-0 text-black bg-black/30 justify-center items-start hidden z-50">
-        <div class="bg-white w-[70%] p-6 rounded-lg shadow-lg mt-20">
-
-            <div class="text-lg mb-2">
-                @if ($lelang->pasangLelang->isNotEmpty())
-                    @php
-                        $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
-                    @endphp
-                    <p>Tawaran tertinggi : <strong> Rp {{ number_format($topBid->harga_pengajuan, 0, ',', '.') }} </strong></p>
-                @else
-                    <p>Tawaran tertinggi = <strong>Belum ada penawaran</strong></p>
-                @endif
-            </div>
+    <div class="bg-white w-[70%] p-6 rounded-lg shadow-lg mt-20">
+        <div class="text-lg mb-2">
+            @if ($lelang->pasangLelang->isNotEmpty())
+                @php
+                    $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
+                @endphp
+                <p>Tawaran tertinggi : <strong> Rp {{ number_format($topBid->harga_pengajuan, 0, ',', '.') }} </strong></p>
+            @else
+                <p>Tawaran tertinggi = <strong>Belum ada penawaran</strong></p>
+            @endif
+        </div>
         <p class="text-gray-500 mb-4 text-sm">Tawaran akan ditambah dengan ongkos kirim ketika anda<br>memenangkan lelang ini</p>
 
 
@@ -19,18 +17,15 @@
             @csrf
             <div class="mb-4">
                 <label for="harga_pengajuan" class="block text-lg">Masukkan Penawaran</label>
+                {{-- form isi  harga bid --}}
                 <div class="relative">
-                    <input
-                        type="number"
-                        id="harga_pengajuan"
-                        name="harga_pengajuan"
-                        class="mt-2 p-2 w-full rounded-md border border-black shadow-sm"
-                        value=""
-                        required>
+                    <input type="number" id="harga_pengajuan" name="harga_pengajuan" value="" required
+                        class="mt-2 p-2 w-full rounded-md border border-black shadow-sm">
                     <p id="formattedNominal" class="text-gray-600 mt-1 text-sm"></p>
                 </div>
                 <input type="hidden" name="lelang_id" id="lelangID" value="{{ $lelang->id}}">
             </div>
+
             <p class="mb-3 text-lg">Lelang berakhir pada</p>
             <div class="flex justify-between gap-2">
                 <div>
@@ -63,28 +58,30 @@
                         </div>
                     </div>
                 </div>
-
+                {{-- EULA --}}
                 <div class="flex gap-4">
                     <div class="flex-1">
                         <p class="text-sm text-justify max-w-3xs">
                             Ketika anda klik pasang maka anda setuju untuk membeli item ini ketika anda memenangkan lelang.
                         </p>
                     </div>
+                    {{-- tombol kembali --}}
                     <button type="button" id="closePopup" class="px-6 py-[1rem] text-sm font-medium text-center border border-[#255B22] rounded-lg hover:bg-gray-300 hover:border-black transition"
                         onclick="document.getElementById('bidForm').classList.add('hidden'); document.getElementById('bidForm').classList.remove('flex')">
                         Kembali
                     </button>
+                    {{-- tombol submit --}}
                     <button id="submit" type="submit" class="px-6 py-[1rem] text-sm font-medium text-white text-center bg-[#255B22] rounded-lg hover:bg-[#0F3714] transition">
                         Pasang
                     </button>
                 </div>
             </div>
-
         </form>
+
     </div>
 </div>
-</div>
 
+{{-- logic menampilkan input berformat jam --}}
 <script>
     const inputHargaPengajuan = document.getElementById('harga_pengajuan');
     const formattedNominal = document.getElementById('formattedNominal');
@@ -121,5 +118,4 @@
         const formattedValue = new Intl.NumberFormat('id-ID').format(bidValue);
         formattedNominal.textContent = bidValue ? `Nominal: Rp ${formattedValue}` : '';
     }
-
 </script>

@@ -2,9 +2,8 @@
     @include('lelang.form')
 
     <div class="bg-white rounded-lg p-6 w-[90%] mx-auto mb-12 text-black">
-        {{-- <h3 class="text-xl font-semibold mb-4">Detail Lelang</h3> --}}
-
         <div class="flex flex-col gap-10 lg:flex-row">
+
             {{-- FLEX KIRI --}}
             <div class="lg:w-1/5">
                 {{-- Foto Produk --}}
@@ -15,25 +14,27 @@
                 @else
                     <p class="text-gray-500">Tidak ada foto produk tersedia.</p>
                 @endif
-
                 {{-- Deskripsi --}}
                 <p class="mt-4 text-xl">Deskripsi</p>
                 <p class="text-gray-600">{{ $lelang->keterangan ?? 'Tidak ada keterangan' }}</p>
-                {{-- <p><strong>Kode Lelang:</strong> {{ $lelang->kode_lelang }}</p> --}}
+                {{-- kode lelang --}}
+                <p class="mt-4 text-xl">Kode Lelang</p>
+                <p class="text-gray-600">{{ $lelang->kode_lelang }}</p>
             </div>
 
             {{-- FLEX KANAN --}}
             <div class="lg:w-4/5 flex flex-col gap-8 shadow-xs rounded-sm px-4">
                 {{-- Div 1: Informasi --}}
-                <div class="">
+                <div>
                     <div>
-                        {{-- <p><strong>Kode Lelang:</strong> {{ $lelang->kode_lelang }}</p> --}}
+                        {{-- nama --}}
                         <p class="text-3xl mb-2">{{ $lelang->nama_produk_lelang }}</p>
+                        {{-- start from --}}
                         <p class="font-light mb-3 text-gray-500">Dimulai Dari Rp {{ number_format($lelang->harga_dibuka, 0, ',', '.') }}</p>
+                        {{-- berat --}}
                         <p class="mb-5">Kuantitas : {{ $lelang->jumlah_kg }} kg</p>
-                        {{-- <p><strong>Tanggal Dibuka:</strong> {{ $lelang->tanggal_dibuka->format('d M Y, H:i') }}</p>
-                        <p><strong>Tanggal Ditutup:</strong> {{ $lelang->tanggal_ditutup->format('d M Y, H:i') }}</p> --}}
                         <div>
+                            {{-- penawar tertinggi --}}
                             @if ($lelang->pasangLelang->isNotEmpty())
                                 @php
                                     $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
@@ -170,19 +171,23 @@
                     <h4 class="text-3xl mb-2">Penawaran</h4>
                     <ul>
                         @if ($lelang->pasangLelang->isNotEmpty())
+                        {{-- 3 penawar teratas --}}
                             @foreach ($lelang->pasangLelang->sortByDesc('harga_pengajuan')->take(3) as $bid)
                                 <li class="py-2 border-b flex justify-between items-center">
                                     <div class="flex items-center space-x-3">
+                                        {{-- foto profil --}}
                                         @if ($bid->user->foto_profil)
                                             <img src="{{ asset('storage/' . $bid->user->foto_profil) }}" alt="Foto Profil {{ $bid->user->name }}" class="w-10 h-10 rounded-full">
                                         @else
                                             <img src="{{ asset('images/assets/defaultAvatar.svg') }}" alt="Foto Profil Default" class="w-10 h-10 rounded-full">
                                         @endif
+                                        {{-- harga pengajuan --}}
                                         <div>
                                             <span class="font-semibold">{{ $bid->user->name }}</span><br>
                                             <span class="text-gray-600">Rp {{ number_format($bid->harga_pengajuan, 0, ',', '.') }}</span>
                                         </div>
                                     </div>
+                                    {{-- tanggal pengajuan --}}
                                     <div class="text-sm text-gray-500">
                                         {{ $bid->updated_at ? $bid->updated_at->format('d M Y, H:i') : $bid->created_at->format('d M Y, H:i') }}
                                     </div>
@@ -197,6 +202,8 @@
             </div>
         </div>
     </div>
+    
+    {{-- logika jam countdown --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const bidForm = document.getElementById("bidForm");

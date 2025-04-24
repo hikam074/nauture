@@ -1,6 +1,7 @@
 <x-layout>
 
-    <section class="pb-4"> <!-- Bar Sorting & Search -->
+    <!-- Bar Sorting & Search -->
+    <section class="pb-4">
         <div class="w-full h-[150px] relative bg-cover bg-center"
             style="background-image: url('/images/assets/lelangFill.png');">
             <div class="absolute inset-0 bg-[#242222] opacity-50 pointer-events-none"></div>
@@ -39,22 +40,23 @@
         </div>
     </section>
 
-    <section class="lelang w-[90%] mx-auto pt-10"> <!-- Filters : Konten Utama -->
+    <!-- Filters : Konten Utama -->
+    <section class="lelang w-[90%] mx-auto pt-10">
         <div class="flex gap-4">
             <!-- Sisi Kiri: Filter dan Tombol Tambah -->
             <div class="w-1/5 pb-12">
-                {{-- Tombol Tambah Lelang --}}
+                <!-- Tombol Tambah Lelang -->
                 @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
                     <a href="{{ route('lelang.add') }}"
                        class="w-full px-4 py-2 text-sm font-medium text-white bg-[#638B35] rounded-lg hover:bg-[#0F3714] transition block text-center my-4">
                         Tambah Lelang
                     </a>
                 @endif
-                {{-- Filter --}}
+                <!-- Filter -->
                 <div class="mt-4">
                     <h3 class="font-semibold text-md">Filter</h3>
                     <div class="bg-[#CEED82] shadow-lg rounded-lg p-4 mt-1">
-                        {{-- Filter by status --}}
+                        <!-- Filter by status -->
                         <form action="{{ route('lelang.index') }}" method="GET" class="space-y-3">
                             <input type="hidden" name="katalog_id[]" value="{{ implode(',', request('katalog_id', [])) }}">
                             <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
@@ -80,7 +82,7 @@
                                 </div>
                             </div>
                         </form>
-                        {{-- Filter by Katalogs --}}
+                        <!-- Filter by Katalogs -->
                         <form action="{{ route('lelang.index') }}" method="GET" class="space-y-3">
                             <input type="hidden" name="filter" value="{{ request('filter') }}">
                             <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
@@ -101,9 +103,11 @@
                                 </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
+
             <!-- Sisi Kanan: Cards Lelang -->
             <div class="w-4/5">
                 <div class="relative overflow-hidden">
@@ -115,7 +119,7 @@
                                     <img src="{{ asset('storage/' . $lelang->foto_produk) }}" alt="{{ $lelang->nama_produk_lelang }}" class="w-full h-40 object-cover rounded-md">
                                     <h2 class="text-center text-[#0F3714] text-lg font-semibold mt-2">{{ $lelang->nama_produk_lelang }}</h2>
                                     @if($lelang->pasangLelang->isNotEmpty())
-                                        {{-- <p>Penawaran Tertinggi : Rp{{ number_format($lelang->tawaran->max('nominal_tawaran'), 0, ',', '.') }}</p> --}}
+                                        <p class="text-center text-[#0F3714] font-thin text-xs">Penawaran Tertinggi : Rp{{ number_format($lelang->pasangLelang->max('harga_pengajuan'), 0, ',', '.') }}</p>
                                     @else
                                         <p class="text-center text-[#0F3714] font-thin text-xs">Dibuka Mulai : Rp{{ number_format($lelang->harga_dibuka, 0, ',', '.') }}</p>
                                     @endif
@@ -138,11 +142,11 @@
                                         @else
                                             <div class="flex justify-between items-center">
                                                 {{-- Tombol bid --}}
-                                                <a href="{{ route('lelang.index', $lelang->id) }}" class="px-4 py-2 text-sm font-medium text-white text-center bg-blue-500 rounded-lg hover:bg-blue-600 transition">
+                                                <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}" class="px-4 py-2 text-sm font-medium text-white text-center bg-blue-500 rounded-lg hover:bg-blue-600 transition">
                                                     Pasang<br>Tawaran
                                                 </a>
                                                 {{-- Tombol detail --}}
-                                                <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}" class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition">
+                                                <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}" class="px-4 py-4.5 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition">
                                                     Detail
                                                 </a>
                                             </div>
