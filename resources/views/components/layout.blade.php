@@ -12,19 +12,23 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <header>
-        <nav class="fixed top-0 left-0 right-0 z-50 bg-[#CEED82] pl-8 py-3 flex items-center justify-between">
+        <nav class="fixed top-0 left-0 right-0 z-50 bg-[#fff] pl-8 py-3 flex items-center justify-between shadow-lg ">
             <!-- Logo -->
             <a href="{{ route('homepage') }}" class="flex items-center">
                 <img id="homelink" src="/images/logos/homeLogo.png" alt="[alt]NauTure-Home" class="h-8">
             </a>
 
+            <!-- Tengah (Nav Links) -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-6 text-[#0F3714] font-semibold">
+                <a href="{{ route('homepage') }}" class="hover:text-black hover:[transform:translateY(-2px)_scale(1.1)] transition-transform duration-200">Beranda</a>
+                 {{-- katalogs link --}}
+                <a href="{{ route('katalog.index') }}" class="hover:text-black hover:[transform:translateY(-2px)_scale(1.1)] transition-transform duration-200">Katalog</a>
+                {{-- lelangs link --}}
+                <a href="{{ route('lelang.index') }}" class="hover:text-black hover:[transform:translateY(-2px)_scale(1.1)] transition-transform duration-200">Lelang</a>
+            </div>
+
             <!-- nav links -->
             <div class="flex items-center space-x-6  text-[#0F3714] pr-8 gap-x-3 font-semibold">
-                {{-- katalogs link --}}
-                <a href="{{ route('katalog.index') }}" class="hover:text-black hover:scale-110 transition-transform duration-200">Katalog</a>
-                {{-- lelangs link --}}
-                <a href="{{ route('lelang.index') }}" class="hover:text-black hover:scale-110 transition-transform duration-200">Lelang</a>
-
                 @if ((Auth::check()) && Auth::user()->email && Auth::user()->name)
                 <div class="relative">
                     <!-- profile dropdown -->
@@ -84,15 +88,36 @@
         </nav>
     </header>
 
-    <main class="container mx-auto pt-[4rem] text-[#0F3714] flex-grow">
+    <main class="w-full pt-[4rem] text-[#0F3714] flex-grow">
         {{ $slot }}
     </main>
 
-    <footer class="bg-[#638B35] p-8 mt-auto">
-        <p>ini footer kocak</p>
-        <p>ini footer kocak</p>
-        <p>ini footer kocak</p>
+    <footer class="bg-[#C8E6C9] p-5 mt-auto flex flex-col items-center w-full">
+        <a href="{{ route('homepage') }}" class="flex items-center">
+            <img id="homelink" src="/images/logos/homeLogo.png" alt="[alt]NauTure-Home" class="h-20">
+        </a>
+        <p class="text-center w-150 py-5">Sistem Lelang Hasil Panen © 2025 - Platform terpercaya untuk perdagangan hasil pertanian secara adil dan efisien.</p>
+        <div class="flex justify-between px-4 py-2 w-full">
+            <p class="leading-10 ">
+                Location :<br>
+                Jl. Tidar No.27 68124 Jember Jawa
+            </p>
+            <div class="flex gap-8">
+                <ul class="flex flex-col gap-5 text-[#0000009d]">
+                    <li><a href="{{ route('homepage') }}" class="hover:text-black hover:scale-110 transition-transform duration-200">Beranda</a></li>
+                    <li><a href="{{ route('katalog.index') }}" class="hover:text-black hover:scale-110 transition-transform duration-200">Katalog</a></li>
+                    <li><a href="{{ route('lelang.index') }}" class="hover:text-black hover:scale-110 transition-transform duration-200">Lelang</a></li>
+                </ul>
+                <div class="flex items-center justify-center">
+                    <p class="text-center">
+                        Contact Us<br>
+                        <a href="" class="text-[#0000009d]">+62 852-2972-8848</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </footer>
+
 
     <script>
         const dropdownButton = document.getElementById('dropdownInformationButton');

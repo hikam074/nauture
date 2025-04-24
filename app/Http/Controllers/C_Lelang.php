@@ -136,7 +136,7 @@ class C_Lelang
             $request->katalog_id,
             $lelangCountToday + 1
         );
-        dd($lelangCountToday);
+        // dd($lelangCountToday);
 
         // Simpan file foto ke folder `lelangs`
         $fotoProdukPath = null;
