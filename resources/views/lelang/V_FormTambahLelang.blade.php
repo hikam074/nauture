@@ -1,4 +1,14 @@
-<x-layout>
+@extends('layouts.app')
+
+@section('title')
+    @if(isset($lelang))
+        Ubah Lelang
+    @else
+        Tambah Lelang
+    @endif
+@endsection
+
+@section('content')
     <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg my-10">
         <h1 class="text-2xl font-semibold text-center mb-6 p-5 bg-[#CEED82]">{{ isset($lelang) ? 'Ubah Detail Lelang' : 'Tambahkan Lelang' }}</h1>
 
@@ -9,11 +19,15 @@
         @endif
 
         <div class="px-6 pb-6">
-            
-            <form action="{{ isset($lelang) ? route('lelang.update', $lelang->id) : route('lelang.store') }}" method="POST" enctype="multipart/form-data">
+
+            <form id="lelangForm" action="{{ isset($lelang) ? route('lelang.update', ['id' => $lelang->id]) : route('lelang.store') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                >
                 @csrf
                 @if (isset($lelang))
                     @method('PUT')
+                    <input id="lelangID" type="hidden" name="lelang_id" value="{{ $lelang->id }}">
                 @endif
                 <div class="space-y-4">
                     <!-- Nama Produk Lelang -->
@@ -37,15 +51,50 @@
                         <input type="number" name="harga_dibuka" value="{{ old('harga_dibuka', $lelang->harga_dibuka ?? '') }}" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <!-- Tanggal Dibuka -->
-                    <div>
-                        <label for="tanggal_dibuka" class="block font-medium text-gray-700">Tanggal Dibuka :</label>
-                        <input type="datetime-local" name="tanggal_dibuka" value="{{ old('tanggal_dibuka', isset($lelang->tanggal_dibuka) ? $lelang->tanggal_dibuka->format('Y-m-d\TH:i') : '') }}" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex gap-2 w-full justify-between">
+                        <div class="w-full">
+                            <label for="tanggal_dibuka" class="block font-medium text-gray-700">Tanggal Dibuka:</label>
+                            <input type="date" name="tanggal_dibuka"
+                                value="{{ old('tanggal_dibuka', $tanggalDibuka ?? '') }}"
+                                required
+                                class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="w-50">
+                            <div>
+                                <label for="waktu_dibuka" class="block font-medium text-gray-700">Waktu Dibuka:</label>
+                                <select name="waktu_dibuka" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @foreach (range(0, 23) as $hour)
+                                        <option value="{{ sprintf('%02d:00', $hour) }}"
+                                                {{ old('waktu_dibuka', $lelang->waktu_dibuka ?? '') == sprintf('%02d:00', $hour) ? 'selected' : '' }}>
+                                            {{ sprintf('%02d:00', $hour) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <!-- Tanggal Ditutup -->
-                    <div>
-                        <label for="tanggal_ditutup" class="block font-medium text-gray-700">Tanggal Ditutup :</label>
-                        <input type="datetime-local" name="tanggal_ditutup" value="{{ old('tanggal_ditutup', isset($lelang->tanggal_ditutup) ? $lelang->tanggal_ditutup->format('Y-m-d\TH:i') : '') }}" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex gap-2 w-full justify-between">
+                        <div class="w-full">
+                            <label for="tanggal_ditutup" class="block font-medium text-gray-700">Tanggal Ditutup:</label>
+                            <input type="date" name="tanggal_ditutup"
+                                value="{{ old('tanggal_ditutup', $tanggalDitutup ?? '') }}"
+                                required
+                                class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="w-50">
+                            <label for="waktu_ditutup" class="block font-medium text-gray-700">Waktu Ditutup:</label>
+                            <select name="waktu_ditutup" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @foreach (range(0, 23) as $hour)
+                                    <option value="{{ sprintf('%02d:00', $hour) }}"
+                                            {{ old('waktu_ditutup', $lelang->waktu_ditutup ?? '') == sprintf('%02d:00', $hour) ? 'selected' : '' }}>
+                                        {{ sprintf('%02d:00', $hour) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+
                     <!-- Referensi Produk Katalog -->
                     <div>
                         <label for="katalog_id" class="block font-medium text-gray-700">Produk Katalog :</label>
@@ -64,7 +113,9 @@
                     <!-- Foto Produk -->
                     <div>
                         <label for="foto_produk" class="block text-gray-700 font-medium mb-2">Foto Produk : <a id="teksFotoDipilih"></a></label>
-                        <div class="flex items-start mt-4 space-x-4">
+                        <div class="flex flex-col items-center mt-4 space-x-4
+                            sm:items-start sm:flex-row"
+                            >
                             <!-- Kotak Input untuk Upload -->
                             <div class="flex flex-col space-y-2">
                                 <p class="text-sm text-gray-500"><br></p>
@@ -100,10 +151,18 @@
                                 class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer">
                                 Kembali
                             </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
-                                Simpan
-                            </button>
+                            @if (isset($lelang))
+                                <button type="button" id="confirmButton"
+                                    class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
+                                    >
+                                    Simpan Perubahan
+                                </button>
+                            @else
+                                <button type="submit" id="confirmButton"
+                                    class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
+                                    Simpan
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -206,4 +265,50 @@
         }
     </script>
 
-</x-layout>
+    <script>
+        document.getElementById("confirmButton").addEventListener("click", () => {
+            const form = document.getElementById("lelangForm");
+            const lelangId = document.getElementById("lelangID").value;
+
+            const metadataUrl = `/lelang/${lelangId}/edit-konfirm`;
+            console.log(metadataUrl);
+            fetch(metadataUrl, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                },
+            })
+            .then((response) => {
+                if (!response.ok) throw new Error("Gagal mengambil metadata");
+                return response.json();
+            })
+            .then((metadata) => {
+                // Panggil showAlert dengan metadata dari backend
+                showAlert({
+                    title: metadata.title,
+                    text: metadata.text,
+                    icon: metadata.icon,
+                    confirmButtonText: metadata.confirmButtonText,
+                    cancelButtonText: metadata.cancelButtonText,
+                    onConfirm: () => {
+                        // Ubah form method ke PUT dan submit
+                        const methodInput = document.createElement("input");
+                        methodInput.type = "hidden";
+                        methodInput.name = "_method";
+                        methodInput.value = "PUT";
+                        form.appendChild(methodInput);
+
+                        form.submit();
+                    },
+                });
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                // Tampilkan notifikasi error jika diperlukan
+            });
+        });
+    </script>
+
+
+@endsection

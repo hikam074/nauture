@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('metode_pembayarans', function (Blueprint $table) {
+        Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_metode_pembayaran')->unique();
-            $table->string('nama_metode_pembayaran')->unique();
+            $table->string('nama_payment_method')->unique();
+            $table->string('kode_payment_method')->unique();
 
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
     public function down(): void
     {
         // hapus tabel
-        Schema::dropIfExists('metode_pembayarans');
+        Schema::dropIfExists('payment_methods');
     }
 };

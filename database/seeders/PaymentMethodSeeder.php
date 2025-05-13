@@ -2,22 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\M_MetodePembayaran;
+use App\Models\M_PaymentMethod;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class MetodePembayaranSeeder extends Seeder
+class PaymentMethodSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Pastikan metode_pembayaran yang sama tidak dibuat dua kali
-        $arrManual = [
-            'direct_debit',
-        ];
-
         // pembayaran publishing mode, pastikan metode_pembayaran yang sama tidak dibuat dua kali
         $arr = [
             'Visa',
@@ -37,29 +32,34 @@ class MetodePembayaranSeeder extends Seeder
             'Direct Debit',
         ];
         $arrKode = [
-            'visa',
-            'mastercard',
-            'JCB',
-            'AMEX',
-            'VA_BRI',
-            'VA_BNI',
-            'VA_BCA',
-            'VA_CIMB',
-            'VA_Permata',
-            'alfamart',
+            'credit_card',
+            'bca_va',
+            'bni_va',
+            'bri_va',
+            'permata_va',
+            'mandiri_bill',
+            'cimb_va',
+            'gopay',
+            'shopeepay',
             'qris',
-            'ovo',
-            'dana',
-            'linkaja',
-            'direct_debit',
+            'indomaret',
+            'alfamart',
+            'akulaku',
+            'kredivo',
+            'bca_klikpay',
+            'klikbca',
+            'cimb_clicks',
+            'danamon_online',
+            'bri_epay',
+            'uob_ezpay',
         ];
 
         foreach ($arr as $index => $name) {
-            M_MetodePembayaran::firstOrCreate([
+            M_PaymentMethod::firstOrCreate([
                 'id' => $index + 1, // ID akan dimulai dari 1
             ], [
-                'kode_metode_pembayaran' => $arrKode[$index],
-                'nama_metode_pembayaran' => $name
+                'nama_payment_method' => $name,
+                'kode_payment_method' => $arrKode[$index]
             ]);
         }
     }

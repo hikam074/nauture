@@ -14,15 +14,15 @@ return new class extends Migration
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_transaksi')->unique();
+            $table->string('order_id')->unique();
             $table->unsignedBigInteger('lelang_id');        // FK ke lelangs
             $table->unsignedBigInteger('pasang_lelang_id'); // FK ke pasang_lelangs
-            $table->integer('nominal');
+            $table->integer('gross_amount');
             $table->string('alamat');
-            $table->datetime('deadline_transaksi');
-            $table->unsignedBigInteger('metode_pembayaran_id'); // FK ke metode_pembayarans
-            $table->unsignedBigInteger('status_transaksi_id');  // FK ke status_transaksis
-            $table->string('bukti_transfer')->nullable();
+            $table->string('url_midtrans');
+            $table->datetime('payment_time')->nullable();
+            $table->unsignedBigInteger('payment_method_id')->nullable();    // FK ke payment_methods
+            $table->unsignedBigInteger('status_transaksi_id');              // FK ke status_transaksis
 
             $table->timestamps();
 
@@ -30,8 +30,8 @@ return new class extends Migration
             $table->foreign('lelang_id')->references('id')->on('lelangs')->onDelete('cascade');
             // reference pasang_lelang_id ke pasang_lelangs
             $table->foreign('pasang_lelang_id')->references('id')->on('pasang_lelangs')->onDelete('cascade');
-            // reference metode_pembayaran_id ke metode_pembayarans
-            $table->foreign('metode_pembayaran_id')->references('id')->on('metode_pembayarans')->onDelete('cascade');
+            // reference metode_pembayaran_id ke payment_methods
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('cascade');
             // reference status_transaksi_id ke status_transaksis
             $table->foreign('status_transaksi_id')->references('id')->on('status_transaksis')->onDelete('cascade');
         });
@@ -52,10 +52,10 @@ return new class extends Migration
             $table->dropForeign(['pasang_lelang_id']);
             $table->dropColumn('pasang_lelang_id');
         });
-        // hapus reference ke metode_pembayarans
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->dropForeign(['metode_pembayaran_id']);
-            $table->dropColumn('metode_pembayaran_id');
+        // hapus reference ke payment_methods
+        Schema::table('payment_methods', function (Blueprint $table) {
+            $table->dropForeign(['payment_method_id']);
+            $table->dropColumn('payment_method_id');
         });
         // hapus reference ke status_transaksis
         Schema::table('transaksis', function (Blueprint $table) {

@@ -1,4 +1,14 @@
-<x-layout>
+@extends('layouts.app')
+
+@section('title')
+    @if(isset($katalog))
+        Ubah Katalog
+    @else
+        Tambah Katalog
+    @endif
+@endsection
+
+@section('content')
     <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg my-10 ">
         <h1 class="text-2xl font-bold mb-6 text-center p-5 bg-[#CEED82]">
             {{ isset($katalog) ? 'Ubah Detail Produk' : 'Tambahkan Produk' }}
@@ -6,10 +16,15 @@
 
         <div class="px-6 pb-6">
 
-            <form action="{{ isset($katalog) ? route('katalog.update', $katalog->id) : route('katalog.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form id="katalogForm" action="{{ isset($katalog) ? route('katalog.update', $katalog->id) : route('katalog.store') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="space-y-4"
+                >
                 @csrf
                 @if (isset($katalog))
                     @method('PUT')
+                    <input id="katalogID" type="hidden" name="katalog_id" value="{{ $katalog->id }}">
                 @endif
                 {{-- nama produk --}}
                 <div>
@@ -53,20 +68,38 @@
                             <p class="text-sm text-gray-500">Pratinjau Upload Baru:</p>
                             <img id="preview" src="#" alt="Pratinjau Foto Baru" class="w-32 h-32 object-cover cursor-pointer border-2 border-gray-300 hidden" onclick="selectImage(this, 'new', 'Pratinjau Upload Baru')">
                         </div>
-                        <input type="hidden" name="selected_image" id="selected_image" value="{{ $katalog->foto_produk ?? '' }}">
                     </div>
+                    <input type="hidden" name="selected_image" id="selected_image" value="{{ $katalog->foto_produk ?? '' }}" required>
                 </div>
                 {{-- tombol2 --}}
                 <div class="text-center">
-                    <button type="button" onclick="window.history.back();" class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer">
+                    {{-- <button type="button" onclick="window.history.back();" class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer">
                         Kembali
                     </button>
                     <button type="submit" class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
                         {{ isset($katalog) ? 'Simpan Perubahan' : 'Tambahkan' }}
+                    </button> --}}
+
+                    <button type="button" onclick="window.history.back();"
+                        class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer"
+                        >
+                        Kembali
                     </button>
+                    @if (isset($katalog))
+                        <button type="button" id="confirmButton"
+                            class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
+                            >
+                            Simpan Perubahan
+                        </button>
+                    @else
+                        <button type="submit" id="confirmButton"
+                            class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
+                            Tambahkan
+                        </button>
+                    @endif
                 </div>
             </form>
-            
+
         </div>
 
     </div>
@@ -108,6 +141,9 @@
 
         // memilih image yang akan disubmit
         function selectImage(imageElement, value, teks) {
+            console.log("Selected image value:", document.getElementById('selected_image').value);
+            console.log("Selected image value:", document.getElementById('foto_produk').value);
+
             // Reset styles on all images
             document.querySelectorAll('img').forEach(img => img.classList.remove('ring-4', 'ring-blue-500'));
             // Highlight selected image
@@ -120,4 +156,48 @@
         console.log(document.getElementById('selected_image').value);
     </script>
 
-</x-layout>
+    <script>
+        document.getElementById("confirmButton").addEventListener("click", () => {
+            const form = document.getElementById("katalogForm");
+            const katalogId = document.getElementById("katalogID").value;
+
+            const metadataUrl = `/katalog/${katalogId}/edit-konfirm`;
+            console.log(metadataUrl);
+            fetch(metadataUrl, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                },
+            })
+            .then((response) => {
+                if (!response.ok) throw new Error("Gagal mengambil metadata");
+                return response.json();
+            })
+            .then((metadata) => {
+                // Panggil showAlert dengan metadata dari backend
+                showAlert({
+                    title: metadata.title,
+                    text: metadata.text,
+                    icon: metadata.icon,
+                    confirmButtonText: metadata.confirmButtonText,
+                    cancelButtonText: metadata.cancelButtonText,
+                    onConfirm: () => {
+                        // Ubah form method ke PUT dan submit
+                        const methodInput = document.createElement("input");
+                        methodInput.type = "hidden";
+                        methodInput.name = "_method";
+                        methodInput.value = "PUT";
+                        form.appendChild(methodInput);
+
+                        form.submit();
+                    },
+                });
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                // Tampilkan notifikasi error jika diperlukan
+            });
+        });
+    </script>
+@endsection

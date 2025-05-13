@@ -29,6 +29,8 @@ class M_Lelang extends Model
         'tanggal_ditutup' => 'datetime',
     ];
 
+    protected $dates = ['tanggal_dibuka', 'tanggal_ditutup'];
+
     // reference this katalog_id ke katalogs id
     public function katalog()
     {

@@ -11,54 +11,83 @@ use Exception;
 
 class C_PasangLelang
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(string $id)
-    {
-        // pastikan sudah login
-        if (!Auth::check()) {
-            return redirect()->route('login');
+    public function showFormPasangLelang() {
+        if (Auth::check()) {
+            return response()->json(['loggedIn' => true]);
+        } else {
+            return response()->json(['loggedIn' => false]);
         }
-
-        // // Ambil semua data katalog
-        // $lelang = M_Lelang::FindOrFail($id);
-
-        // return view('lelang.form', compact('lelang'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
+    // !!!WARNING
+    // public function checkDataLengkap(int $id_lelang, int $harga) {
+    // WARNING!!!
+    public function checkDataLengkap(Request $request) {
         $validated = $request->validate([
             'lelang_id' => 'required|exists:lelangs,id',
             'harga_pengajuan' => 'required|numeric|min:0',
         ]);
 
-        // Gunakan updateOrCreate untuk cek data dan update/insert
+        // Ambil harga minimal lelang dari database
+        $lelang = M_Lelang::findOrFail($request->input('lelang_id'));
+        $minimal = $lelang->harga_dibuka;
+        // Ambil bid saat ini dari database
+        $topBid = M_PasangLelang::where('lelang_id', $request->input('lelang_id'))->max('harga_pengajuan') ?? 0;
+
+        // Validasi apakah harga lebih besar dari harga minimal
+        if ($request->input('harga_pengajuan') < $minimal) {
+            return redirect()->back()->with('error', [
+                    'title' => 'Gagal',
+                    'message'  => 'Harga yang diajukan harus lebih besar dari harga mulai!'
+                ])->withInput();
+        }
+        // Validasi apakah harga lebih besar dari bid saat ini
+        if ($request->input('harga_pengajuan') <= $topBid) {
+            return redirect()->back()->with('error', [
+                    'title' => 'Gagal',
+                    'message'  => 'Harga yang diajukan harus lebih besar dari penawaran tertinggi saat ini!'
+                ])->withInput();
+        }
+        // Validasi apakah harga kelipatan 10.000
+        if ($request->input('harga_pengajuan') % 10000 !== 0) {
+            return redirect()->back()->with('error', [
+                    'title' => 'Gagal',
+                    'message'  => 'Harga yang diajukan harus kelipatan Rp10.000!'
+                ])->withInput();
+        }
+
+        if ($validated) {
+            // data valid, lanjut menyimpan
+            return $this->insertPasangLelang($validated);
+        }
+        else {
+            return redirect()->back()->with('error', [
+            'title' => 'Peringatan',
+            'message'  => 'Data harus diisi lengkap!'
+        ]);
+        }
+    }
+
+    public function insertPasangLelang($data) {
+        // Gunakan updateOrCreate untuk cek data dan update/insert : komplit
         M_PasangLelang::updateOrCreate(
             [
                 'user_id' => Auth::id(),
-                'lelang_id' => $validated['lelang_id'],
+                'lelang_id' => $data['lelang_id'],
             ],
             [
-                'harga_pengajuan' => $validated['harga_pengajuan'],
+                'harga_pengajuan' => $data['harga_pengajuan'],
             ]
         );
-
-        $request->session()->flash('success', 'Tawaran berhasil dipasang atau diperbarui! Pantau terus perkembangan lelang ini!');
-        return redirect()->route('lelang.show', ['id' => $validated['lelang_id']]);
+        // session()->flash('success', 'Tawaran berhasil dipasang atau diperbarui! Pantau terus perkembangan lelang ini!');
+        return redirect()->route('lelang.show', ['id' => $data['lelang_id']])->with('success', [
+            'title' => 'Berhasil',
+            'message'  => 'Tawaran berhasil dipasang atau diperbarui! Pantau terus perkembangan lelang ini!'
+        ]);
     }
+
+
+
 
     /**
      * Display the specified resource.
@@ -81,29 +110,7 @@ class C_PasangLelang
     }
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-
-    }
 
     public function forceDelete(string $id)
     {
@@ -112,27 +119,32 @@ class C_PasangLelang
             ->where('tanggal_ditutup', '>', now())
             ->first();
 
+        // Jika lelang tidak ada atau sudah berakhir, beri respon error
         if (!$lelang) {
-            // Jika lelang tidak ada atau sudah berakhir, beri respon error
-            return redirect()->back()
-                ->withErrors(['error' => 'Tawaran tidak dapat dihapus. Lelang sudah berakhir atau tidak valid.']);
+            return redirect()->back()->with('error', [
+                    'title' => 'Gagal',
+                    'message'  => 'Tawaran tidak dapat dihapus. Lelang sudah berakhir atau tidak valid!'
+            ]);
         }
 
         // Validasi apakah lelang_id ada di database
         $pasangLelang = M_PasangLelang::where('user_id', Auth::id())
             ->where('lelang_id', $id)
             ->first();
-
         try {
             $pasangLelang->forceDelete();
             // Berikan notifikasi berhasil
-            session()->flash('success', 'Tawaran berhasil dibatalkan!');
-            return redirect()->route('lelang.show', ['id' => $id]);
+            return redirect()->route('lelang.show', ['id' => $id])->with('success', [
+                    'title' => 'Sukses',
+                    'message'  => 'Tawaran berhasil dibatalkan!'
+            ]);
 
         } catch (Exception $e) {
             // Jika data tidak ditemukan, beri respon error
-            return redirect()->back()
-                ->withErrors(['error' => 'Tawaran tidak ditemukan atau tidak dapat dihapus.']);
+            return redirect()->back()->with('error', [
+                    'title' => 'Gagal',
+                    'message'  => 'Tawaran tidak ditemukan atau tidak dapat dihapus!'
+            ]);
         }
     }
 

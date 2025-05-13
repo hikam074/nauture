@@ -9,15 +9,15 @@ class M_Transaksi extends Model
     protected $table = 'transaksis';
 
     protected $fillable = [
-        'kode_transaksi',
+        'order_id',
         'lelang_id',
         'pasang_lelang_id',
-        'nominal',
+        'gross_amount',
         'alamat',
-        'deadline_transaksi',
-        'metode_pembayaran_id',
+        'url_midtrans',
+        'payment_time',
+        'payment_method_id',
         'status_transaksi_id',
-        'bukti_transfer',
     ];
 
     // reference this lelang_id ke lelangs id
@@ -31,24 +31,18 @@ class M_Transaksi extends Model
         return $this->belongsTo(M_PasangLelang::class);
     }
     // reference this metode_pembayaran_id ke metode_pembayaran id
-    public function metodePembayaran()
+    public function paymentMethod()
     {
-        return $this->belongsTo(M_MetodePembayaran::class);
+        return $this->belongsTo(M_paymentMethod::class);
     }
     // reference this status_transaksi_id ke status_transaksis id
     public function statusTransaksi()
     {
         return $this->belongsTo(M_StatusTransaksi::class);
     }
-
     // deklarasi this transaksi_id bisa punya banyak transaksi_id di log_masuks
     public function logMasuk()
     {
         return $this->hasMany(M_LogMasuk::class);
-    }
-    // deklarasi this transaksi_id bisa punya banyak transaksi_id di xendit_payments
-    public function xenditPayment()
-    {
-        return $this->hasMany(M_XenditPayment::class);
     }
 }

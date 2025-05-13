@@ -73,19 +73,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(M_PasangLelang::class);
     }
-    // deklarasi this user_id bisa punya banyak user_id di monitorings
-    public function monitoring()
-    {
-        return $this->hasMany(M_Monitoring::class);
-    }
+    
     // deklarasi this user_id bisa punya banyak user_id di log_masuks
     public function logMasuk()
     {
         return $this->hasMany(M_LogMasuk::class);
-    }
-    // deklarasi this user_id bisa punya banyak user_id di log_keluars
-    public function logKeluar()
-    {
-        return $this->hasMany(M_LogKeluar::class);
     }
 }

@@ -9,8 +9,40 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    /* sesuaikan lagi warnanya */
+    --color-primer: oklch(0.3 0.0749 145.58); /*0F3714*/
+    --color-sekunder: oklch(0.59 0.1239 130.44); /*638b35*/
+    --color-sekunderDark: oklch(0.42 0.1051 142.54); /*255B22*/
+    --color-tersier: oklch(0.61 0.0801 131.78); /*728E5B*/
+    --color-kuarter: oklch(0.91 0.1501 123.02); /*CEF17B*/
+    --color-bsoft: oklch(0.91 0.0845 130.49); /*CEEDB2 */
+    --color-bkrem: oklch(0.94 0.0825 112.34); /*ECF2B2*/
+    --color-bblue: oklch(0.88 0.0495 153.41); /*BEE0C7*/
+    --color-warning: oklch(0.924 0.12 95.746); /*#fee685*/
+
+    --color-restore: oklch(79.5% 0.184 86.047); /*yellow-500*/
+    --color-restorehov: oklch(68.1% 0.162 75.834); /*yellow-600*/
+    --color-hapus: oklch(63.7% 0.237 25.331); /*red-500*/
+    --color-hapushov: oklch(57.7% 0.245 27.325); /*red-600*/
+    --color-edit: oklch(62.3% 0.214 259.815); /*blue-500*/
+    --color-edithov: oklch(54.6% 0.245 262.881); /*blue-600*/
+}
+@layer utilities {
+    table td, table th {
+      @apply px-2 py-1;
+    }
 }
 
+pre {
+    white-space: pre-wrap; /* Agar teks membungkus */
+    font-family: inherit;  /* Gunakan font dari elemen induk */
+    font-size: inherit;    /* Ikuti ukuran font induk */
+    color: inherit;        /* Ikuti warna teks induk */
+    background-color: transparent; /* Hapus latar belakang bawaan */
+    border: none;          /* Hapus border bawaan */
+    padding: 0;            /* Hapus padding bawaan */
+    margin: 0;             /* Hapus margin bawaan */
+}
 
 /* Kustomisasi untuk tipe toast */
 /* @import "~toastr/toastr.css"; */

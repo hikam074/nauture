@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NauTure: Login</title>
+    <title>NauTure | Login</title>
     @vite('resources/css/global.css')
     @vite('resources/js/app.js')
     @vite('resources/css/app.css')
@@ -36,7 +36,7 @@
             {{-- email --}}
             <div class="email mb-4">
                 <label for="email" class="block text-sm font-medium mb-1">Email</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                <input type="email" id="email" name="email" value="{{ old('email') }}"
                     class="w-full bg-[rgba(255,250,250,0.5)] text-white p-3 rounded-lg border-2 border-transparent
                     focus:outline-none focus:border-white focus:shadow-lg focus:shadow-[rgba(15,55,20,0.5)]
                     transition">
@@ -46,7 +46,7 @@
             <div class="password mb-4">
                 <label for="password" class="block text-sm font-medium mb-1">Password</label>
                 <div class="relative flex items-center">
-                    <input type="password" id="password" name="password" required
+                    <input type="password" id="password" name="password"
                         class="w-full bg-[rgba(255,250,250,0.5)] text-white p-3 rounded-lg border-2 border-transparent focus:outline-none focus:border-white transition">
                     <span id="toggleIcon" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center w-6 h-6 hover:text-[rgba(15,55,20,1)] transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="eye-icon">

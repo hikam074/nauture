@@ -7,80 +7,107 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 use App\Models\M_Katalog;
 use App\Models\M_Lelang;
 
 class C_Katalog extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function getDataKatalog(Request $request)
     {
         $kategori = $request->get('kategori', 'active'); // Default 'all' jika tidak ada kategori.
         $sortBy = $request->get('sort_by', 'date_added'); // Default 'date_added' jika tidak ada sort.
 
-        $katalogs = M_Katalog::query();
+        $query = M_Katalog::query();
 
         // Filter berdasarkan kategori
         if ($kategori === 'active') {
-            $katalogs = $katalogs->whereNull('deleted_at'); // Produk tersedia.
+            $query->whereNull('deleted_at'); // Produk tersedia.
         } elseif ($kategori === 'deleted') {
-            $katalogs = $katalogs->onlyTrashed(); // Produk dihapus.
+            $query->onlyTrashed(); // Produk dihapus.
         } elseif ($kategori === 'all') {
-            $katalogs = $katalogs->withTrashed(); // semua.
+            $query->withTrashed(); // semua.
         }
 
         // Logika sort berdasarkan pilihan
         if ($sortBy === 'date_added') {
-            $katalogs = $katalogs->orderBy('created_at', 'asc'); // Mengurutkan berdasarkan tanggal ditambahkan
+            $query->orderBy('created_at', 'asc'); // Mengurutkan berdasarkan tanggal ditambahkan
         } elseif ($sortBy === 'alphabetical') {
-            $katalogs = $katalogs->orderBy('nama_produk', 'asc'); // Mengurutkan berdasarkan nama produk secara abjad
+            $query->orderBy('nama_produk', 'asc'); // Mengurutkan berdasarkan nama produk secara abjad
         }
 
-        // Pagination dengan query string diteruskan.
-        $katalogs = $katalogs->paginate(12)->appends($request->query());
+        // kalau pagination
+        $katalogs = $query->paginate(12)->appends($request->query());
+        // kalau get all
+        // $katalogs = $query->get();
 
-        return view('katalog.index', compact('katalogs', 'kategori', 'sortBy'));
+        return $this->showDataKatalog($katalogs, $kategori, $sortBy);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function showDataKatalog($katalogs, $kategori, $sortBy)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-        return view('katalog.add');
+        return view('katalog.V_HalamanKatalog', compact('katalogs', 'kategori', 'sortBy'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+
+
+
+    public function getDetailDataKatalog(string $id)
     {
-        // Validasi input
-        $validator = Validator::make($request->all(), [
+        // cari data katalog berdasarkan ID
+        $katalog = M_Katalog::withTrashed()->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
+        // Cari data lelang yang memiliki katalog_id sama dengan katalog ini
+        $lelangTerkaits = M_Lelang::where('katalog_id', $katalog->id)->take(5)->get();
+        // teruskan data ke pengeksekusi show
+        return $this->showDetailDatakatalog($katalog, $lelangTerkaits);
+    }
+
+    public function showDetailDatakatalog(M_Katalog $katalog, $lelangTerkaits = null)
+    {
+        // tampilkan view
+        return view('katalog.V_HalamanDetailKatalog', ['katalog' => $katalog, 'lelangTerkaits' => $lelangTerkaits]);
+    }
+
+
+
+
+    public function showFormTambahKatalogProduk()
+    {
+        return view('katalog.V_FormTambahProdukKatalog');
+    }
+
+    public function checkInputNotNull(Request $request)
+    {
+        // aturan input
+        $rules = [
             'nama_produk' => 'required|string|max:128',
             'deskripsi_produk' => 'nullable|string',
             'harga_perkilo' => 'required|integer',
             'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'nama_produk.required' => 'Nama produk wajib diisi!',
-            'harga_perkilo.required' => 'Harga perkilo wajib diisi!',
-            'foto_produk.required' => 'Foto produk wajib diisi!',
-        ]);
+        ];
+        //pesan error validasi
+        $pesan = [
+            'nama_produk.required' => 'Nama produk harus diisi!',
+            'harga_perkilo.required' => 'Harga perkilo harus diisi!',
+            'foto_produk.required' => 'Foto produk harus diisi!',
+        ];
 
-        // Jika validasi gagal
+        // Buat validasi manual
+        $validator = Validator::make($request->all(), $rules, $pesan);
+
+        // kalo gagal validasi
         if ($validator->fails()) {
-            // Kirim error kembalikan ke halaman sebelumnya
-            return redirect()->back()
-                ->withErrors($validator) // Kirim error validasi ke error bag
-                ->withInput(); // Kirim input sebelumnya agar tetap terisi
+            return redirect()->back()->withErrors($validator)->withInput();
         }
+        else {
+            // eksekusi simpan datanya
+            return $this->insertDataKatalog($request);
+        }
+    }
 
+    public function insertDataKatalog(Request $request)
+    {
         try {
             // Simpan file foto ke dalam folder storage
             $fotoPath = $request->file('foto_produk')->store('katalogs', 'public');
@@ -94,59 +121,80 @@ class C_Katalog extends Controller
             ]);
 
             // Kirim pesan sukses ke session
-            $request->session()->flash('success', 'Produk berhasil ditambahkan!');
-            return redirect()->route('katalog.index');
+            return redirect()->route('katalog.index')->with('success', [
+                    'title' => 'Sukses',
+                    'message'  => 'Data produk katalog '.$request->nama_produk.' berhasil dibuat!'
+                ]);
 
         } catch (\Exception $e) {
-            // Tangkap error runtime dan kirim pesan error ke session
-            $request->session()->flash('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput(); // Tetap isi form dengan data sebelumnya
+            return redirect()->back()->with('error', [
+                    'title' => 'Kesalahan Sistem',
+                    'message'  => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+                ])->withInput();
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        // Cari data katalog berdasarkan ID
-        $katalog = M_Katalog::withTrashed()->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
 
-        // Kirim data ke view 'katalog.show'
-        return view('katalog.show', ['katalog' => $katalog]);
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+
+    public function showFormUbahKatalog(string $id)
     {
         $katalog = M_Katalog::findOrFail($id);
-        return view('katalog.add', compact('katalog'));
+        return view('katalog.V_FormTambahProdukKatalog', compact('katalog'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function klikSimpanPerubahan(Request $request, $id)
     {
-        $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'deskripsi_produk' => 'nullable|string',
-            'harga_perkilo' => 'required|integer',
-            'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'selected_image' => 'nullable|string',
+        return response()->json([
+            'title' => 'Simpan perubahan?',
+            'text' => 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+            'icon' => 'warning',
+            'confirmButtonText' => 'Simpan',
+            'cancelButtonText' => 'Batal',
+            'confirmUrl' => route('katalog.update', $id),
         ]);
+    }
 
-        $katalog = M_Katalog::findOrFail($id);
-        // dd($request->foto_produk, $request->selected_image);
+    public function checkUbahKatalog(Request $request, string $id)
+    {
+        try {
+            $validated = $request->validate([
+                'nama_produk' => 'required|string|max:255',
+                'deskripsi_produk' => 'nullable|string',
+                'harga_perkilo' => 'required|integer',
+                'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'selected_image' => 'nullable|string',
+            ]);
 
-        // makai gambar lama
-        if ($request->input('selected_image') !== 'new') {
+            if (!$id) {
+                return redirect()->back()->with('error', [
+                    'title' => 'Data tidak valid!',
+                    'message' => 'ID katalog tidak valid',
+                ])->withInput();
+            }
+            else {
+                return $this->updateDataLelang($request, $id);
+            }
 
+        } catch (ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+
+            return redirect()->back()->with('error', [
+                'title' => 'Data tidak valid!',
+                'message' => implode('<br>', $errors),
+            ])->withInput();
         }
-        else {
+    }
+
+    public function updateDataLelang(Request $request, string $id)
+    {
+        $katalog = M_Katalog::findOrFail($id);
+
+        // kalau pakai gambar lama
+        if ($request->input('selected_image') !== 'new')
+            {}
+        else
+        {
             $basenameLama = basename($katalog->foto_produk);
             // Hapus foto lama jika ada
             if ($katalog->foto_produk && Storage::exists($katalog->foto_produk)) {
@@ -160,33 +208,21 @@ class C_Katalog extends Controller
             // Ambil basename file untuk dicari di folder lelangs
             $basenameFoto = basename($fotoPath);
 
-            // Cari semua lelang yang menggunakan gambar dengan basename yang sama
-            // $lelangs = M_Lelang::where('foto_produk', 'like', "lelangs/%$basenameLama")->get();
+            // Hapus gambar lama di folder lelangs
+            if (Storage::exists('lelangs/'. $basenameLama)) {
+                Storage::delete('lelangs/'. $basenameLama);
+            }
 
-            // if ($lelangs->isNotEmpty()) {
-                // foreach ($lelangs as $lelang) {
-                    // Hapus gambar lama di folder lelangs
-                    if (Storage::exists('lelangs/'. $basenameLama)) {
-                        Storage::delete('lelangs/'. $basenameLama);
-                    }
+            // Salin gambar baru ke folder lelangs
+            $destinationPath = 'lelangs/' . $basenameFoto;
+            Storage::copy($fotoPath, $destinationPath);
 
-                    // Salin gambar baru ke folder lelangs
-                    $destinationPath = 'lelangs/' . $basenameFoto;
-                    Storage::copy($fotoPath, $destinationPath);
-
-                    // Update path di database lelangs
-                    $lelangs = M_Lelang::where('foto_produk', 'like', "lelangs/$basenameLama")->get();
-                    foreach ($lelangs as $lelang) {
-                        $lelang->foto_produk = $destinationPath;
-                        $lelang->save();
-                    }
-                // }
-            // } else {
-                // Jika tidak ada lelang yang memakai gambar ini, salin gambar baru ke folder lelangs
-                // $destinationPath = 'lelangs/' . $basenameFoto;
-                // Storage::copy($fotoPath, $destinationPath);
-            // }
-
+            // Update path di database lelangs
+            $lelangs = M_Lelang::where('foto_produk', 'like', "lelangs/$basenameLama")->get();
+            foreach ($lelangs as $lelang) {
+                $lelang->foto_produk = $destinationPath;
+                $lelang->save();
+            }
         }
 
         // Perbarui atribut lainnya
@@ -197,8 +233,14 @@ class C_Katalog extends Controller
         // Simpan perubahan
         $katalog->save();
 
-        return redirect()->route('katalog.index')->with('success', 'Produk berhasil diperbarui.');
+        return redirect()->route('katalog.index')->with('success', [
+                'title' => 'Update berhasil!',
+                'message' => 'Produk berhasil diperbarui',
+        ]);
     }
+
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -240,7 +282,10 @@ class C_Katalog extends Controller
         return redirect()->route('katalog.index')->with('success', 'Produk berhasil dihapus permanen.');
     }
 
-    // api
+
+
+
+    // API
     public function getKatalog($id): JsonResponse
     {
         $katalog = M_Katalog::find($id);

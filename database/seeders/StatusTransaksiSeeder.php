@@ -15,34 +15,28 @@ class StatusTransaksiSeeder extends Seeder
     {
         // Pastikan status_pembayaran yang sama tidak dibuat dua kali
         $arr = [
-            'Menunggu Pembayaran',
-            'Dibayar, Mengemas barang',
-            'Kedaluwarsa',
-            'Gagal',
-            'Sudah diterima, memproses pembayaran',
-            //
-            'Dibatalkan oleh Sistem',
-            'Barang di perjalanan',
-            'Barang diterima, Transaksi Selesai'
+            'Pending : Transaksi belum dibayar',
+            'Settlement : Pembayaran Berhasil, Mengemas barang',
+            'Expire : Waktu pembayaran telah habis',
+            'Cancel : Transaksi dibatalkan',
+            'Capture : Pembayaran kartu kredit telah ditangkap',
+            'Deny : Transaksi ditolak',
             ];
         $arrKode = [
-            'PENDING',
-            'PAID',
-            'EXPIRED',
-            'FAILED',
-            'SETTLED',
-            //
-            'CANCELED BY SYSTEM',
-            'PACKAGE SENT',
-            'FINISH',
+            'pending',
+            'settlement',
+            'expire',
+            'cancel',
+            'capture',
+            'deny',
             ];
 
         foreach ($arr as $index => $nama) {
             M_StatusTransaksi::firstOrCreate([
                 'id' => $index + 1, // ID akan dimulai dari 1
             ], [
-                'kode_status_transaksi' => $arrKode[$index],
-                'nama_status_transaksi' => $nama
+                'nama_status_transaksi' => $nama,
+                'kode_status_transaksi' => $arrKode[$index]
             ]);
         }
     }
