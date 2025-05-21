@@ -27,4 +27,9 @@ class M_PasangLelang extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function transaksi()
+    {
+        return $this->hasMany(M_Transaksi::class, 'pasang_lelang_id');
+    }
+
 }

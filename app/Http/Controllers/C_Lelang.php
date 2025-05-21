@@ -96,12 +96,11 @@ class C_Lelang
         // cari bid an tertinggi
         $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
 
-        if ($lelang->pemenang_id) {
-            dd('ada pemenang');
-            // ambil data dari transaksi
-            $pemenang = M_Transaksi::findOrFail($id);
-            return $this->showDetailDataLelang($lelang, $userBids, $topBid, $pemenang);
-        }
+        // if ($lelang->pemenang_id) {
+        //     // ambil data dari transaksi
+        //     $pemenang = M_Transaksi::findOrFail($id);
+        //     return $this->showDetailDataLelang($lelang, $userBids, $topBid, $pemenang);
+        // }
 
         // teruskan data ke pengeksekusi show
         return $this->showDetailDataLelang($lelang, $userBids, $topBid);
@@ -130,8 +129,8 @@ class C_Lelang
             'keterangan' => 'nullable|string',
             'jumlah_kg' => 'required|numeric|min:0',
             'harga_dibuka' => 'required|numeric|min:0',
-            'tanggal_dibuka' => 'required|date|before:tanggal_ditutup',
-            'tanggal_ditutup' => 'required|date|after:tanggal_dibuka',
+            'tanggal_dibuka' => 'required|date',
+            'tanggal_ditutup' => 'required|date',
             'waktu_dibuka' => [
                 'required',
                 'regex:/^([01]\d|2[0-3]):00$/',
@@ -231,7 +230,8 @@ class C_Lelang
             if ($request->hasFile('foto_produk') && $request->selected_image == 'foto unggahan baru') {
                 // Jika ada file upload, simpan langsung ke folder `lelangs`
                 $fotoProdukPath = $request->file('foto_produk')->store('lelangs', 'public');
-            } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
+            // } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
+            } else {
                 // Jika menggunakan gambar dari katalog, salin ke folder `lelangs`
                 $imageUrl = str_replace(url('/storage'), '', $request->current_img); // Menghapus URL base jika ada
                 $sourcePath = public_path('storage' . $imageUrl);
@@ -457,6 +457,28 @@ class C_Lelang
             'message'  => 'Lelang berhasil diperbarui'
         ]);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

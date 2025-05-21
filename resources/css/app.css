@@ -26,6 +26,12 @@
     --color-hapushov: oklch(57.7% 0.245 27.325); /*red-600*/
     --color-edit: oklch(62.3% 0.214 259.815); /*blue-500*/
     --color-edithov: oklch(54.6% 0.245 262.881); /*blue-600*/
+    --color-canceled: oklch(87.2% 0.01 258.338); /*gray-300*/
+    --color-canceledhov: oklch(70.7% 0.022 261.325); /*gray-500*/
+    --color-info: oklch(0.66 0.1105 212.17); /*#17a2b8*/
+    --color-infohov: oklch(0.51 0.09034776642657427 215.94395528514525); /*#007287*/
+    --color-success: oklch(0.64 0.1751 146.74); /*#28a745*/
+    --color-successhov: oklch(0.51 0.1650683709419067 143.84687596291317); /*#007b15*/
 }
 @layer utilities {
     table td, table th {

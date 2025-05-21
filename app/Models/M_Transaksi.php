@@ -14,6 +14,7 @@ class M_Transaksi extends Model
         'pasang_lelang_id',
         'gross_amount',
         'alamat',
+        'snap_token',
         'url_midtrans',
         'payment_time',
         'payment_method_id',

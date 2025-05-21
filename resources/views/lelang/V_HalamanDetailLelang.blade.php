@@ -172,7 +172,18 @@
                                             Lelang<br>Dihapus
                                         </button>
                                     </a>
-                                @elseif (is_null($userBids))
+                                @elseif ($lelang->tanggal_ditutup <= \Carbon\Carbon::now())
+                                    <a class="p-4 rounded-lg bg-gray-400 w-full
+                                        sm:w-auto"
+                                        >
+                                        <button disabled>
+                                            Lelang<br>Berakhir
+                                        </button>
+                                    </a>
+                                @elseif ((is_null($userBids))
+                                    && ($lelang->tanggal_dibuka <= \Carbon\Carbon::now())
+                                    && ($lelang->tanggal_ditutup > \Carbon\Carbon::now())
+                                    )
                                     <a class="rounded-lg bg-sekunderDark w-full h-full
                                         hover:bg-primer transition"
                                         >
@@ -183,7 +194,7 @@
                                             Pasang<br>Tawaran
                                         </button>
                                     </a>
-                                @else
+                                @elseif ($userBids)
                                     <a class="rounded-lg bg-blue-500 w-full h-full
                                         hover:bg-blue-600 transition
                                         sm:w-auto"
@@ -208,6 +219,17 @@
                                                 Batalkan<br>Tawaran
                                             </button>
                                         </form>
+                                    </a>
+                                @else
+                                    <a class="rounded-lg bg-canceledhov w-full h-full
+                                        transition"
+                                        >
+                                        <button
+                                            class="p-4 w-full
+                                                sm:w-auto"
+                                            >
+                                            Menunggu<br>Dibuka
+                                        </button>
                                     </a>
                                 @endif
                             @endif

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Berkayk\OneSignal\OneSignalClient;
 
 class C_Notification
 {
@@ -61,4 +62,14 @@ class C_Notification
     {
         //
     }
+
+    // public function sendNotification(Request $request) {
+    //     OneSignal::sendNotificationToAll(
+    //     "Some Message",
+    //     $url = null,
+    //     $data = null,
+    //     $buttons = null,
+    //     $schedule = null
+    // );
+    // }
 }

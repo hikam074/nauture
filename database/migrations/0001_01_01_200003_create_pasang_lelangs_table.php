@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('pasang_lelangs', function (Blueprint $table) {
             $table->id();
-            $table->string('lelang_id');  // FK ke lelangs
+            $table->unsignedBigInteger('lelang_id');  // FK ke lelangs
             $table->unsignedBigInteger('user_id');  // FK ke users
             $table->integer('harga_pengajuan');
+            $table->datetime('waktu_dimenangkan')->nullable();
             $table->softDeletes();  // deleted_at
 
             $table->timestamps();

@@ -19,7 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('pasang_lelang_id'); // FK ke pasang_lelangs
             $table->integer('gross_amount');
             $table->string('alamat');
-            $table->string('url_midtrans');
+            $table->string('snap_token')->nullable();
+            $table->string('url_midtrans')->nullable();
             $table->datetime('payment_time')->nullable();
             $table->unsignedBigInteger('payment_method_id')->nullable();    // FK ke payment_methods
             $table->unsignedBigInteger('status_transaksi_id');              // FK ke status_transaksis
@@ -53,7 +54,7 @@ return new class extends Migration
             $table->dropColumn('pasang_lelang_id');
         });
         // hapus reference ke payment_methods
-        Schema::table('payment_methods', function (Blueprint $table) {
+        Schema::table('transaksis', function (Blueprint $table) {
             $table->dropForeign(['payment_method_id']);
             $table->dropColumn('payment_method_id');
         });

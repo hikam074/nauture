@@ -15,20 +15,22 @@ class StatusTransaksiSeeder extends Seeder
     {
         // Pastikan status_pembayaran yang sama tidak dibuat dua kali
         $arr = [
+            'Applying : Mengirim permintaan invoice',
             'Pending : Transaksi belum dibayar',
             'Settlement : Pembayaran Berhasil, Mengemas barang',
             'Expire : Waktu pembayaran telah habis',
             'Cancel : Transaksi dibatalkan',
             'Capture : Pembayaran kartu kredit telah ditangkap',
-            'Deny : Transaksi ditolak',
+            'Deny : Transaksi ditolak'
             ];
         $arrKode = [
+            'applying',
             'pending',
             'settlement',
             'expire',
             'cancel',
             'capture',
-            'deny',
+            'deny'
             ];
 
         foreach ($arr as $index => $nama) {

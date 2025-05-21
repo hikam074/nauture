@@ -7,15 +7,21 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\M_Lelang;
 use App\Models\M_PasangLelang;
+use App\Models\M_StatusTransaksi;
+use App\Models\M_Transaksi;
 use Exception;
 
 class C_PasangLelang
 {
     public function showFormPasangLelang() {
         if (Auth::check()) {
-            return response()->json(['loggedIn' => true]);
+            return response()->json(['loggedIn' => true], 200);
         } else {
-            return response()->json(['loggedIn' => false]);
+            return response()->json(['loggedIn' => false], 200);
+            // return redirect()->back()->with('error', [
+            //     'title' => 'Peringatan',
+            //     'message'  => 'Data harus diisi lengkap!'
+            // ]);
         }
     }
 
@@ -60,12 +66,12 @@ class C_PasangLelang
             // data valid, lanjut menyimpan
             return $this->insertPasangLelang($validated);
         }
-        else {
-            return redirect()->back()->with('error', [
+
+        return redirect()->back()->with('error', [
             'title' => 'Peringatan',
             'message'  => 'Data harus diisi lengkap!'
         ]);
-        }
+
     }
 
     public function insertPasangLelang($data) {
@@ -89,25 +95,96 @@ class C_PasangLelang
 
 
 
+    public function showDataLelangUserIni()
+    {
+        $id = Auth::user()->id;
+        $allBids = M_PasangLelang::with(['lelang', 'transaksi'])->get()->where('user_id', $id);
+        // $thisTransaksi = M_Transaksi::findOrFail();
+
+        $allBids->each(function ($bid) {
+            if ($bid->lelang) {
+                // Cari bider tertinggi berdasarkan harga pengajuan
+                $topBid = $bid->lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
+                $biderTertinggiId = $topBid ? $topBid->user_id : null;
+
+                if (now()->lessThan($bid->lelang->tanggal_ditutup)) {
+                    // Lelang masih berlangsung
+                    if ($biderTertinggiId == $bid->user_id) {
+                        $bid->status = 'Berlangsung, Penawar Tertinggi';
+                    } else {
+                        $bid->status = 'Berlangsung, BUKAN Penawar Tertinggi';
+                    }
+                } else {
+                    // Lelang telah selesai
+                    $selisihWaktu = now()->diffInHours($bid->lelang->tanggal_ditutup);
+                    $settle = M_StatusTransaksi::where('kode_status_transaksi', 'settlement')->first()->id;
+                    $capture = M_StatusTransaksi::where('kode_status_transaksi', 'capture')->first()->id;
+                    $pending = M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id;
+
+                    $transaksiIsSettlement = $bid->transaksi
+                        ->where('pasang_lelang_id', $bid->id)
+                        ->whereIn('status_transaksi_id', [$settle, $capture])
+                        ->first();
+                    $transaksiIsOngoing = $bid->transaksi
+                        ->where('pasang_lelang_id', $bid->id)
+                        ->where('status_transaksi_id', $pending)
+                        ->first();
+
+                    if ($bid->id == $bid->lelang->pemenang_id)
+                    {
+                        if ($transaksiIsSettlement) {
+                            $bid->status = 'Menang, selesai dibayar';
+                        } elseif ($selisihWaktu <= 3 && $transaksiIsOngoing) {
+                            $bid->status = 'Menang, segera selesaikan pembayaran';
+                        } elseif ($selisihWaktu <= 3 ) {
+                            $bid->status = 'Menang, belum dibayar';
+                        } else {
+                            $bid->status = 'Dialihkan ke pemenang lain';
+                        }
+                    } else {
+                        $bid->status = 'Kalah';
+                    }
+                }
+            } else {
+                // Tidak ada data lelang yang terkait
+                $bid->status = 'TIDAK VALID';
+            }
+        });
+        // reset index
+        $allBids = $allBids->values();
+        return view('dashboard.lelangAnda', compact('allBids'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        // Pastikan user login
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
+    // public function show(string $id)
+    // {
+    //     // Pastikan user login
+    //     if (!Auth::check()) {
+    //         return redirect()->route('login');
+    //     }
 
-        $lelang = M_Lelang::findOrFail($id);
+    //     $lelang = M_Lelang::findOrFail($id);
 
-        // Periksa apakah user sudah memiliki tawaran
-        $existingBid = M_PasangLelang::where('user_id', Auth::id())
-            ->where('lelang_id', $id)
-            ->first();
+    //     // Periksa apakah user sudah memiliki tawaran
+    //     $existingBid = M_PasangLelang::where('user_id', Auth::id())
+    //         ->where('lelang_id', $id)
+    //         ->first();
 
-        return view('lelang.show', compact('lelang', 'existingBid'));
-    }
+    //     return view('lelang.show', compact('lelang', 'existingBid'));
+    // }
 
 
 

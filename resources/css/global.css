@@ -2,3 +2,20 @@
 * {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    vertical-align: top; /* Pastikan semua konten berada di atas */
+    padding: 8px; /* Beri ruang pada konten */
+    text-align: left; /* Untuk perataan teks */
+    word-wrap: break-word; /* Memastikan kata panjang terpotong */
+}
+tr {
+    height: auto; /* Pastikan tinggi baris otomatis mengikuti konten */
+}
+th {
+    text-align: center;
+}

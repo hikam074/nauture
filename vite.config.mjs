@@ -7,11 +7,11 @@ export default defineConfig({
         tailwindcss(),
         laravel({
             input: [
+                'resources/css/app.css',
                 'resources/css/global.css',
-                'resources/css/auth-login.css',
-                'resources/css/auth-register.css',
-                'resources/js/auth-login.js',
-                'resources/js/auth-register.js',
+                'resources/js/app.js',
+                'resources/js/bootstrap.js',
+                'resources/js/sweetalert.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
         }),

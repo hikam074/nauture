@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // jalankan seeder untuk input data & enum
         $this->call(RoleSeeder::class);
-        $this->call(AdminSeeder::class);
+        $this->call(AkunSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(SaldoSeeder::class);
         $this->call(PaymentMethodSeeder::class);

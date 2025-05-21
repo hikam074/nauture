@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\M_Role;
+use Laravel\Sanctum\HasApiTokens;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -73,10 +74,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(M_PasangLelang::class);
     }
-    
+
     // deklarasi this user_id bisa punya banyak user_id di log_masuks
     public function logMasuk()
     {
         return $this->hasMany(M_LogMasuk::class);
     }
+
+
+    public function lelangMenang()
+    {
+        return $this->hasMany(M_Lelang::class, 'pemenang_id');
+    }
+    public function transaksi()
+    {
+        return $this->hasManyThrough(
+            M_Transaksi::class,
+            M_PasangLelang::class,
+            'user_id',       // Foreign key di M_PasangLelang
+            'pasang_lelang_id', // Foreign key di M_Transaksi
+            'id',            // Local key di User
+            'id'             // Local key di M_PasangLelang
+        );
+    }
+
 }
