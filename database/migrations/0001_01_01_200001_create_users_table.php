@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Hapus folder users dan isinya
+        if (Storage::disk('public')->exists('users')) {
+            Storage::disk('public')->deleteDirectory('users');
+        }
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');

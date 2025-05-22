@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Hapus folder lelangs dan isinya
+        if (Storage::disk('public')->exists('lelangs')) {
+            Storage::disk('public')->deleteDirectory('lelangs');
+        }
+
         Schema::create('lelangs', function (Blueprint $table) {
             $table->id();
             $table->string('kode_lelang')->unique();

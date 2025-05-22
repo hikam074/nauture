@@ -123,7 +123,7 @@
                         sm:w-48"
                         onclick="window.location.href='{{ route('lelang.show', ['id' => $lelang->id]) }}'"
                         >
-                        <img src="{{ asset('storage/' . $lelang->katalog->foto_produk) }}" alt="[{{ $lelang->katalog->nama_produk }}]"
+                        <img src="{{ asset('storage/' . $lelang->foto_produk) }}" alt="[{{ $lelang->nama_produk }}]"
                             class="w-full h-40 object-cover rounded-md"
                         >
                         <h2 class="text-lg font-semibold mt-2">{{ $lelang->nama_produk_lelang }}</h2>

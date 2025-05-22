@@ -55,8 +55,8 @@
             <!-- INPUT ALAMAT DETAIL -->
             <div class="flex gap-5">
                 <div class="w-full">
-                    <label for="addressDetail" class="text-sm">Alamat Detail :</label>
-                    <input type="text" name="detail_alamat" id="addressDetail" class="w-full p-2 border rounded" placeholder="Contoh : Jl. Tidar 1 No.3 Kranjingan Sumbersari Jember Jawa Timur">
+                    <label for="addressDetail" class="text-sm">Alamat Detail (tulis ulang secara lengkap):</label>
+                    <input type="text" name="detail_alamat" id="addressDetail" class="w-full p-2 border rounded" placeholder="Contoh : Jl. Tidar 1 No.3 Kranjingan Sumbersari Jember Jawa Timur 68123" value="{{ Auth::user()->alamat }}">
                 </div>
             </div>
         </div>
@@ -188,7 +188,7 @@
                 }
                 const select = document.getElementById('destinationList');
                 select.innerHTML = destinations.map(loc =>
-                    `<option value="${loc.id}">${loc.province_name}, ${loc.city_name}, ${loc.district_name}, ${loc.subdistrict_name}</option>`
+                    `<option value="${loc.id}">${loc.province_name}, ${loc.city_name}, ${loc.district_name}, ${loc.subdistrict_name} ${loc.zip_code}</option>`
                 ).join('');
                 if (select.options.length > 0) {
                     select.selectedIndex = 0;   // Pilih otomatis opsi pertama

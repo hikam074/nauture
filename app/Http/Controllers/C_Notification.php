@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Berkayk\OneSignal\OneSignalClient;
+use App\Services\OneSignalService;
 
 class C_Notification
 {
@@ -63,13 +63,19 @@ class C_Notification
         //
     }
 
-    // public function sendNotification(Request $request) {
-    //     OneSignal::sendNotificationToAll(
-    //     "Some Message",
-    //     $url = null,
-    //     $data = null,
-    //     $buttons = null,
-    //     $schedule = null
-    // );
-    // }
+    public function sendNotification($judul, $isiPesan, $url = null)
+    {
+        if ($url == null) {$url = config('onesignal.this_app_url');}
+        
+        $oneSignal = new OneSignalService();
+        $response = $oneSignal->sendNotification(
+            $judul, // Judul
+            $isiPesan, // pesan
+            $url // Opsional, URL tujuan.
+        );
+        if (isset($response['error'])) {
+            return response()->json(['status' => 'failed', 'message' => $response['error']], 500);
+        }
+        return response()->json(['status' => 'success', 'data' => $response]);
+    }
 }

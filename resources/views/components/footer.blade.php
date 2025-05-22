@@ -7,7 +7,7 @@
         class="h-20">
     </a>
     <!-- DESKRIPSI -->
-    <p class="text-center py-5">Sistem Lelang Hasil Panen © 2025 - Platform terpercaya untuk perdagangan hasil pertanian secara adil dan efisien.</p>
+    <p class="text-center py-5">Platform Lelang Hasil Panen © 2025 - Platform terpercaya untuk perdagangan hasil pertanian secara adil dan efisien.</p>
 
     <d class="flex flex-col justify-between gap-5 py-2 w-full text-sm text-primer
         sm:text-base sm:px-10 sm:flex-row">

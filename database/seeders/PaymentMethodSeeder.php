@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\M_PaymentMethod;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PaymentMethodSeeder extends Seeder
 {
@@ -13,45 +14,16 @@ class PaymentMethodSeeder extends Seeder
      */
     public function run(): void
     {
-        // pembayaran publishing mode, pastikan metode_pembayaran yang sama tidak dibuat dua kali
+        DB::table('payment_methods')->truncate();
         $arr = [
-            'Visa',
-            'Mastercard',
-            'JCB',
-            'American Express',
-            'Virtual Account BRI',
-            'Virtual Account BNI',
-            'Virtual Account BCA',
-            'Virtual Account CIMB Niaga',
-            'Virtual Account PermataBank',
-            'Alfamart',
-            'Q-ris',
-            'OVO',
-            'DANA',
-            'LinkAja',
-            'Direct Debit',
+            'Mandiri Bill',
+            'PermataBank',
+            'QRIS[GoPay/ShopeePay/Dana/OVO/LinkAja]',
         ];
         $arrKode = [
-            'credit_card',
-            'bca_va',
-            'bni_va',
-            'bri_va',
-            'permata_va',
-            'mandiri_bill',
-            'cimb_va',
-            'gopay',
-            'shopeepay',
+            'echannel',
+            'bank_transfer',
             'qris',
-            'indomaret',
-            'alfamart',
-            'akulaku',
-            'kredivo',
-            'bca_klikpay',
-            'klikbca',
-            'cimb_clicks',
-            'danamon_online',
-            'bri_epay',
-            'uob_ezpay',
         ];
 
         foreach ($arr as $index => $name) {

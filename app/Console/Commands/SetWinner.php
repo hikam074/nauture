@@ -13,7 +13,7 @@ class SetWinner extends Command
      *
      * @var string
      */
-    protected $signature = 'lelang:set-winner';
+    protected $signature = 'lelang-set-winner';
 
     /**
      * The console command description.
@@ -27,7 +27,7 @@ class SetWinner extends Command
      */
     public function handle()
     {
-        Log::info('Command lelang:set-winner started.');
+        Log::info('Command lelang-set-winner started.');
         $now = now();
 
         // Ambil lelang yang sudah mencapai batas waktu

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\C_Midtrans;
+use App\Http\Controllers\C_Notification;
 use App\Http\Controllers\C_OpenRoute;
 use App\Http\Controllers\C_RajaOngkir;
 use Illuminate\Http\Request;
@@ -19,6 +20,4 @@ Route::get('/cari-lokasi', [C_RajaOngkir::class, 'cariDestination'])
 // POST rajaongkir hitung ongkir
 Route::post('/cek-ongkir', [C_RajaOngkir::class, 'hitungOngkir'])
     ->name('rajaongkir.hitungOngkir');
-// POST openroutfe hitung jarak
-Route::post('/cek-jarak', [C_OpenRoute::class, 'cariRuteJarak'])
-    ->name('openroute.hitungJarak');
+Route::get('/send-notification', [C_Notification::class, 'sendNotification']);

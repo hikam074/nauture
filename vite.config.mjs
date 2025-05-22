@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
@@ -16,4 +17,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    // server: {
+    //     // host: 'nauture_devmidtrans.test', // Ganti dengan domain Laragon Anda
+    //     host: 'nauture_devmidtrans.test', // Ganti dengan domain Laragon Anda
+    //     https: {
+    //         key: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.key'),
+    //         cert: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.crt'),
+    //     },
+    // },
 });

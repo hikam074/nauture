@@ -18,6 +18,12 @@ use Carbon\Carbon;
 
 class C_Lelang
 {
+    protected $notifController;
+    public function __construct(C_Notification $notifController)
+    {
+        $this->notifController = $notifController;
+    }
+
     public function getDataLelang(Request $request)
     {
         $filter = $request->query('filter', 'active'); // Default 'active' jika tidak ada filter.
@@ -259,6 +265,13 @@ class C_Lelang
                 'foto_produk' => $fotoProdukPath,
                 'katalog_id' => $request->katalog_id,
             ]);
+
+            if($lelang) {
+                $judul = 'LELANG BARU DIBUKA!';
+                $pesan = 'Lelang '.$lelang->nama_produk_lelang.' mulai dari '.$lelang->harga_dibuka.'! ditutup : '.$lelang->tanggal_ditutup;
+                $url = config('onesignal.this_app_url').'/lelang/'.$lelang->id;
+                $this->notifController->sendNotification($judul, $pesan, $url);
+            }
 
             return redirect()->route('lelang.index')->with('success', [
                     'title' => 'Berhasil',

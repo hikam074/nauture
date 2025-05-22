@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\M_PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -30,8 +31,9 @@ class C_Midtrans extends Controller
             $orderId = $payload['order_id'] ?? null;
             $status = $payload['status_code'] ?? null;
             $grossAmount = $payload['gross_amount'] ?? null;
+            $paymentmethod = $payload['payment_type'] ?? null;
 
-            if (!$orderId || !$status || !$grossAmount) {
+            if (!$orderId || !$status || !$grossAmount || !$paymentmethod) {
                 return response()->json(['message' => 'Invalid payload'], 400);
             }
 
@@ -51,6 +53,15 @@ class C_Midtrans extends Controller
 
             if (!$order) {
                 return response()->json(['message' => 'Order not found'], 404);
+            }
+
+            try {
+                $selectedPaymentMethod = M_PaymentMethod::where('kode_payment_method', $paymentmethod)->first()->id;
+                // if (!$selectedPaymentMethod)
+                //     return response()->json(['message' => 'Payment method not found'], 404);
+                $order->payment_method_id = $selectedPaymentMethod;
+            } catch (Exception $e) {
+                Log::error('Error cari payment method: ' . $e->getMessage());
             }
 
             // Update status transaksi berdasarkan status dari Midtrans

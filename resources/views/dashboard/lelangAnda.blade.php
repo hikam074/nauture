@@ -74,7 +74,7 @@
                             <td class="text-white font-semibold text-sm">
                                 @if ($myBid->status ==='Menang, belum dibayar')
                                     <a class="">
-                                        <button type="button" onclick="openPopup({{ $myBid->id }}, {{ $myBid->lelang->jumlah_kg }}, {{ $myBid->harga_pengajuan }}, {{ $myBid->lelang->jumlah_kg }}, '{{ $myBid->lelang->kode_lelang }}')"
+                                        <button type="button" onclick="openPopup({{ $myBid->id }}, {{ $myBid->lelang->jumlah_kg }}, {{ $myBid->harga_pengajuan }}, '{{ $myBid->lelang->kode_lelang }}')"
                                             class="h-full w-full px-3 py-2 rounded-lg bg-sekunderDark
                                                 hover:bg-primer"
                                             >
@@ -89,12 +89,20 @@
                                             Lihat
                                         </button>
                                     </a>
-                                @elseif ($myBid->status == ('Menang, selesai dibayar' || 'Menang, segera selesaikan pembayaran'))
+                                @elseif ($myBid->status === ('Menang, segera selesaikan pembayaran'))
                                     <a href="{{ route('transaksi.index') }}">
                                         <button class="h-full w-full bg-info rounded-lg px-3 py-2
                                                 hover:bg-infohov"
                                             >
                                             Lihat Transaksi
+                                        </button>
+                                    </a>
+                                @elseif ($myBid->status === ('Menang, selesai dibayar'))
+                                    <a href="{{ route('lelang.show', ['id' => $myBid->lelang_id]) }}">
+                                        <button class="h-full w-full bg-info rounded-lg px-3 py-2
+                                                hover:bg-infohov"
+                                            >
+                                            Beri Penilaian
                                         </button>
                                     </a>
                                 @else
@@ -116,25 +124,37 @@
 
     <script>
         const popup = document.getElementById('popupAlamat');
+        const popupContent = document.getElementById('alamatContent');
         const closePopup = document.getElementById('closePopup');
         // const content = document.getElementById('alamatContent');
 
         // Function to open popup
-        function openPopup(pasang_lelang_id, weight, hargaBid, beratPaket, kodeLelang) {
+        function openPopup(pasang_lelang_id, weight, hargaBid, kodeLelang) {
             document.getElementById('pasang_lelang_id').value = pasang_lelang_id;
             document.getElementById('weight').value = weight;
             document.getElementById('hargaBid').value = hargaBid;
-            document.getElementById('beratPaket').value = beratPaket;
-            document.getElementById('kodeLelang').value = kodeLelang;
+            document.getElementById('beratPaket').innerText = weight;
+            document.getElementById('kodeLelang').innerText = kodeLelang;
             document.getElementById('konfirmasiBiayaLelang').innerText = hargaBid.toLocaleString('id-ID');
-            popup.classList.remove('hidden');
-            popup.classList.add('flex');
+
+            popup.classList.remove('hidden', 'fade-out');
+            popupContent.classList.remove('move-up');
+            popup.classList.add('fade-in', 'flex');
+            popupContent.classList.add('move-down');
         }
 
         // Close popup when "Batal" is clicked
         closePopup.addEventListener('click', () => {
-            popup.classList.add('hidden');
-            popup.classList.remove('flex');
+            popup.classList.remove('fade-in');
+            popupContent.classList.remove('move-down');
+            popup.classList.add('fade-out');
+            popupContent.classList.add('move-up');
+
+            // Tunggu hingga animasi selesai, lalu sembunyikan popup
+            setTimeout(() => {
+                popup.classList.remove('flex');
+                popup.classList.add('hidden');
+            }, 500);
         });
     </script>
 

@@ -22,6 +22,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         // tentukan pemenang setiap jam
-        $schedule->command('lelang:set-winner')->hourly();
+        $schedule->command('lelang-set-winner')->hourly();
     })
     ->create();

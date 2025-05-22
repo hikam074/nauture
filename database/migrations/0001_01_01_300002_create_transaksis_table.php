@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->string('order_id')->unique();
+            $table->string('order_id')->unique();   // kode transaksi
             $table->unsignedBigInteger('lelang_id');        // FK ke lelangs
             $table->unsignedBigInteger('pasang_lelang_id'); // FK ke pasang_lelangs
             $table->integer('gross_amount');

@@ -56,7 +56,7 @@ class C_Transaksi extends Controller
         $currentDateTime = Carbon::now()->format('Ymd-His');
         // Hitung jumlah kode transaksi yang telah dibuat untuk pasang_lelang_id tertentu
         $countKodeTransaksi = M_Transaksi::where('pasang_lelang_id', $pasang_lelang_id)
-            ->whereNotNull('kode_transaksi') // Memastikan kode transaksi sudah digenerate
+            ->whereNotNull('order_id') // Memastikan kode transaksi sudah digenerate
             ->count();
         // Generate kode transaksi
         $kodeTransaksi = sprintf(
@@ -131,7 +131,8 @@ class C_Transaksi extends Controller
                     'postal_code' => $postalCode,
                     'country_code' => "IDN"
                 )
-            )
+            ),'enabled_payments' => ['bank_transfer', 'qris', 'echannel'],
+
         );
 
         // dd($request->all());
@@ -148,7 +149,7 @@ class C_Transaksi extends Controller
     }
 
     public function showHalamanChekout($id) {
-        $transaksi = M_Transaksi::findOrFail($id);
+        $transaksi = M_Transaksi::with(['pasangLelang', 'lelang'])->findOrFail($id);
         if ($transaksi->status_transaksi_id != M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id) {
             return redirect()->back()->with('error', 'Transaksi ini sudah selesai atau dibatalkan.');
         }

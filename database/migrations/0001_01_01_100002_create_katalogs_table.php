@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Hapus folder katalog dan isinya
+        if (Storage::disk('public')->exists('katalogs')) {
+            Storage::disk('public')->deleteDirectory('katalogs');
+        }
+
         Schema::create('katalogs', function (Blueprint $table) {
             $table->id();
             $table->string('nama_produk')->unique();
