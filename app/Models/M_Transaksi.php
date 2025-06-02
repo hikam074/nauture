@@ -13,7 +13,7 @@ class M_Transaksi extends Model
         'lelang_id',
         'pasang_lelang_id',
         'gross_amount',
-        'alamat',
+        'alamat_id',
         'snap_token',
         'url_midtrans',
         'payment_time',
@@ -29,7 +29,12 @@ class M_Transaksi extends Model
     // reference this pasang_lelang_id ke pasang_lelangs id
     public function pasangLelang()
     {
-        return $this->belongsTo(M_PasangLelang::class);
+        return $this->belongsTo(M_PasangLelang::class, 'pasang_lelang_id');
+    }
+    // reference this alamat ke alamats id
+    public function alamat()
+    {
+        return $this->belongsTo(M_Alamat::class, 'alamat_id');
     }
     // reference this metode_pembayaran_id ke metode_pembayaran id
     public function paymentMethod()

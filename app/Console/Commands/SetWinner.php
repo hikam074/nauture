@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\M_Lelang;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -60,10 +61,9 @@ class SetWinner extends Command
                 Log::info('Auctions updated');
             } else {
                 // Soft delete lelang
-                DB::table('lelangs')->where('id', $auction->id)->update([
-                    'deleted_at' => $now,
-                ]);
-                Log::info('Auctions deleted');
+                $data = M_Lelang::find($auction->id);
+                $data->delete();
+                Log::info('Auctions deleted id: '.$auction->id);
             }
         }
         Log::info('Auctions found: ' . $auctions->count());

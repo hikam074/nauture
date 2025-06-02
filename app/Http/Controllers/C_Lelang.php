@@ -19,7 +19,7 @@ use Carbon\Carbon;
 class C_Lelang
 {
     protected $notifController;
-    public function __construct(C_Notification $notifController)
+    public function __construct(C_Notifikasi $notifController)
     {
         $this->notifController = $notifController;
     }
@@ -40,15 +40,15 @@ class C_Lelang
 
         // Filter berdasarkan status
         if ($filter === 'deleted') {
-            $query->onlyTrashed()->whereNull('pemenang_id');
+            $query->onlyTrashed();
         } elseif ($filter === 'completed') {
-            $query->onlyTrashed()->whereNotNull('pemenang_id');
+            $query->whereNotNull('pemenang_id');
         } elseif ($filter === 'active') {
-            $query->whereNull('deleted_at');
+            $query->whereNull(['deleted_at', 'pemenang_id']);
         } elseif ($filter === 'all') {
             $query->withTrashed();
         } else {
-            $query->whereNull('deleted_at'); // Default: Lelang yang masih berlangsung.
+            $query->whereNull(['deleted_at', 'pemenang_id']); // Default: Lelang yang masih berlangsung.
         }
 
         // Ambil data di tabel `pasang_lelangs` jika ada
@@ -72,6 +72,8 @@ class C_Lelang
             $query->orderBy('nama_produk_lelang', 'asc'); // Mengurutkan berdasarkan nama produk secara abjad
         } elseif ($sortBy === 'highest_bid') {
             $query->orderBy('harga_dibuka', 'desc'); // Mengurutkan berdasarkan harga tertinggi
+        } elseif ($sortBy === 'closed_soon') {
+            $query->orderBy('tanggal_ditutup', 'asc'); // Mengurutkan berdasarkan paling deket ditutup
         }
 
         // kalo pagination
@@ -266,11 +268,13 @@ class C_Lelang
                 'katalog_id' => $request->katalog_id,
             ]);
 
+            // generate notif
             if($lelang) {
+                $idLelang = $lelang->id;
                 $judul = 'LELANG BARU DIBUKA!';
                 $pesan = 'Lelang '.$lelang->nama_produk_lelang.' mulai dari '.$lelang->harga_dibuka.'! ditutup : '.$lelang->tanggal_ditutup;
                 $url = config('onesignal.this_app_url').'/lelang/'.$lelang->id;
-                $this->notifController->sendNotification($judul, $pesan, $url);
+                $this->notifController->sendNotification($idLelang, $judul, $pesan, $url);
             }
 
             return redirect()->route('lelang.index')->with('success', [
@@ -469,6 +473,31 @@ class C_Lelang
             'title' => 'Berhasil Ubah!',
             'message'  => 'Lelang berhasil diperbarui'
         ]);
+    }
+
+
+
+
+    public function getSemuaLelang() {
+        $lelangs = M_Lelang::withTrashed()->get();
+
+        $lelangs->each(function ($lelang) {
+            if ($lelang->trashed()) {
+                $lelang->status = 'Dibatalkan';
+            } else if ($lelang->pemenang_id) {
+                $lelang->status = 'Selesai, ada pemenang';
+            } else if (($lelang->tanggal_dibuka < now()) && ($lelang->tanggal_ditutup > now())) {
+                $lelang->status = 'Berlangsung';
+            } else if (($lelang->tanggal_ditutup < now()) && (!$lelang->pemenang_id)) {
+                $lelang->status = 'Selesai, tidak ada pemenang';
+            } else {
+                $lelang->status = 'Belum dibuka';
+            }
+        });
+        // reset index
+        $lelangs = $lelangs->values();
+
+        return view('dashboard.listLelang', compact('lelangs'));
     }
 
 

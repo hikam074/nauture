@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\M_Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -24,12 +25,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        if (!Storage::disk('public')->exists('users')) {
+            Storage::disk('public')->makeDirectory('users');
+        }
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('3'),
             'role_id' => 3,
-            'isSuspended' => $this->faker->boolean(10),
+            'SuspendPoint' => $this->faker->numberBetween(0, 1),
             'no_telp' => $this->faker->phoneNumber(),
             'created_at' => now(),
             'updated_at' => now(),

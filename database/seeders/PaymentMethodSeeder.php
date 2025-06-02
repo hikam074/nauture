@@ -14,7 +14,7 @@ class PaymentMethodSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('payment_methods')->truncate();
+        DB::table('payment_methods')->delete();
         $arr = [
             'Mandiri Bill',
             'PermataBank',

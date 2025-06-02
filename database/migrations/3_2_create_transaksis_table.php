@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('lelang_id');        // FK ke lelangs
             $table->unsignedBigInteger('pasang_lelang_id'); // FK ke pasang_lelangs
             $table->integer('gross_amount');
-            $table->string('alamat');
+            $table->unsignedBigInteger('alamat_id');
             $table->string('snap_token')->nullable();
             $table->string('url_midtrans')->nullable();
             $table->datetime('payment_time')->nullable();
@@ -31,6 +31,8 @@ return new class extends Migration
             $table->foreign('lelang_id')->references('id')->on('lelangs')->onDelete('cascade');
             // reference pasang_lelang_id ke pasang_lelangs
             $table->foreign('pasang_lelang_id')->references('id')->on('pasang_lelangs')->onDelete('cascade');
+            // reference alamat_id ke alamats
+            $table->foreign('alamat_id')->references('id')->on('alamats')->onDelete('cascade');
             // reference metode_pembayaran_id ke payment_methods
             $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('cascade');
             // reference status_transaksi_id ke status_transaksis

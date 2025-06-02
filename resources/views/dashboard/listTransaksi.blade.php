@@ -11,20 +11,21 @@
 @section('content')
     <div class="mb-5 flex flex-col gap-10 w-full">
         <div>
-            <h1 class="font-bold text-4xl">Transaksi Anda</h1>
-            <p class="font-thin text-sm">Semua transaksi yang anda lakukan</p>
+            <h1 class="font-bold text-4xl">Transaksi</h1>
+            <p class="font-thin text-sm">Semua transaksi NauTure</p>
         </div>
         <div>
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b-1 border-primer py-1">
                         <th>No.</th>
+                        <th>Nama User</th>
                         <th>Kode Transaksi</th>
                         <th>Kode Lelang</th>
                         <th>Harga</th>
                         <th>Status Saat Ini</th>
                         <th>Waktu Dibayar</th>
-                        <th>Aksi</th>
+                        <th>Aksi : Ubah Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,8 @@
                         <tr class="border-b-1 border-bsoft">
                             <!--NO.-->
                             <td class="text-center">{{ $index + 1 }}.</td>
+                            <!--NAMA USER-->
+                            <td class="max-w-30">{{ $transaksi->pasangLelang->user->name }}</td>
                             <!--KODE TRANSAKSI-->
                             <td class="max-w-30">{{ $transaksi->order_id }}</td>
                             <!--KODE LELANG-->
@@ -79,12 +82,12 @@
                             <td>{{ $transaksi->payment_time }}</td>
                             <!--AKSI-->
                             <td class="flex items-center justify-center ">
-                                @if ($transaksi->statusTransaksi->kode_status_transaksi === 'pending')
-                                    <a href="{{ route('transaksi.checkout', ['id' => $transaksi->id]) }}"
+                                @if ($transaksi->statusTransaksi->kode_status_transaksi === 'settlement')
+                                    <a href=""
                                         class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center
                                             hover:bg-primer hover:text-white"
                                         >
-                                        Lanjutkan<br>Pembayaran
+                                        Update<br>Telah Dikirim
                                     </a>
                                 @endif
                             </td>
@@ -95,6 +98,7 @@
         </div>
     </div>
 @endsection
+
 
 
 

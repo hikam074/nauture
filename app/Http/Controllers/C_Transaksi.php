@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\M_Alamat;
+use App\Models\M_City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,10 +14,27 @@ use App\Models\M_StatusTransaksi;
 use App\Models\User;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class C_Transaksi extends Controller
 {
-    public function createTransaksi(Request $request)
+    public function checkBatasWaktuPembayaran(Request $request) {
+        // dapatkan pasangLelangID
+        $pasang_lelang_id = $request->input('pasang_lelang_id');
+        // cari data pasangLelang berdasarkan ID diatas
+        $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
+
+        // hanya bisa buat transaksi 3 jam setelah dinyatakan menang
+        if ($pasang_lelang->waktu_dimenangkan && now()->diffInHours($pasang_lelang->waktu_dimenangkan) > 3) {
+            return redirect()->back()->with('error', [
+                'title' => 'Gagal',
+                'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
+            ]);
+        }
+        return $this->insertDataTransaksi($request);
+    }
+
+    public function insertDataTransaksi(Request $request)
     {
         // dapatkan pasangLelangID
         $pasang_lelang_id = $request->input('pasang_lelang_id');
@@ -42,14 +61,6 @@ class C_Transaksi extends Controller
         // ambil input detail
         $detail_alamat = $request->input('detail_alamat');
 
-        // hanya bisa buat transaksi 3 jam setelah dinyatakan menang
-        if ($pasang_lelang->waktu_dimenangkan && now()->diffInHours($pasang_lelang->waktu_dimenangkan) > 3) {
-            return redirect()->back()->with('error', [
-                'title' => 'Gagal',
-                'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
-            ]);
-        }
-
         // PEMBUATAN KODE TRANSAKSI
 
         // Ambil tanggal dan waktu saat ini
@@ -68,13 +79,19 @@ class C_Transaksi extends Controller
         );
 
         // VALIDASI ALAMAT
-        $alamatDiProfil = Auth::user()->alamat;
+        $alamatDiProfil = Auth::user()->alamat_id;
         if (!$alamatDiProfil) {
             return redirect()->back()->with('error', [
                 'title' => 'Anda Belum Mengisi Alamat',
                 'message' =>  'Silahkan tambahkan alamat anda di menu Profil!'
             ]);
         }
+        // buat instance alamat
+        $cityNameLower = $cityName.strtolower($cityName);
+        $address = M_Alamat::create([
+            'city_id' => M_City::where('nama_city', $cityNameLower)->first()->id,
+            'detail_alamat' => $detail_alamat,
+        ]);
 
         // SIMPAN DATA TRANSAKSI
         $transaksi = new M_Transaksi([
@@ -82,7 +99,7 @@ class C_Transaksi extends Controller
             'lelang_id' => $lelang->id,
             'pasang_lelang_id' => $pasang_lelang_id,
             'gross_amount' => $harga_total,
-            'alamat' => $detail_alamat,
+            'alamat_id' => $address->id,
             'status_transaksi_id' => M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id,
         ]);
 
@@ -131,17 +148,17 @@ class C_Transaksi extends Controller
                     'postal_code' => $postalCode,
                     'country_code' => "IDN"
                 )
-            ),'enabled_payments' => ['bank_transfer', 'qris', 'echannel'],
+            ),
+            // 'enabled_payments' => ['bank_transfer', 'qris', 'echannel'],
 
         );
 
-        // dd($request->all());
+        Log::info('Midtrans Params:', $params);
 
         $snapToken = \Midtrans\Snap::getSnapToken($params);
         $transaksi->snap_token = $snapToken;
         $transaksi->save();
 
-        // return redirect()->route('transaksi.checkout', ['id' => $transaksi->id]);
         return redirect()->back()->with('success', [
             'title' => 'Berhasil menginisiasi transaksi!',
             'message' =>  'Silahkan masuk ke tab transaksi untuk melanjutkan pembayaran'
@@ -156,13 +173,6 @@ class C_Transaksi extends Controller
         return view('transaksi.bayar', compact('transaksi'));
     }
 
-    public function showHalamanSukses($id) {
-        $transaksi = M_Transaksi::findOrFail($id);
-        // $transaksi->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'settlement')->first()->id;
-        // $transaksi->save();
-        return view('transaksi.success', compact('transaksi'));
-    }
-
     public function showDataTransaksiUserIni() {
         $user = User::find(Auth::id());
         $transaksis = M_Transaksi::with(['lelang', 'statusTransaksi'])
@@ -171,6 +181,15 @@ class C_Transaksi extends Controller
             })
             ->get();
         return view('dashboard.transaksi', compact('transaksis'));
+    }
+
+    public function showDataTransaksi() {
+        $transaksis = M_Transaksi::with('pasangLelang')->get();
+        return view('dashboard.listTransaksi', compact('transaksis'));
+    }
+
+    public function updateStatusPengiriman(Request $request) {
+        //
     }
 
 

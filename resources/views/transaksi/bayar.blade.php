@@ -61,7 +61,7 @@
         snap.pay('{{ $transaksi->snap_token }}', {
           // Optional
           onSuccess: function(result){
-            window.location.href = '{{ route('transaksi.success', ['id' => $transaksi->id]) }}'
+            window.location.href = '{{ route('transaksi.index')}}';
           },
           // Optional
           onPending: function(result){
@@ -69,10 +69,10 @@
           },
           // Optional
           onError: function(result){
-            window.location.href = '{{ route('profil.index') }}';
+            window.location.href = '{{ route('transaksi.index') }}';
           },
           onClose: function() {
-            alert('Anda telah menutup popup pembayaran. Anda dapat melanjutkan pembayaran nanti.');
+            alert('Anda dapat melanjutkan pembayaran di tab Transaksi');
             window.location.href = '{{ route('transaksi.index') }}';
           }
         });

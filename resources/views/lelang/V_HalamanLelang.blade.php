@@ -26,6 +26,7 @@
                                 >
                                 <option value="date_added" {{ request('sort_by') == 'date_added' ? 'selected' : '' }}>Default</option>
                                 <option value="alphabetical" {{ request('sort_by') == 'alphabetical' ? 'selected' : '' }}>Per Abjad</option>
+                                <option value="closed_soon" {{ request('sort_by') == 'closed_soon' ? 'selected' : '' }}>Segera Berakhir</option>
                             </select>
                             <span class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
                                 ▼

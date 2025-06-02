@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\M_Role;
+use Illuminate\Support\Facades\DB;
 
 class RoleSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('roles')->delete();
         // Pastikan role yang sama tidak dibuat dua kali
         $arr = [
             'owner',

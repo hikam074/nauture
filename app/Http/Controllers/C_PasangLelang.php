@@ -95,7 +95,7 @@ class C_PasangLelang
 
 
 
-    public function showDataLelangUserIni()
+    public function getDataLelangUserIni()
     {
         $id = Auth::user()->id;
         $allBids = M_PasangLelang::with(['lelang', 'transaksi'])->get()->where('user_id', $id);
@@ -152,9 +152,13 @@ class C_PasangLelang
         });
         // reset index
         $allBids = $allBids->values();
-        return view('dashboard.lelangAnda', compact('allBids'));
+        return $this->showDataLelangUserIni($allBids);
     }
 
+    public function showDataLelangUserIni($allBids)
+    {
+        return view('dashboard.V_HalamanLelangSaya', compact('allBids'));
+    }
 
 
 

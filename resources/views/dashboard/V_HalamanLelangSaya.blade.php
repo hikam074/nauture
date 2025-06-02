@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                     @foreach ($allBids as $index => $myBid)
-                        @include('dashboard.popup_alamat')
+                        @include('dashboard.V_FormTambahPembayaran')
                         <tr class="border-b-1 border-bsoft">
                             <!-- No. -->
                             <td class="text-center">{{ $index + 1 }}.</td>

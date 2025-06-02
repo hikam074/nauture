@@ -56,6 +56,6 @@ class M_Lelang extends Model
     // deklarasi this lelang_id bisa punya banyak lelang_id di notifications
     public function notification()
     {
-        return $this->hasMany(M_Notification::class);
+        return $this->hasMany(M_Notifikasi::class);
     }
 }

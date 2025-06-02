@@ -18,6 +18,6 @@ class M_Role extends Model
     // deklarasi this role_id bisa punya banyak role_id di users
     public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'role_id');
     }
 }

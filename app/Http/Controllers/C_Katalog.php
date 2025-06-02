@@ -242,6 +242,21 @@ class C_Katalog extends Controller
 
 
 
+    public function getSemuaKatalog() {
+        $katalogs = M_katalog::withTrashed()->get();
+
+        $katalogs->each(function ($katalog) {
+            $katalog->status = $katalog->trashed() ? 'Dihapus' : 'Aktif';
+        });
+        // reset index
+        $katalogs = $katalogs->values();
+
+        return view('dashboard.listKatalog', compact('katalogs'));
+    }
+
+
+
+
     /**
      * Remove the specified resource from storage.
      */

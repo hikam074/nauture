@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\M_StatusTransaksi;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class StatusTransaksiSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class StatusTransaksiSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('status_transaksis')->delete();
         // Pastikan status_pembayaran yang sama tidak dibuat dua kali
         $arr = [
             'Applying : Mengirim permintaan invoice',
@@ -21,7 +23,9 @@ class StatusTransaksiSeeder extends Seeder
             'Expire : Waktu pembayaran telah habis',
             'Cancel : Transaksi dibatalkan',
             'Capture : Pembayaran kartu kredit telah ditangkap',
-            'Deny : Transaksi ditolak'
+            'Deny : Transaksi ditolak',
+            'Delivering : Produk telah diserahkan ke pihak ekspedisi, produk dalam perjalanan',
+            'Delivered : Produk telah diterima oleh customer',
             ];
         $arrKode = [
             'applying',
@@ -30,7 +34,9 @@ class StatusTransaksiSeeder extends Seeder
             'expire',
             'cancel',
             'capture',
-            'deny'
+            'deny',
+            'delivering',
+            'delivered',
             ];
 
         foreach ($arr as $index => $nama) {

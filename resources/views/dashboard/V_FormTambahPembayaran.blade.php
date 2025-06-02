@@ -56,7 +56,11 @@
             <div class="flex gap-5">
                 <div class="w-full">
                     <label for="addressDetail" class="text-sm">Alamat Detail (tulis ulang secara lengkap):</label>
-                    <input type="text" name="detail_alamat" id="addressDetail" class="w-full p-2 border rounded" placeholder="Contoh : Jl. Tidar 1 No.3 Kranjingan Sumbersari Jember Jawa Timur 68123" value="{{ Auth::user()->alamat }}">
+                    @if (Auth::user()->alamat_id)
+                    <input type="text" name="detail_alamat" id="addressDetail" class="w-full p-2 border rounded" placeholder="Contoh : Jl. Tidar 1 No.3 Kranjingan Sumbersari Jember Jawa Timur 68123" value="{{ Auth::user()->alamat->detail_alamat }}">
+                    @else
+                    <input type="text" name="detail_alamat" id="addressDetail" class="w-full p-2 border rounded" placeholder="Contoh : Jl. Tidar 1 No.3 Kranjingan Sumbersari Jember Jawa Timur 68123" value="">
+                    @endif
                 </div>
             </div>
         </div>
@@ -375,5 +379,24 @@
         method.addEventListener('change', () => updateConfirmation());
     });
     updateConfirmation();
+
+    document.getElementById('submitBtn').addEventListener('click', function (e) {
+        e.preventDefault(); // Mencegah form terkirim langsung
+
+        showAlert({
+            title: 'Apakah Anda yakin ingin membuat pesanan?',
+            text: "Anda tidak bisa mengubah pesanan setelah ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Buat Pesanan',
+            cancelButtonText: 'Batal',
+            onConfirm: function () {
+                document.getElementById('pengirimans').submit(); // Kirim form secara manual
+            }
+        });
+    });
+
 
 </script>

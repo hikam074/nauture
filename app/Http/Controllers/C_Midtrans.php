@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\M_PaymentMethod;
+use App\Models\M_Saldo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -57,8 +58,6 @@ class C_Midtrans extends Controller
 
             try {
                 $selectedPaymentMethod = M_PaymentMethod::where('kode_payment_method', $paymentmethod)->first()->id;
-                // if (!$selectedPaymentMethod)
-                //     return response()->json(['message' => 'Payment method not found'], 404);
                 $order->payment_method_id = $selectedPaymentMethod;
             } catch (Exception $e) {
                 Log::error('Error cari payment method: ' . $e->getMessage());
@@ -69,10 +68,26 @@ class C_Midtrans extends Controller
                 case 'capture':
                     $order->payment_time = now();
                     $order->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'settlement')->first()->id;
+                    try {
+                        // tambah saldo
+                        $saldo =  M_Saldo::find(1);
+                        $saldo->saldo += $order->gross_amount;
+                        $saldo->save();
+                    } catch (Exception $e) {
+                        Log::error('Error tambah saldo: ' . $e->getMessage());
+                    }
                     break;
                 case 'settlement':
                     $order->payment_time = $payload['settlement_time'];
                     $order->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'settlement')->first()->id;
+                    try {
+                        // tambah saldo
+                        $saldo =  M_Saldo::find(1);
+                        $saldo->saldo += $order->gross_amount;
+                        $saldo->save();
+                    } catch (Exception $e) {
+                        Log::error('Error tambah saldo: ' . $e->getMessage());
+                    }
                     break;
                 case 'pending':
                     $order->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id;

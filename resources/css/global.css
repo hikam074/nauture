@@ -9,7 +9,7 @@ table {
 }
 th, td {
     vertical-align: top; /* Pastikan semua konten berada di atas */
-    padding: 8px; /* Beri ruang pada konten */
+    padding: 12px; /* Beri ruang pada konten */
     text-align: left; /* Untuk perataan teks */
     word-wrap: break-word; /* Memastikan kata panjang terpotong */
 }
@@ -18,6 +18,10 @@ tr {
 }
 th {
     text-align: center;
+}
+
+a, button {
+    cursor: pointer;
 }
 
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class M_PasangLelang extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
 
     protected $table = 'pasang_lelangs';
 
@@ -26,7 +26,7 @@ class M_PasangLelang extends Model
     // reference this user_id ke users id
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function transaksi()
     {

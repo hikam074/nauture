@@ -30,7 +30,7 @@ class User extends Authenticatable
         'password',
         'role_id',
         'isSuspended',
-        'alamat',
+        'alamat_id',
         'no_telp',
     ];
 
@@ -67,6 +67,11 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(M_Role::class, 'role_id');
+    }
+    // reference this alamat_id ke alamats id
+    public function alamat()
+    {
+        return $this->belongsTo(M_Alamat::class, 'alamat_id');
     }
 
     // deklarasi this user_id bisa punya banyak user_id di pasang_lelangs

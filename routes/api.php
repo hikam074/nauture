@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\C_Alamat;
 use App\Http\Controllers\C_Midtrans;
-use App\Http\Controllers\C_Notification;
+use App\Http\Controllers\C_Notifikasi;
 use App\Http\Controllers\C_OpenRoute;
 use App\Http\Controllers\C_RajaOngkir;
 use Illuminate\Http\Request;
@@ -20,4 +21,7 @@ Route::get('/cari-lokasi', [C_RajaOngkir::class, 'cariDestination'])
 // POST rajaongkir hitung ongkir
 Route::post('/cek-ongkir', [C_RajaOngkir::class, 'hitungOngkir'])
     ->name('rajaongkir.hitungOngkir');
-Route::get('/send-notification', [C_Notification::class, 'sendNotification']);
+Route::get('/send-notification', [C_Notifikasi::class, 'sendNotification']);
+// GET this_database cari city
+Route::get('/cari-city/{id}', [C_Alamat::class, 'getDataCity'])
+    ->name('nauture.cariCity');

@@ -13,8 +13,9 @@ class DatabaseSeeder extends Seeder
     {
         // jalankan seeder untuk input data & enum
         $this->call(RoleSeeder::class);
+        $this->call(ProvinsiSeeder::class);
+        $this->call(CitySeeder::class);
         $this->call(AkunSeeder::class);
-        $this->call(RoleSeeder::class);
         $this->call(SaldoSeeder::class);
         $this->call(PaymentMethodSeeder::class);
         $this->call(StatusTransaksiSeeder::class);
