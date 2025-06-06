@@ -24,6 +24,8 @@
                         <th>Harga</th>
                         <th>Status Saat Ini</th>
                         <th>Waktu Dibayar</th>
+                        <th>No. Resi</th>
+                        <th>Metode pembayaran</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -87,6 +89,10 @@
                             @endif
                             <!--PAYMENT TIME-->
                             <td>{{ $transaksi->payment_time }}</td>
+                            <!--NO RESI-->
+                            <td>{{ $transaksi->no_resi }}</td>
+                            <!--METODE PEMBAYARAN-->
+                            <td>{{ $transaksi->paymentMethod->nama_payment_method }}</td>
                             <!--AKSI-->
                             <td >
                                 <div class="flex items-center justify-center ">

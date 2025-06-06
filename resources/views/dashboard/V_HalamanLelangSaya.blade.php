@@ -78,7 +78,7 @@
                                             class="h-full w-full px-3 py-2 rounded-lg bg-sekunderDark
                                                 hover:bg-primer"
                                             >
-                                            Bayar
+                                            Bayar Pesanan Lelang
                                         </button>
                                     </a>
                                 @elseif ($myBid->status === 'Kalah')

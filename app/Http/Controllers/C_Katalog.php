@@ -62,8 +62,13 @@ class C_Katalog extends Controller
         $lelangTerkaits = M_Lelang::where('katalog_id', $katalog->id)->take(5)->get();
         // cari data rating klo ada
         $ratings = M_Rating::whereHas('transaksi.lelang', function ($query) use ($id) {
-            $query->where('katalog_id', $id);
-        })->with(['transaksi.lelang.katalog'])->get();
+                $query->where('katalog_id', $id);
+            })->with(
+            [
+                'transaksi.lelang.katalog',
+                'transaksi.lelang.pemenang.user'
+            ]
+            )->get();
 
         // Hitung rata-rata rating jika ada data
         if ($ratings) {

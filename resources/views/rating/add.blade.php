@@ -74,7 +74,7 @@
                     <textarea id="review" name="review" class="w-full p-3 border rounded-lg" rows="2"placeholder="Tulis ulasan Anda di sini">{{ $rating->ulasan ?? '' }}</textarea>
                 </div>
                 <!-- Tombol Submit -->
-                <button type="submit" class="w-full px-6 py-2 bg-sekunderDark text-white font-semibold rounded-lg hover:bg-primer">
+                <button id="btnSubmit" type="button" class="w-full px-6 py-2 bg-sekunderDark text-white font-semibold rounded-lg hover:bg-primer">
                     {{ isset($rating) ? 'Perbarui' : 'Kirim' }}
                 </button>
             </form>
@@ -137,6 +137,25 @@
             // Initialize stars based on initial value
             const initialRating = parseInt(ratingInput.value) || 0;
             updateStars(initialRating);
+
+            const button = document.getElementById('btnSubmit');
+            const form = document.getElementById('ratingForm');
+
+            button.addEventListener('click', function () {
+                showAlert({
+                    title: 'Apakah anda yakin?',
+                    text: 'Apakah Anda yakin memberi penilaian ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Batal',
+                    onConfirm: function () {
+                        form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                    }
+                });
+            });
         });
     </script>
 

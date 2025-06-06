@@ -177,7 +177,7 @@ class C_Transaksi extends Controller
 
     public function showDataTransaksiUserIni() {
         $user = User::find(Auth::id());
-        $transaksis = M_Transaksi::with(['lelang', 'statusTransaksi'])
+        $transaksis = M_Transaksi::with(['lelang', 'statusTransaksi', 'paymentMethod'])
             ->whereHas('pasangLelang', function ($query) {
                 $query->where('user_id', Auth::id());
             })
@@ -186,7 +186,7 @@ class C_Transaksi extends Controller
     }
 
     public function showDataTransaksi() {
-        $transaksis = M_Transaksi::with('pasangLelang')->get();
+        $transaksis = M_Transaksi::with('pasangLelang', 'paymentMethod')->get();
         return view('dashboard.listTransaksi', compact('transaksis'));
     }
 
@@ -215,7 +215,7 @@ class C_Transaksi extends Controller
 
         return redirect()->back();
     }
-    
+
     public function updateDeliverySelesai(Request $request) {
         $transaksi = M_Transaksi::where('order_id', $request->order_id)->first();
         try {

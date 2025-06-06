@@ -25,6 +25,8 @@
                         <th>Harga</th>
                         <th>Status Saat Ini</th>
                         <th>Waktu Dibayar</th>
+                        <th>No. Resi</th>
+                        <th>Metode Pembayaran</th>
                         <th>Aksi : Ubah Status</th>
                     </tr>
                 </thead>
@@ -76,6 +78,10 @@
                             </td>
                             <!--PAYMENT TIME-->
                             <td>{{ $transaksi->payment_time }}</td>
+                            <!--NO RESI-->
+                            <td>{{ $transaksi->no_resi }}</td>
+                            <!--PAYMENT NETHOD-->
+                            <td>{{ $transaksi->paymentMethod->nama_payment_method }}</td>
                             <!--AKSI-->
                             <td>
                                 <!-- Popup -->
@@ -107,7 +113,7 @@
                                         class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
                                         onclick="showPopup({{ $transaksi->id }}, '{{ route('dashboard.updateStatsTransaksi') }}')"
                                     >
-                                        Update<br>Telah Dikirim
+                                        Ubah Pesanan<br>Menjadi Dikirim
                                     </button>
                                 @endif
                                 </div>

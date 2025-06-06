@@ -204,6 +204,7 @@
                                     </div>
                                     <!-- skor -->
                                     <div class="text-sm text-gray-500 flex items-center space-x-1">
+                                        @if (Auth::user()->id == $rating->transaksi->lelang->pemenang->user->id)
                                         <div class="flex gap-1">
                                             <a href="{{ route('rating.add', ['id' => $rating->transaksi_id]) }}" class="text-xs text-edit border-edit border-1 p-1 rounded">Ubah</a>
                                             <form id="hapusKomenForm" action="{{ route('rating.destroy', $rating->transaksi_id) }}" method="POST">
@@ -212,6 +213,8 @@
                                                 <button class="text-xs text-hapus border-hapus border-1 p-1 rounded" id="hapusKomen" type="button">Hapus</button>
                                             </form>
                                         </div>
+                                        @endif
+
                                         <div>
                                             @for ($i = 1; $i <= 5; $i++)
                                                 @if ($i <= $rating->rating)
