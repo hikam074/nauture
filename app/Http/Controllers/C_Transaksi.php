@@ -87,10 +87,12 @@ class C_Transaksi extends Controller
             ]);
         }
         // buat instance alamat
-        $cityNameLower = $cityName.strtolower($cityName);
+        $cityNameUpper = strtoupper($cityName);
+
         $address = M_Alamat::create([
-            'city_id' => M_City::where('nama_city', $cityNameLower)->first()->id,
+            'city_id' => M_City::where('nama_city', $cityNameUpper)->first()->id,
             'detail_alamat' => $detail_alamat,
+            'kode_pos' => $postalCode,
         ]);
 
         // SIMPAN DATA TRANSAKSI
@@ -189,7 +191,40 @@ class C_Transaksi extends Controller
     }
 
     public function updateStatusPengiriman(Request $request) {
-        //
+        $transaksi = M_Transaksi::findOrFail($request->transaksi_id);
+        // dd($transaksi->id.' '.$request->no_resi);
+        $transaksi->no_resi = $request->no_resi;
+        try {
+            $transaksi->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'delivering')->first()->id;
+            $transaksi->save();
+            return redirect()->back()->with('success', 'Berhasil memperbarui status : sedang dikirim! ( Nomor Resi : '.$request->no_resi.' )');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function klikSelesai(Request $request) {
+        $request->session()->flash('alert', [
+            'title' => 'Pesanan telah diterima?',
+            'text' => 'Apakah anda yakin ingin menyelesaikan pesanan?',
+            'icon' => 'warning',
+            'confirmButtonText' => 'Ya, Selesai!',
+            'cancelButtonText' => 'Batal',
+            'confirmUrl' => route('dashboard.pesananSelesai'),
+        ]);
+
+        return redirect()->back();
+    }
+    
+    public function updateDeliverySelesai(Request $request) {
+        $transaksi = M_Transaksi::where('order_id', $request->order_id)->first();
+        try {
+            $transaksi->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'delivered')->first()->id;
+            $transaksi->save();
+            return redirect()->back()->with('success', 'Barang telah anda terima! Jangan lupa memberi penilaian untuk barang kai!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
 

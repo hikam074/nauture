@@ -8,6 +8,7 @@
     <title>Nauture | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @vite(['resources/css/global.css'])
+    @vite(['resources/js/sweetalert.js'])
     @include('includes.toastr')
     @include('includes.sweetalert')
 </head>

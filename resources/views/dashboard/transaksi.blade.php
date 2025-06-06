@@ -74,19 +74,50 @@
                                     <span class="h-3 w-3 rounded-full mr-2 flex-shrink-0 bg-hapus"></span>
                                     {{ $transaksi->statusTransaksi->nama_status_transaksi }}
                                 </td>
+                            @elseif ($transaksi->statusTransaksi->kode_status_transaksi === 'delivering')
+                                <td class="flex items-center max-w-60">
+                                    <span class="h-3 w-3 rounded-full mr-2 flex-shrink-0 bg-restore"></span>
+                                    {{ $transaksi->statusTransaksi->nama_status_transaksi }}
+                                </td>
+                            @elseif ($transaksi->statusTransaksi->kode_status_transaksi === 'delivered')
+                                <td class="flex items-center max-w-60">
+                                    <span class="h-3 w-3 rounded-full mr-2 flex-shrink-0 bg-info"></span>
+                                    {{ $transaksi->statusTransaksi->nama_status_transaksi }}
+                                </td>
                             @endif
                             <!--PAYMENT TIME-->
                             <td>{{ $transaksi->payment_time }}</td>
                             <!--AKSI-->
-                            <td class="flex items-center justify-center ">
-                                @if ($transaksi->statusTransaksi->kode_status_transaksi === 'pending')
-                                    <a href="{{ route('transaksi.checkout', ['id' => $transaksi->id]) }}"
-                                        class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center
-                                            hover:bg-primer hover:text-white"
+                            <td >
+                                <div class="flex items-center justify-center ">
+                                    @if ($transaksi->statusTransaksi->kode_status_transaksi === 'pending')
+                                        <a href="{{ route('transaksi.checkout', ['id' => $transaksi->id]) }}"
+                                            class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center
+                                                hover:bg-primer hover:text-white"
+                                            >
+                                            Lanjutkan<br>Pembayaran
+                                        </a>
+                                    @elseif ($transaksi->statusTransaksi->kode_status_transaksi === 'delivering')
+                                    <form id="selesaikanPesananForm" action="{{ route('dashboard.pesananSelesai') }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="order_id" id="orderId" value="{{ $transaksi->order_id }}">
+                                        <button id="selesaikanPesananButton" type="button"
+                                            class="text-sm px-4 py-2 rounded-lg bg-white border text-primer text-center
+                                                hover:bg-primer hover:text-white"
                                         >
-                                        Lanjutkan<br>Pembayaran
-                                    </a>
-                                @endif
+                                            Selesaikan<br>Pesanan
+                                        </button>
+                                    </form>
+                                    @elseif ($transaksi->statusTransaksi->kode_status_transaksi === 'delivered')
+                                        <a href="{{ route('rating.add', ['id' => $transaksi->id]) }}"
+                                            class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center
+                                                hover:bg-primer hover:text-white"
+                                            >
+                                            Beri<br>Penilaian
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -94,8 +125,33 @@
             </table>
         </div>
     </div>
+
+
 @endsection
 
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const button = document.getElementById('selesaikanPesananButton');
+            const form = document.getElementById('selesaikanPesananForm');
 
+            button.addEventListener('click', function () {
+                showAlert({
+                    title: 'Konfirmasi Selesaikan Pesanan',
+                    text: 'Apakah Anda yakin ingin menyelesaikan pesanan ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Selesaikan!',
+                    cancelButtonText: 'Batal',
+                    onConfirm: function () {
+                        form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                    }
+                });
+            });
+        });
+</script>
+@endsection
 
 

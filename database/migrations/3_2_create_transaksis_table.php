@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('gross_amount');
             $table->unsignedBigInteger('alamat_id');
             $table->string('snap_token')->nullable();
-            $table->string('url_midtrans')->nullable();
+            $table->string('no_resi')->nullable();
             $table->datetime('payment_time')->nullable();
             $table->unsignedBigInteger('payment_method_id')->nullable();    // FK ke payment_methods
             $table->unsignedBigInteger('status_transaksi_id');              // FK ke status_transaksis

@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 use App\Models\M_Katalog;
 use App\Models\M_Lelang;
+use App\Models\M_Rating;
 
 class C_Katalog extends Controller
 {
@@ -59,14 +60,31 @@ class C_Katalog extends Controller
         $katalog = M_Katalog::withTrashed()->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
         // Cari data lelang yang memiliki katalog_id sama dengan katalog ini
         $lelangTerkaits = M_Lelang::where('katalog_id', $katalog->id)->take(5)->get();
+        // cari data rating klo ada
+        $ratings = M_Rating::whereHas('transaksi.lelang', function ($query) use ($id) {
+            $query->where('katalog_id', $id);
+        })->with(['transaksi.lelang.katalog'])->get();
+
+        // Hitung rata-rata rating jika ada data
+        if ($ratings) {
+            $avgRating = number_format($ratings->avg('rating'), 1);
+        } else {
+            $avgRating = 0;
+        }
+        // COUNT(rating)
+        $barisRatings = $ratings->count();
+        // rating yang ada ulasan
+        $barisRatingsWithUlasan = $ratings->filter(function($rating) {
+            return !empty(trim($rating->ulasan));
+        })->count();
         // teruskan data ke pengeksekusi show
-        return $this->showDetailDatakatalog($katalog, $lelangTerkaits);
+        return $this->showDetailDatakatalog($katalog, $lelangTerkaits, $ratings, $avgRating, $barisRatings, $barisRatingsWithUlasan);
     }
 
-    public function showDetailDatakatalog(M_Katalog $katalog, $lelangTerkaits = null)
+    public function showDetailDatakatalog(M_Katalog $katalog, $lelangTerkaits = null, $ratings = null, $avgRating = 0, $barisRatings = 0, $barisRatingsWithUlasan = 0)
     {
         // tampilkan view
-        return view('katalog.V_HalamanDetailKatalog', ['katalog' => $katalog, 'lelangTerkaits' => $lelangTerkaits]);
+        return view('katalog.V_HalamanDetailKatalog', ['katalog' => $katalog, 'lelangTerkaits' => $lelangTerkaits, 'ratings' => $ratings, 'avgRating' => $avgRating, 'barisRatings' => $barisRatings, 'barisRatingsWithUlasan' => $barisRatingsWithUlasan]);
     }
 
 

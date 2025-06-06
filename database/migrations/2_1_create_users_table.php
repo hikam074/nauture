@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->unsignedBigInteger('role_id')->default(3);  // FK ke roles
-            $table->integer('SuspendPoint')->default(0);
+            $table->integer('suspend_point')->default(0);
             $table->unsignedBigInteger('alamat_id')->nullable();
             $table->string('no_telp')->unique();
             $table->string('foto_profil')->nullable();

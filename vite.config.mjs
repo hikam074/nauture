@@ -15,6 +15,11 @@ export default defineConfig({
                 'resources/js/sweetalert.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
+            resolve: {
+                alias: {
+                    '@': '/resources/js',
+                },
+            },
         }),
     ],
     // server: {

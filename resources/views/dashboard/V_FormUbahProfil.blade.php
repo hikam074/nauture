@@ -84,11 +84,11 @@
                     md:flex-row">
                     <div class="w-full">
                         <label for="provinsi" class="block text-sm font-medium">Provinsi</label>
+
                         <select name="provinsi_id" id="provinsi" class="border-1 p-2 w-full rounded" required>
-                            <option value="{{ $profil->alamat->city->provinsi->id }}"
-                                {{ $profil->alamat->city->provinsi_id == $profil->alamat->city->provinsi->id ? 'selected' : '' }}
+                            <option value="{{ $profil->alamat_id ? $profil->alamat->city->provinsi->id : '' }}"
                             >
-                                {{$profil->alamat->city->provinsi->nama_provinsi }}
+                                {{ $profil->alamat_id ? $profil->alamat->city->provinsi->nama_provinsi : 'Pilih Provinsi' }}
                             </option>
                             @foreach ($provinsis as $provinsi)
                                 <option value="{{ $provinsi->id }}">{{ $provinsi->nama_provinsi }}</option>
@@ -96,10 +96,10 @@
                         </select>
                     </div>
                     <div class="w-full">
-                        <label for="city" class="block text-sm font-medium">Kota</label>
+                        <label for="city" class="block text-sm font-medium">Kabupaten/Kota</label>
                         <select name="city_id" id="city" class="border-1 p-2 w-full rounded" disabled required>
                             <option value="" {{ $profil->alamat && $profil->alamat->city ? '' : 'selected'}} disabled>Pilih Kota</option>
-                            @if ($profil->alamat->city->id)
+                            @if ($profil->alamat_id)
                             <option value="{{ $profil->alamat->city->id }}" selected>{{ $profil->alamat->city->nama_city }}</option>
                             @endif
                         </select>
@@ -107,15 +107,27 @@
                 </div>
                 <div>
                     <label for="detail" class="block text-sm font-medium">Detail Alamat</label>
-                    <input type="text" name="detail_alamat" id="detail" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->id ? $profil->alamat->detail_alamat : '' }}"
+                    @if ($profil->alamat_id)
+                    <input type="text" name="detail_alamat" id="detail" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->detail_alamat }}"
                         placeholder="Hingga tingkat kecamatan, contoh : Jl. MT. Haryono No.169, Ketawanggede, Kecamatan Lowokwaru" required
                     >
+                    @else
+                    <input type="text" name="detail_alamat" id="detail" class="border-1 p-2 w-full rounded"
+                        placeholder="Hingga tingkat kecamatan, contoh : Jl. MT. Haryono No.169, Ketawanggede, Kecamatan Lowokwaru" required
+                    >
+                    @endif
                 </div>
                 <div>
                     <label for="kodePos" class="block text-sm font-medium">Kode Pos</label>
-                    <input type="text" name="kode_pos" id="kodePos" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->id ? $profil->alamat->kode_pos : '' }}"
+                    @if ($profil->alamat_id)
+                    <input type="text" name="kode_pos" id="kodePos" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->kode_pos }}"
                         placeholder="Contoh : 68123" required
                     >
+                    @else
+                    <input type="text" name="kode_pos" id="kodePos" class="border-1 p-2 w-full rounded"
+                        placeholder="Contoh : 68123" required
+                    >
+                    @endif
                 </div>
                 <div>
                     <button type="submit" id="submitBtn" disabled

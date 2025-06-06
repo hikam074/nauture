@@ -12,7 +12,7 @@
     <div class="mb-5 flex flex-col gap-2 w-full">
         <div>
             <h1 class="font-bold text-4xl">Lelang NauTure</h1>
-            <p class="font-thin text-sm">Semua lelang yang dilakukan</p>
+            <p class="font-thin text-sm">Semua lelang yang diselenggarakan</p>
         </div>
         @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
         <div class="w-full flex justify-end">
@@ -59,19 +59,32 @@
                             >
                         </td>
                         <!--STATUS-->
-                            <td class="flex flex-row items-center">
-                                @if($lelang->status == 'Dibatalkan')
-                                <span class="h-3 w-3 rounded-full mr-2 bg-hapus"></span>
-                                @elseif($lelang->status == 'Selesai, ada pemenang')
-                                <span class="h-3 w-3 rounded-full mr-2 bg-info"></span>
-                                @elseif($lelang->status == 'Berlangsung')
-                                <span class="h-3 w-3 rounded-full mr-2 bg-success"></span>
-                                @elseif($lelang->status == 'Selesai, tidak ada pemenang')
-                                <span class="h-3 w-3 rounded-full mr-2 bg-hapus"></span>
-                                @elseif($lelang->status == 'Belum dibuka')
-                                <span class="h-3 w-3 rounded-full mr-2 bg-canceled"></span>
-                                @endif
-                                <span class=" flex-1">{{ $lelang->status }}</span>
+                            <td >
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="flex items-center">
+                                        @if($lelang->status == 'Dibatalkan')
+                                        <span class="h-3 w-3 rounded-full mr-2 bg-hapus"></span>
+                                        @elseif($lelang->status == 'Selesai, ada pemenang')
+                                        <span class="h-3 w-3 rounded-full mr-2 bg-info"></span>
+                                        @elseif($lelang->status == 'Berlangsung')
+                                        <span class="h-3 w-3 rounded-full mr-2 bg-success"></span>
+                                        @elseif($lelang->status == 'Selesai, tidak ada pemenang')
+                                        <span class="h-3 w-3 rounded-full mr-2 bg-hapus"></span>
+                                        @elseif($lelang->status == 'Belum dibuka')
+                                        <span class="h-3 w-3 rounded-full mr-2 bg-canceled"></span>
+                                        @endif
+                                        <span class=" flex-1">{{ $lelang->status }}</span>
+                                    </div>
+
+                                    @if($lelang->status == 'Selesai, ada pemenang')
+                                    <div class="flex items-center text-center">
+                                        <span class="w-full p-1 border-1 rounded border-canceled">
+                                            Pemenang :<br>
+                                            {{ $lelang->pemenang->user->name }}
+                                        </span>
+                                    </div>
+                                    @endif
+                                </div>
                             </td>
                         <!--AKSI-->
                         <td class="text-white">

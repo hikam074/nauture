@@ -24,7 +24,7 @@ class AkunSeeder extends Seeder
                 'email' => 'owner@example.com',
                 'password' => Hash::make('1'),
                 'role_id' => 1,
-                'SuspendPoint' => 0,
+                'suspend_point' => 0,
                 'no_telp' => '081234567890',
 
                 'created_at' => now(),
@@ -37,7 +37,7 @@ class AkunSeeder extends Seeder
                 'email' => '2@2',
                 'password' => Hash::make('2'),
                 'role_id' => 2,
-                'SuspendPoint' => 0,
+                'suspend_point' => 0,
                 'no_telp' => '081029384756',
 
                 'created_at' => now(),
@@ -50,7 +50,7 @@ class AkunSeeder extends Seeder
                 'email' => 'hikam@example.com',
                 'password' => Hash::make('3'),
                 'role_id' => 3,
-                'SuspendPoint' => 0,
+                'suspend_point' => 0,
                 'no_telp' => '081331178493',
 
                 'created_at' => now(),

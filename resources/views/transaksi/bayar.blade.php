@@ -40,7 +40,13 @@
                             </tr>
                             <tr>
                                 <td><p>Alamat tujuan</p></td>
-                                <td><p class="font-bold">{{ $transaksi['alamat'] }}</p></td>
+                                <td><p class="font-bold">
+                                    {{
+                                        $transaksi->alamat->detail_alamat.', '.
+                                        $transaksi->alamat->city->nama_city.', '.
+                                        $transaksi->alamat->city->provinsi->nama_provinsi
+                                    }}
+                                </p></td>
                             </tr>
                         </tbody>
                     </table>

@@ -13,6 +13,6 @@ class PasangLelangSeeder extends Seeder
      */
     public function run(): void
     {
-        M_PasangLelang::factory()->count(50)->create();
+        M_PasangLelang::factory()->count(100)->create();
     }
 }

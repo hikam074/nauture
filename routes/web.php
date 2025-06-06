@@ -7,6 +7,7 @@ use App\Http\Controllers\C_Login;
 use App\Http\Controllers\C_Notifikasi;
 use App\Http\Controllers\C_Registrasi;
 use App\Http\Controllers\C_Profil;
+use App\Http\Controllers\C_Rating;
 use App\Http\Controllers\C_Transaksi;
 
 use Illuminate\Support\Facades\Route;
@@ -64,13 +65,22 @@ Route::prefix('/dashboard')->group(function () {
     Route::get('/katalog', [C_katalog::class, 'getSemuaKatalog'])->middleware('auth')->middleware('role:pegawai,owner')->name('dashboard.katalog'); // GET halaman list katalog
     Route::get('/lelang', [C_lelang::class, 'getSemuaLelang'])->middleware('auth')->middleware('role:pegawai,owner')->name('dashboard.lelang'); // GET halaman list lelang
     Route::get('/transaksi', [C_Transaksi::class, 'showDataTransaksi'])->middleware('auth')->middleware('role:pegawai,owner')->name('dashboard.transaksi'); // GET halaman list transaksi
-    Route::patch('/', [C_Transaksi::class, ''])->middleware('auth')->middleware('role:pegawai')->name('dashboard.updateStatsTransaksi');
+    Route::patch('/transaksi', [C_Transaksi::class, 'updateStatusPengiriman'])->middleware('auth')->middleware('role:pegawai')->name('dashboard.updateStatsTransaksi');
+    Route::patch('/transaksi-selesai', [C_Transaksi::class, 'updateDeliverySelesai'])->middleware('auth')->middleware('role:customer')->name('dashboard.pesananSelesai');
 
     Route::get('/transaksi-saya', [C_Transaksi::class, 'showDataTransaksiUserIni'])->middleware('auth')->middleware('role:customer')->name('transaksi.index'); // GET halaman transaksi saya
     Route::get('/lelang-saya', [C_PasangLelang::class, 'getDataLelangUserIni'])->middleware('auth')->middleware('role:customer')->name('lelang.saya'); // GET show bid an saya
     Route::post('/lelang-saya', [C_Transaksi::class, 'checkBatasWaktuPembayaran'])->middleware('auth')->middleware('role:customer')->name('transaksi.create'); // POST create tagihan transaksi
     Route::get('/lelang-saya/pay/{id}', [C_Transaksi::class, 'showHalamanChekout'])->middleware('auth')->middleware('role:customer')->name('transaksi.checkout'); // GET halaman anda akan membayar
 
+});
+
+// MENU DASHBOARD
+Route::prefix('/rating')->group(function () {
+    Route::get('/{id}', [C_Rating::class, 'showFormRating'])->middleware('auth')->middleware('role:customer')->name('rating.add'); // GET show halaman profil
+    Route::post('/{id}', [C_Rating::class, 'insertDataRating'])->middleware('auth')->middleware('role:customer')->name('rating.store'); // GET show halaman profil
+    Route::patch('/{id}', [C_Rating::class, 'insertDataRating'])->middleware('auth')->middleware('role:customer')->name('rating.update'); // GET show halaman profil
+    Route::delete('/{id}', [C_Rating::class, 'deleteDataRating'])->middleware('auth')->middleware('role:customer')->name('rating.destroy'); // GET show halaman profil
 });
 
 

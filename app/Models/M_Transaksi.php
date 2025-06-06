@@ -15,7 +15,7 @@ class M_Transaksi extends Model
         'gross_amount',
         'alamat_id',
         'snap_token',
-        'url_midtrans',
+        'no_resi',
         'payment_time',
         'payment_method_id',
         'status_transaksi_id',
@@ -50,5 +50,10 @@ class M_Transaksi extends Model
     public function logMasuk()
     {
         return $this->hasMany(M_LogMasuk::class);
+    }
+    // deklarasi this transaksi_id hanya bisa ada 1 rating_id
+    public function rating()
+    {
+        return $this->hasOne(M_Rating::class, 'transaksi_id', 'id');
     }
 }

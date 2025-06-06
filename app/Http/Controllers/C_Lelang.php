@@ -479,7 +479,7 @@ class C_Lelang
 
 
     public function getSemuaLelang() {
-        $lelangs = M_Lelang::withTrashed()->get();
+        $lelangs = M_Lelang::withTrashed()->with(['pasangLelang.user', 'pemenang'])->get();
 
         $lelangs->each(function ($lelang) {
             if ($lelang->trashed()) {

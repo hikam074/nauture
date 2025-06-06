@@ -33,7 +33,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('3'),
             'role_id' => 3,
-            'SuspendPoint' => $this->faker->numberBetween(0, 1),
+            'suspend_point' => $this->faker->numberBetween(0, 1),
             'no_telp' => $this->faker->phoneNumber(),
             'created_at' => now(),
             'updated_at' => now(),
