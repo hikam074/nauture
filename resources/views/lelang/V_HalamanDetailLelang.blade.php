@@ -126,112 +126,94 @@
                                 text-sm font-medium text-center text-white
                                 sm:w-auto sm:justify-start"
                             >
-                            @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
-                                @if ($lelang->trashed())
-                                    <a
-                                        class="p-4 bg-yellow-500
-                                            hover:bg-yellow-600 transition"
-                                        >
-                                        <form action="{{ route('lelang.restore', $lelang->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit">
-                                                Restore
-                                            </button>
-                                        </form>
-                                    </a>
-                                @else
-                                    <a href="{{ route('lelang.edit', $lelang->id) }}"
-                                        class="text-primer p-4 rounded-lg border border-primer w-full
-                                            hover:bg-sekunderDark hover:text-white transition
-                                            sm:w-auto"
-                                        >
-                                        <button>
-                                            Edit
-                                        </button>
-                                    </a>
-                                    <a class="p-4 bg-red-500 rounded-lg w-full
-                                        hover:bg-red-600 transition
-                                        sm:w-auto"
-                                        >
-                                        <form action="{{ route('lelang.show', $lelang->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </a>
-                                @endif
-                            @elseif ((!Auth::check() || (Auth::user()->role->nama_role == 'customer')))
-                                @if ($lelang->trashed())
-                                    <a class="p-4 rounded-lg bg-gray-400 w-full
-                                        sm:w-auto"
-                                        >
-                                        <button disabled>
-                                            Lelang<br>Dihapus
-                                        </button>
-                                    </a>
-                                @elseif ($lelang->tanggal_ditutup <= \Carbon\Carbon::now())
-                                    <a class="p-4 rounded-lg bg-gray-400 w-full
-                                        sm:w-auto"
-                                        >
-                                        <button disabled>
-                                            Lelang<br>Berakhir
-                                        </button>
-                                    </a>
-                                @elseif ((is_null($userBids))
-                                    && ($lelang->tanggal_dibuka <= \Carbon\Carbon::now())
-                                    && ($lelang->tanggal_ditutup > \Carbon\Carbon::now())
-                                    )
-                                    <a class="rounded-lg bg-sekunderDark w-full h-full
-                                        hover:bg-primer transition"
-                                        >
-                                        <button id="toggleLelang"
-                                            class="p-4 w-full
-                                                sm:w-auto"
-                                            >
-                                            Pasang<br>Tawaran
-                                        </button>
-                                    </a>
-                                @elseif ($userBids)
-                                    <a class="rounded-lg bg-blue-500 w-full h-full
-                                        hover:bg-blue-600 transition
-                                        sm:w-auto"
-                                        >
-                                        <button id="toggleLelang" onclick="fillBidForm({{ $userBids->harga_pengajuan ?? '0' }})"
-                                            class="p-4 block w-full h-full
-                                                md:p-3 lg:p-4"
-                                            >
-                                            Ubah<br>Tawaran
-                                        </button>
-                                    </a>
-                                    <a class="rounded-lg bg-red-500 w-full h-full
-                                        hover:bg-red-600 transition
-                                        sm:w-auto"
-                                        >
-                                        <form action="{{ route('lelang.destroy', ['id' => $lelang->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin membatalkan tawaran ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="p-4 block w-full h-full
-                                                md:p-3 lg:p-4"
-                                                >
-                                                Batalkan<br>Tawaran
-                                            </button>
-                                        </form>
-                                    </a>
-                                @else
-                                    <a class="rounded-lg bg-canceledhov w-full h-full
-                                        transition"
-                                        >
-                                        <button
-                                            class="p-4 w-full
-                                                sm:w-auto"
-                                            >
-                                            Menunggu<br>Dibuka
-                                        </button>
-                                    </a>
-                                @endif
+
+                            @php
+                                $isPegawai = Auth::check() && Auth::user()->role->nama_role === 'pegawai';
+                                $isCustomer = Auth::check() && Auth::user()->role->nama_role === 'customer';
+                                $isPemenang = $isCustomer && $lelang->pemenang && $lelang->pemenang->user_id === Auth::user()->id;
+                                $lelangBelumDibuka = now()->lessThan($lelang->tanggal_dibuka);
+                                $lelangBerakhir = now()->greaterThanOrEqualTo($lelang->tanggal_ditutup) && (!$lelang->pemenang_id || ($isCustomer && !$isPemenang));
+                            @endphp
+
+                            <!-- PEGAWAI : RESTORE -->
+                            @if ($lelang->trashed() && $isPegawai && now()->lessThan($lelang->tanggal_ditutup))
+                            <a class="p-4 bg-yellow-500 hover:bg-yellow-600 transition">
+                                <form action="{{ route('lelang.restore', $lelang->id) }}" method="POST" class="inline" id="formRestoreLelang">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="button" id="btnRestoreLelang">Restore</button>
+                                </form>
+                            </a>
+
+                            <!-- ALL : DIHAPUS -->
+                            @elseif ($lelang->trashed())
+                            <a class="p-4 rounded-lg bg-gray-400 w-full sm:w-auto">
+                                <button disabled>Lelang<br>Dihapus</button>
+                            </a>
+
+                            <!-- ALL : BELUM DIBUKA -->
+                            @elseif ($lelangBelumDibuka && !$isPegawai)
+                            <a class="rounded-lg bg-canceledhov w-full h-full transition">
+                                <button class="p-4 w-full sm:w-auto">Menunggu<br>Dibuka</button>
+                            </a>
+
+                            <!-- ALL : BERAKHIR -->
+                            @elseif ($lelangBerakhir)
+                            <a class="p-4 rounded-lg bg-gray-400 w-full sm:w-auto">
+                                <button disabled>Lelang<br>Berakhir</button>
+                            </a>
+
+                            <!-- PEGAWAI : EDIT -->
+                            @elseif ($isPegawai && now()->lessThan($lelang->tanggal_dibuka))
+                            <a href="{{ route('lelang.edit', $lelang->id) }}"
+                            class="text-primer p-4 rounded-lg border border-primer w-full hover:bg-sekunderDark hover:text-white transition sm:w-auto">
+                                <button>Edit</button>
+                            </a>
+                            <!-- PEGAWAI : HAPUS -->
+                            <a class="p-4 bg-red-500 rounded-lg w-full hover:bg-red-600 transition sm:w-auto">
+                                <form action="{{ route('lelang.show', $lelang->id) }}" method="POST" id="formHapusLelang">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" id="btnHapusLelang">Hapus</button>
+                                </form>
+                            </a>
+
+                            <!-- CUSTOMER : TRANSAKSI SUDAH BAYAR -->
+                            @elseif ($isPemenang && $adaTransaksi)
+                            <a class="rounded-lg text-black border-1 border-info w-full h-full hover:bg-info hover:text-white transition"
+                            href="{{ route('lelang.saya') }}">
+                                <button class="p-4 w-full sm:w-auto">Lihat<br>Transaksi</button>
+                            </a>
+
+                            <!-- CUSTOMER : TRANSAKSI BELUM BAYAR -->
+                            @elseif ($isPemenang)
+                            <a class="rounded-lg bg-sekunderDark w-full h-full hover:bg-primer transition"
+                            href="{{ route('lelang.saya') }}">
+                                <button class="p-4 w-full sm:w-auto">Bayar<br>Lelang</button>
+                            </a>
+
+                            <!-- CUSTOMER && GUEST : PASANG BID -->
+                            @elseif (now()->between($lelang->tanggal_dibuka, $lelang->tanggal_ditutup) && ((!Auth::check() || ($isCustomer && is_null($userBids)) )))
+                            <a class="rounded-lg bg-sekunderDark w-full h-full hover:bg-primer transition">
+                                <button id="toggleLelang" class="p-4 w-full sm:w-auto">Pasang<br>Tawaran</button>
+                            </a>
+
+                            <!-- CUSTOMER : UBAH BID -->
+                            @elseif ($isCustomer && $userBids)
+                            <a class="rounded-lg bg-blue-500 w-full h-full hover:bg-blue-600 transition sm:w-auto">
+                                <button id="toggleLelang" onclick="fillBidForm({{ $userBids->harga_pengajuan ?? '0' }})"
+                                        class="p-4 block w-full h-full md:p-3 lg:p-4">
+                                    Ubah<br>Tawaran
+                                </button>
+                            </a>
+                            <!-- CUSTOMER : BATAL BID -->
+                            <a class="rounded-lg bg-red-500 w-full h-full hover:bg-red-600 transition sm:w-auto">
+                                <form id="formCancelBid" action="{{ route('lelang.destroy', ['id' => $lelang->id]) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" id="btnCancelBid" class="p-4 block w-full h-full md:p-3 lg:p-4">Batalkan<br>Tawaran</button>
+                                </form>
+                            </a>
                             @endif
                         </div>
                     </div>
@@ -287,85 +269,107 @@
         </div>
     </div>
 
-    {{-- logika jam countdown --}}
+@endsection
+
+@section('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggleLelang");
+            const btnCancelBid = document.getElementById('btnCancelBid');
+            const btnHapusLelang = document.getElementById('btnHapusLelang');
+            const btnRestorelelang = document.getElementById('btnRestoreLelang');
+
+            // Event untuk membuka popup
+            if (toggleButton) {
+                toggleButton.addEventListener("click", openPopup);
+            }
+            // Interval untuk memperbarui countdown
+            const timer = setInterval(updateCountdown, 1000);
+            updateCountdown();
+            // Alert batal bid
+            if (btnCancelBid) {
+                btnCancelBid.addEventListener('click', cancelBid);
+            }
+            // hapus lelang
+            if (btnHapusLelang) {
+                btnHapusLelang.addEventListener('click', deleteLelang);
+            }
+            // restore lelang
+            if (btnRestorelelang) {
+                btnRestorelelang.addEventListener('click', restoreLelang);
+            }
+        });
+
+        function updateCountdown() {
+            const endDate = new Date("{{ $lelang->tanggal_ditutup }}").getTime();
+            const now = new Date().getTime();
+            const timeLeft = endDate - now;
+
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                // Update elemen utama
+                document.getElementById("days").textContent = String(days).padStart(2, "0");
+                document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+                document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+                document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
+
+                // Jika popup terlihat, update elemen popup
+                const bidForm = document.getElementById("bidForm");
+                if (bidForm && !bidForm.classList.contains("hidden")) {
+                    document.getElementById("daysPopup").textContent = String(days).padStart(2, "0");
+                    document.getElementById("hoursPopup").textContent = String(hours).padStart(2, "0");
+                    document.getElementById("minutesPopup").textContent = String(minutes).padStart(2, "0");
+                    document.getElementById("secondsPopup").textContent = String(seconds).padStart(2, "0");
+                }
+            } else {
+                // Waktu habis
+                document.getElementById("countdown").innerHTML = "<p class='text-red-500'>Lelang telah berakhir</p>";
+                clearInterval(timer);
+            }
+        }
+
+        function openPopup() {
             const bidForm = document.getElementById("bidForm");
             const popupContent = document.getElementById('popupContent');
             const toggleButton = document.getElementById("toggleLelang");
             const adaBid = @json($userBids);
 
-            const endDate = new Date("{{ $lelang->tanggal_ditutup }}").getTime();
-
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const timeLeft = endDate - now;
-
-                if (timeLeft > 0) {
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                    // Update elemen utama
-                    document.getElementById("days").textContent = String(days).padStart(2, "0");
-                    document.getElementById("hours").textContent = String(hours).padStart(2, "0");
-                    document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
-                    document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
-
-                    // Jika popup terlihat, update elemen popup
-                    if (!bidForm.classList.contains("hidden")) {
-                        document.getElementById("daysPopup").textContent = String(days).padStart(2, "0");
-                        document.getElementById("hoursPopup").textContent = String(hours).padStart(2, "0");
-                        document.getElementById("minutesPopup").textContent = String(minutes).padStart(2, "0");
-                        document.getElementById("secondsPopup").textContent = String(seconds).padStart(2, "0");
-                    }
+            toggleButton.innerHTML = '<span>Tunggu<br>Sebentar...</span>';
+            fetch('/lelang/auth', {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.loggedIn) {
+                    // Tampilkan popup
+                    bidForm.classList.remove("hidden");
+                    bidForm.classList.add("flex");
+                    setTimeout(() => {
+                        popupContent.classList.remove('opacity-0', '-translate-y-10');
+                        popupContent.classList.add('opacity-100', 'translate-y-0');
+                    }, 10);
                 } else {
-                    // Waktu habis
-                    document.getElementById("countdown").innerHTML = "<p class='text-red-500'>Lelang telah berakhir</p>";
-                    clearInterval(timer);
+                    if (!adaBid) {
+                        toggleButton.innerHTML = '<span>Pasang<br>Tawaran</span>';
+                    } else {
+                        toggleButton.innerHTML = '<span>Ubah<br>Tawaran</span>';
+                    }
+                    toastr.warning('Anda harus login terlebih dahulu untuk memasang tawaran.', 'Peringatan');
                 }
-            }
-
-            // Event untuk membuka popup
-            if (toggleButton) {
-                    toggleButton.addEventListener("click", function () {
-                        toggleButton.innerHTML = '<span>Tunggu<br>Sebentar...</span>';
-                        fetch('/lelang/auth', {
-                            method: 'GET',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.loggedIn) {
-                                // Tampilkan popup
-                                bidForm.classList.remove("hidden");
-                                bidForm.classList.add("flex");
-                                setTimeout(() => {
-                                    popupContent.classList.remove('opacity-0', '-translate-y-10');
-                                    popupContent.classList.add('opacity-100', 'translate-y-0');
-                                }, 10);
-                            } else {
-                                if (!adaBid) {
-                                    toggleButton.innerHTML = '<span>Pasang<br>Tawaran</span>';
-                                } else {
-                                    toggleButton.innerHTML = '<span>Ubah<br>Tawaran</span>';
-                                }
-                                toastr.warning('Anda harus login terlebih dahulu untuk memasang tawaran.', 'Peringatan');
-                            }
-                        })
-                        .catch(error => console.error('Error:', error));
-                    });
-                }
-
-            // Interval untuk memperbarui countdown
-            const timer = setInterval(updateCountdown, 1000);
-            updateCountdown();
-        });
+            })
+            .catch(error => console.error('Error:', error));
+        }
 
         function clsPopup() {
+            const bidForm = document.getElementById("bidForm");
+            const popupContent = document.getElementById('popupContent');
             const toggleButton = document.getElementById("toggleLelang");
             const adaBid = @json($userBids);
 
@@ -374,6 +378,7 @@
             } else {
                 toggleButton.innerHTML = '<span>Ubah<br>Tawaran</span>';
             }
+
             popupContent.classList.remove('opacity-100', 'translate-y-0');
             popupContent.classList.add('opacity-0', '-translate-y-10');
             popupContent.addEventListener(
@@ -385,6 +390,55 @@
             );
         }
 
-    </script>
+        function cancelBid() {
+            const form = document.getElementById('formCancelBid');
+            showAlert({
+                title: 'Batalkan Tawaran anda?',
+                text: 'Apakah Anda yakin ingin membatalkan tawaran anda ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Batalkan',
+                cancelButtonText: 'Kembali',
+                onConfirm: function () {
+                    form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                }
+            });
+        }
 
+        function deleteLelang() {
+            const form = document.getElementById('formHapusLelang');
+            showAlert({
+                title: 'Hapus Lelang Ini?',
+                text: 'Apakah Anda yakin ingin menghapus data lelang ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                onConfirm: function () {
+                    form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                }
+            });
+        }
+
+        function restoreLelang() {
+            const form = document.getElementById('formRestoreLelang');
+            showAlert({
+                title: 'Restore Produk?',
+                text: 'Apakah Anda yakin ingin memunculkan kembali produk ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Restorasi Kembali',
+                cancelButtonText: 'Batal',
+                onConfirm: function () {
+                    form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                }
+            });
+        }
+    </script>
 @endsection

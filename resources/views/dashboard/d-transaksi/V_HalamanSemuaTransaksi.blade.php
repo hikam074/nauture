@@ -27,14 +27,16 @@
                         <th>Waktu Dibayar</th>
                         <th>No. Resi</th>
                         <th>Metode Pembayaran</th>
+                        @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                         <th>Aksi : Ubah Status</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($transaksis as $index => $transaksi)
                         <tr class="border-b-1 border-bsoft">
                             <!--NO.-->
-                            <td class="text-center">{{ $index + 1 }}.</td>
+                            <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td>
                             <!--NAMA USER-->
                             <td class="max-w-30">{{ $transaksi->pasangLelang->user->name }}</td>
                             <!--KODE TRANSAKSI-->
@@ -77,35 +79,16 @@
                                 </div>
                             </td>
                             <!--PAYMENT TIME-->
-                            <td>{{ $transaksi->payment_time }}</td>
+                            <td>{{ $transaksi->payment_time ? $transaksi->payment_time : '-' }}</td>
                             <!--NO RESI-->
-                            <td>{{ $transaksi->no_resi }}</td>
+                            <td>{{ $transaksi->no_resi ? $transaksi->no_resi : '-' }}</td>
                             <!--PAYMENT NETHOD-->
-                            <td>{{ $transaksi->paymentMethod->nama_payment_method }}</td>
+                            <td>{{ $transaksi->payment_method_id ? $transaksi->paymentMethod->nama_payment_method : '-' }}</td>
                             <!--AKSI-->
+                            @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                             <td>
                                 <!-- Popup -->
-                                <div id="popup-resi" class="hidden fixed top-0 left-0 w-full h-full items-center justify-center">
-                                    <div class=" fixed top-0 left-0 w-full h-full items-center justify-center bg-black opacity-30 z-0"></div>
-                                    <div class="bg-white rounded-lg p-6 w-1/3 z-1">
-                                        <h2 class="text-lg font-bold mb-4">Masukkan Nomor Resi</h2>
-                                        <form id="popup-resi-form" action="" method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="transaksi_id" id="popup-transaksi-id">
-                                            <div class="mb-4">
-                                                <label for="no_resi" class="block mb-2">Nomor Resi</label>
-                                                <input type="text" id="popup-nomor-resi" name="no_resi" required
-                                                    class="border px-2 py-1 w-full rounded-lg"
-                                                >
-                                            </div>
-                                            <div class="flex justify-end gap-4">
-                                                <button type="button" class="text-sm px-4 py-2 rounded-lg bg-gray-300" onclick="closePopup()">Batal</button>
-                                                <button type="submit" class="text-sm px-4 py-2 rounded-lg bg-primer text-white hover:bg-opacity-90">Kirim</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                                @include('dashboard.d-transaksi.V_FormTambahResi')
                                 <!-- Tombol -->
                                 @if ($transaksi->statusTransaksi->kode_status_transaksi === 'settlement')
                                 <div class="flex flex-col items-center justify-center gap-2 max-w-30">
@@ -115,13 +98,27 @@
                                     >
                                         Ubah Pesanan<br>Menjadi Dikirim
                                     </button>
-                                @endif
                                 </div>
+                                @elseif ($transaksi->statusTransaksi->kode_status_transaksi === 'delivering')
+                                <div class="flex flex-col items-center justify-center gap-2 max-w-30">
+                                    <button
+                                        class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
+                                        onclick="showPopup({{ $transaksi->id }}, '{{ route('dashboard.updateStatsTransaksi') }}')"
+                                    >
+                                        Ubah<br>Nomor Resi
+                                    </button>
+                                </div>
+                                @endif
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <!-- PAGINATION -->
+            <div class="mt-4">
+                {{ $transaksis->links() }}
+            </div>
         </div>
     </div>
 

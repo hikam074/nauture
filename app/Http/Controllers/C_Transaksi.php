@@ -25,12 +25,13 @@ class C_Transaksi extends Controller
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
 
         // hanya bisa buat transaksi 3 jam setelah dinyatakan menang
-        if ($pasang_lelang->waktu_dimenangkan && now()->diffInHours($pasang_lelang->waktu_dimenangkan) > 3) {
+        if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) < -3)) {
             return redirect()->back()->with('error', [
                 'title' => 'Gagal',
                 'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
             ]);
         }
+        // dd(now()->diffInHours($pasang_lelang->waktu_dimenangkan));
         return $this->insertDataTransaksi($request);
     }
 
@@ -167,28 +168,49 @@ class C_Transaksi extends Controller
         ]);
     }
 
-    public function showHalamanChekout($id) {
+
+
+
+    public function getDataTransaksiChekout($id) {
         $transaksi = M_Transaksi::with(['pasangLelang', 'lelang'])->findOrFail($id);
         if ($transaksi->status_transaksi_id != M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id) {
             return redirect()->back()->with('error', 'Transaksi ini sudah selesai atau dibatalkan.');
         }
-        return view('transaksi.bayar', compact('transaksi'));
+        return $this->showHalamanChekout($id, $transaksi);
     }
 
-    public function showDataTransaksiUserIni() {
-        $user = User::find(Auth::id());
+    public function showHalamanChekout($id, $transaksi) {
+        return view('transaksi.V_HalamanCheckout', compact('transaksi'));
+    }
+
+
+
+
+    public function getDataTransaksiUserIni() {
         $transaksis = M_Transaksi::with(['lelang', 'statusTransaksi', 'paymentMethod'])
             ->whereHas('pasangLelang', function ($query) {
                 $query->where('user_id', Auth::id());
             })
-            ->get();
-        return view('dashboard.transaksi', compact('transaksis'));
+            ->paginate(10);
+        return $this->showDataTransaksiUserIni($transaksis);
+    }
+    public function showDataTransaksiUserIni($transaksis) {
+        return view('dashboard.d-transaksi.V_HalamanTransaksiUser', compact('transaksis'));
     }
 
-    public function showDataTransaksi() {
-        $transaksis = M_Transaksi::with('pasangLelang', 'paymentMethod')->get();
-        return view('dashboard.listTransaksi', compact('transaksis'));
+
+
+
+    public function getDataTransaksi() {
+        $transaksis = M_Transaksi::with('pasangLelang', 'paymentMethod')->paginate(10);
+        return $this->showDataTransaksi($transaksis);
     }
+    public function showDataTransaksi($transaksis) {
+        return view('dashboard.d-transaksi.V_HalamanSemuaTransaksi', compact('transaksis'));
+    }
+
+
+
 
     public function updateStatusPengiriman(Request $request) {
         $transaksi = M_Transaksi::findOrFail($request->transaksi_id);
@@ -203,31 +225,14 @@ class C_Transaksi extends Controller
         }
     }
 
-    public function klikSelesai(Request $request) {
-        $request->session()->flash('alert', [
-            'title' => 'Pesanan telah diterima?',
-            'text' => 'Apakah anda yakin ingin menyelesaikan pesanan?',
-            'icon' => 'warning',
-            'confirmButtonText' => 'Ya, Selesai!',
-            'cancelButtonText' => 'Batal',
-            'confirmUrl' => route('dashboard.pesananSelesai'),
-        ]);
-
-        return redirect()->back();
-    }
-
     public function updateDeliverySelesai(Request $request) {
         $transaksi = M_Transaksi::where('order_id', $request->order_id)->first();
         try {
             $transaksi->status_transaksi_id = M_StatusTransaksi::where('kode_status_transaksi', 'delivered')->first()->id;
             $transaksi->save();
-            return redirect()->back()->with('success', 'Barang telah anda terima! Jangan lupa memberi penilaian untuk barang kai!');
+            return redirect()->back()->with('success', 'Barang telah anda terima! Jangan lupa memberi penilaian untuk barang kami!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
-
-
-
 }

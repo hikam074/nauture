@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +23,10 @@ class DatabaseSeeder extends Seeder
         $this->call(KatalogSeeder::class);
         $this->call(LelangSeeder::class);
         $this->call(PasangLelangSeeder::class);
+
+        // Jalankan command artisan untuk set winner
+        Artisan::call('lelang-set-winner');
+        $this->command->info('Winners for lelang have been set successfully.');
     }
 }
 

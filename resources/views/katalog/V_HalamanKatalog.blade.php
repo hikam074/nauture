@@ -153,39 +153,39 @@
                                     </p>
                                 </div>
 
-                                <!-- KARDS : TOMBOL2 -->
+                                <!-- KARDS : TOMBOL2 PEGAWAI -->
                                 <div class="flex w-full text-sm justify-between gap-2 font-medium text-white">
-                                    @if($katalog->trashed())
-                                        @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
-                                        <!-- PEGAWAI : RESTORE -->
-                                        <a class="w-full px-4 py-2 bg-yellow-500 rounded-lg
+                                    @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
+                                    <!-- RESTORE -->
+                                        @if($katalog->trashed())
+                                        <a class="w-full bg-yellow-500 rounded-lg
                                                 hover:bg-yellow-600 transition"
                                             >
-                                            <form action="{{ route('katalog.restore', $katalog->id) }}" method="POST">
+                                            <form action="{{ route('katalog.restore', $katalog->id) }}" method="POST" id="formRestoreKatalog">
                                                 @csrf
                                                 @method('PATCH')
-                                                    <button type="submit">
+                                                    <button type="button" id="btnRestoreKatalog"
+                                                        onclick="event.stopPropagation();"
+                                                        class="w-full px-4 py-2">
                                                         Restore
                                                     </button>
                                             </form>
                                         </a>
-                                        @endif
-                                    @else
-                                        @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
-                                            <!-- PEGAWAI : EDIT -->
-                                            <a href="{{ route('katalog.edit', $katalog->id) }}"
-                                                class="w-full py-2 bg-blue-500 rounded-lg
-                                                hover:bg-blue-600 transition"
-                                                >
-                                                Edit
-                                            </a>
-                                            <!-- DETAIL -->
-                                            <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
-                                                class="w-full py-2 bg-gray-500 rounded-lg
-                                                hover:bg-gray-600 transition"
-                                                >
-                                                Detail
-                                            </a>
+                                        @else
+                                        <!-- EDIT -->
+                                        <a href="{{ route('katalog.edit', $katalog->id) }}"
+                                            class="w-full py-2 bg-blue-500 rounded-lg
+                                            hover:bg-blue-600 transition"
+                                            >
+                                            Edit
+                                        </a>
+                                        <!-- DETAIL -->
+                                        <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
+                                            class="w-full py-2 bg-gray-500 rounded-lg
+                                            hover:bg-gray-600 transition"
+                                            >
+                                            Detail
+                                        </a>
                                         @endif
                                     @endif
                                 </div>
@@ -201,4 +201,32 @@
             </div>
         </div>
     </section>
+@endsection
+
+@section('scripts')
+    @if ((Auth::check()) && (Auth::user()->role->nama_role == 'pegawai'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('#btnRestoreKatalog');
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = this.closest('form');
+                    showAlert({
+                        title: 'Restore Produk?',
+                        text: 'Apakah Anda yakin ingin memunculkan kembali produk ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Restorasi Kembali',
+                        cancelButtonText: 'Batal',
+                        onConfirm: function () {
+                            form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    @endif
 @endsection

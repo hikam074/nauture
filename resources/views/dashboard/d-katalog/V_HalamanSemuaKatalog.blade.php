@@ -42,11 +42,11 @@
                     @foreach ($katalogs as $index => $katalog)
                         <tr class="border-b-1 border-bsoft">
                             <!--NO.-->
-                            <td class="">{{ $index + 1 }}.</td>
+                            <td class="text-center">{{ ($katalogs->currentPage() - 1) * $katalogs->perPage() + $index + 1 }}.</td>
                             <!--NAMA PRODUK-->
                             <td class="">{{ $katalog->nama_produk }}</td>
                             <!--DESKRIPSI-->
-                            <td class="max-w-40">{{ $katalog->deskripsi_produk }}</td>
+                            <td class="max-w-40">{{ $katalog->deskripsi_produk ? $katalog->deskripsi_produk : '-' }}</td>
                             <!--HARGA-->
                             <td class="">Rp. {{ number_format($katalog->harga_perkilo, 0, ',', '.') }}</td>
                             <!--FOTO-->
@@ -75,23 +75,38 @@
                                     >
                                     Lihat
                                 </a>
-                                <a href="{{ route('katalog.edit', ['id' => $katalog->id]) }}"
-                                    class="text-sm px-4 py-2 rounded-lg bg-edit
-                                        hover:bg-edithov"
-                                    >
-                                    Edit
-                                </a>
-                                <a href="{{ route('katalog.destroy', ['id' => $katalog->id]) }}"
-                                    class="text-sm px-4 py-2 rounded-lg bg-hapus
-                                        hover:bg-hapushov"
-                                    >
-                                    Hapus
-                                </a>
+                                @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
+                                    @if ($katalog->trashed())
+                                    <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
+                                        class="text-sm px-4 py-2 rounded-lg bg-restore
+                                            hover:bg-restorehov"
+                                        >
+                                        Restore
+                                    </a>
+                                    @else
+                                    <a href="{{ route('katalog.edit', ['id' => $katalog->id]) }}"
+                                        class="text-sm px-4 py-2 rounded-lg bg-edit
+                                            hover:bg-edithov"
+                                        >
+                                        Edit
+                                    </a>
+                                    <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
+                                        class="text-sm px-4 py-2 rounded-lg bg-hapus
+                                            hover:bg-hapushov"
+                                        >
+                                        Hapus
+                                    </a>
+                                    @endif
+                                @endif
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <!-- PAGINATION -->
+            <div class="mt-4">
+                {{ $katalogs->links() }}
+            </div>
         </div>
     </div>
 @endsection

@@ -73,36 +73,38 @@
                 </div>
                 {{-- tombol2 --}}
                 <div class="text-center">
-                    {{-- <button type="button" onclick="window.history.back();" class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer">
-                        Kembali
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
-                        {{ isset($katalog) ? 'Simpan Perubahan' : 'Tambahkan' }}
-                    </button> --}}
-
                     <button type="button" onclick="window.history.back();"
                         class="px-4 py-2 mt-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 cursor-pointer"
                         >
                         Kembali
                     </button>
-                    @if (isset($katalog))
-                        <button type="button" id="confirmButton"
-                            class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
-                            >
-                            Simpan Perubahan
-                        </button>
+                    {{-- @if (isset($katalog))
+                    <button type="button" id="confirmButton"
+                        class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
+                        >
+                        Simpan Perubahan
+                    </button>
                     @else
-                        <button type="submit" id="confirmButton"
-                            class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
-                            Tambahkan
-                        </button>
-                    @endif
+                    <button type="button" id="confirmButton"
+                        class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
+                        Tambahkan
+                    </button>
+                    @endif --}}
+                    <button type="button" id="confirmButton"
+                        data-action="{{ isset($katalog) ? 'edit' : 'add' }}"
+                        class="px-4 py-2 bg-sekunderDark text-white rounded-lg shadow hover:bg-primer focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
+                        {{ isset($katalog) ? 'Simpan Perubahan' : 'Tambahkan' }}
+                    </button>
                 </div>
             </form>
 
         </div>
 
     </div>
+
+@endsection
+
+@section('scripts')
 
     {{-- logic pemilihan gambar --}}
     <script>
@@ -154,16 +156,16 @@
             console.log(document.getElementById('selected_image').value);
         }
         console.log(document.getElementById('selected_image').value);
-    </script>
 
-    <script>
         document.getElementById("confirmButton").addEventListener("click", () => {
             const form = document.getElementById("katalogForm");
-            const katalogId = document.getElementById("katalogID").value;
+            const action = document.getElementById("confirmButton").dataset.action;
+            const url = action === "edit"
+                ? `/katalog/${document.getElementById("katalogID").value}/edit-konfirm`
+                : "/katalog/add-konfirm";
 
-            const metadataUrl = `/katalog/${katalogId}/edit-konfirm`;
-            console.log(metadataUrl);
-            fetch(metadataUrl, {
+            // Fetch metadata untuk SweetAlert
+            fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -175,7 +177,6 @@
                 return response.json();
             })
             .then((metadata) => {
-                // Panggil showAlert dengan metadata dari backend
                 showAlert({
                     title: metadata.title,
                     text: metadata.text,
@@ -183,13 +184,15 @@
                     confirmButtonText: metadata.confirmButtonText,
                     cancelButtonText: metadata.cancelButtonText,
                     onConfirm: () => {
-                        // Ubah form method ke PUT dan submit
-                        const methodInput = document.createElement("input");
-                        methodInput.type = "hidden";
-                        methodInput.name = "_method";
-                        methodInput.value = "PUT";
-                        form.appendChild(methodInput);
-
+                        if (action === "edit") {
+                            // Tambahkan input hidden untuk method PUT
+                            const methodInput = document.createElement("input");
+                            methodInput.type = "hidden";
+                            methodInput.name = "_method";
+                            methodInput.value = "PUT";
+                            form.appendChild(methodInput);
+                        }
+                        // Submit form
                         form.submit();
                     },
                 });
@@ -199,5 +202,7 @@
                 // Tampilkan notifikasi error jika diperlukan
             });
         });
+
     </script>
+
 @endsection

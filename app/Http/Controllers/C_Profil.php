@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\M_Alamat;
 use App\Models\M_Provinsi;
+use App\Models\M_Transaksi;
 use App\Models\User;
 
 use Illuminate\Http\Request;
@@ -14,14 +15,6 @@ use Illuminate\Support\Facades\Storage;
 
 class C_Profil extends Controller
 {
-    public function showHalamanDashboard()
-    {
-        return view('dashboard.dashboard');
-    }
-
-
-
-
     public function getDataProfil()
     {
         $profil = User::with(['role', 'alamat.city.provinsi'])->find(Auth::user()->id);
@@ -32,19 +25,19 @@ class C_Profil extends Controller
 
     public function showHalamanProfil($profil)
     {
-        return view('dashboard.V_HalamanProfil', compact('profil'));
+        return view('dashboard.d-profil.V_HalamanProfil', compact('profil'));
     }
 
 
 
 
-    public function editDataProfil(Request $request) {
+    public function showFormUbahDataProfil(Request $request) {
         $profil = User::with(['role', 'alamat.city.provinsi'])->find(Auth::user()->id);
         $provinsis = M_Provinsi::all();
-        return view('dashboard.V_FormUbahProfil', compact('profil', 'provinsis'));
+        return view('dashboard.d-profil.V_FormUbahProfil', compact('profil', 'provinsis'));
     }
 
-    public function checkInputDataTerbaru(Request $request)
+    public function checkInputDataProfilTerbaru(Request $request)
     {
 
         $field = $request->input('field');
@@ -165,6 +158,13 @@ class C_Profil extends Controller
 
 
 
+
+    public function getDataProfilPegawai() {
+        //
+    }
+    public function showDataProfilPegawai() {
+        //
+    }
 
 
     public function klikLogout(Request $request) {

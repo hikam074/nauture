@@ -158,7 +158,7 @@
                                     Simpan Perubahan
                                 </button>
                             @else
-                                <button type="submit" id="confirmButton"
+                                <button type="button" id="confirmButton"
                                     class="px-4 py-2 bg-[#255B22] text-white rounded-lg shadow hover:bg-[#1d331c] focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer">
                                     Simpan
                                 </button>
@@ -263,9 +263,25 @@
                 }
             }
         }
-    </script>
 
-    <script>
+        const button = document.getElementById('confirmButton');
+        const form = document.getElementById('lelangForm');
+        button.addEventListener('click', function () {
+            showAlert({
+                title: 'Apakah anda yakin?',
+                text: 'Apakah Anda yakin hendak menambahkan lelang ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Tambahkan',
+                cancelButtonText: 'Batal',
+                onConfirm: function () {
+                    form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                }
+            });
+        });
+
         document.getElementById("confirmButton").addEventListener("click", () => {
             const form = document.getElementById("lelangForm");
             const lelangId = document.getElementById("lelangID").value;

@@ -15,7 +15,7 @@ class C_Notifikasi
 
     public function showHalamanNotifikasi($notifs)
     {
-        return view('dashboard.notifikasi', compact('notifs'));
+        return view('dashboard.d-notifikasi.V_HalamanNotifikasi', compact('notifs'));
     }
 
 

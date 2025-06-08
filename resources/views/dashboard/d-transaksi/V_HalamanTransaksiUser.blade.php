@@ -33,7 +33,7 @@
                     @foreach ($transaksis as $index => $transaksi)
                         <tr class="border-b-1 border-bsoft">
                             <!--NO.-->
-                            <td class="text-center">{{ $index + 1 }}.</td>
+                            <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td>
                             <!--KODE TRANSAKSI-->
                             <td class="max-w-30">{{ $transaksi->order_id }}</td>
                             <!--KODE LELANG-->
@@ -88,11 +88,11 @@
                                 </td>
                             @endif
                             <!--PAYMENT TIME-->
-                            <td>{{ $transaksi->payment_time }}</td>
+                            <td><span class="w-full text-center">{{ $transaksi->payment_time ? $transaksi->payment_time : '-' }}</span></td>
                             <!--NO RESI-->
-                            <td>{{ $transaksi->no_resi }}</td>
+                            <td class="text-center">{{ $transaksi->no_resi ? $transaksi->no_resi : '-' }}</td>
                             <!--METODE PEMBAYARAN-->
-                            <td>{{ $transaksi->paymentMethod->nama_payment_method }}</td>
+                            <td class="text-center">{{ $transaksi->payment_method_id ? $transaksi->paymentMethod->nama_payment_method : 'Belum Dibayar' }}</td>
                             <!--AKSI-->
                             <td >
                                 <div class="flex items-center justify-center ">
@@ -129,9 +129,12 @@
                     @endforeach
                 </tbody>
             </table>
+            <!-- PAGINATION -->
+            <div class="mt-4">
+                {{ $transaksis->links() }}
+            </div>
         </div>
     </div>
-
 
 @endsection
 

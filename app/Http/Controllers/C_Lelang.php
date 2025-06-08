@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\M_Lelang;
 use App\Models\M_PasangLelang;
 use App\Models\M_Katalog;
+use App\Models\M_StatusTransaksi;
 use App\Models\M_Transaksi;
 
 use Illuminate\Support\Facades\Auth;
@@ -98,25 +99,23 @@ class C_Lelang
     public function getDetailDataLelang(string $id)
     {
         // Cari data lelang berdasarkan ID
-        $lelang = M_Lelang::withTrashed()->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
+        $lelang = M_Lelang::withTrashed()->with('pemenang')->findOrFail($id); // Akan melempar 404 jika ID tidak ditemukan
         // cari apakah user yang logged sudah nge bid
         $userBids = $lelang->pasangLelang->where('user_id', Auth::id())->first();
         // cari bid an tertinggi
         $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
-
-        // if ($lelang->pemenang_id) {
-        //     // ambil data dari transaksi
-        //     $pemenang = M_Transaksi::findOrFail($id);
-        //     return $this->showDetailDataLelang($lelang, $userBids, $topBid, $pemenang);
-        // }
+        // cari ini sudah selesai atau belum
+        $adaTransaksi = $userBids
+            ? M_Transaksi::where('pasang_lelang_id', $userBids->id)->first()
+            : null;
 
         // teruskan data ke pengeksekusi show
-        return $this->showDetailDataLelang($lelang, $userBids, $topBid);
+        return $this->showDetailDataLelang($lelang, $userBids, $topBid, $adaTransaksi);
     }
 
-    public function showDetailDataLelang(M_Lelang $lelang, $userBids = null, $topBid = null, $pemenang = null)
+    public function showDetailDataLelang(M_Lelang $lelang, $userBids = null, $topBid = null, $adaTransaksi = null)
     {
-        return view('lelang.V_HalamanDetailLelang', ['lelang' => $lelang, 'userBids' => $userBids, 'topBid' => $topBid, 'pemenang' => $pemenang]);
+        return view('lelang.V_HalamanDetailLelang', ['lelang' => $lelang, 'userBids' => $userBids, 'topBid' => $topBid, 'adaTransaksi' => $adaTransaksi]);
     }
 
 
@@ -479,7 +478,7 @@ class C_Lelang
 
 
     public function getSemuaLelang() {
-        $lelangs = M_Lelang::withTrashed()->with(['pasangLelang.user', 'pemenang'])->get();
+        $lelangs = M_Lelang::withTrashed()->with(['pasangLelang.user', 'pemenang'])->paginate(10);
 
         $lelangs->each(function ($lelang) {
             if ($lelang->trashed()) {
@@ -495,9 +494,9 @@ class C_Lelang
             }
         });
         // reset index
-        $lelangs = $lelangs->values();
+        // $lelangs = $lelangs->values();
 
-        return view('dashboard.listLelang', compact('lelangs'));
+        return view('dashboard.d-lelang.V_HalamanSemuaLelang', compact('lelangs'));
     }
 
 

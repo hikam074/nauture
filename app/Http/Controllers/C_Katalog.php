@@ -100,6 +100,18 @@ class C_Katalog extends Controller
         return view('katalog.V_FormTambahProdukKatalog');
     }
 
+    public function klikTambahBarang(Request $request)
+    {
+        return response()->json([
+            'title' => 'Apakah Anda Yakin?',
+            'text' => 'Apakah Anda yakin hendak menambahkan katalog ini?',
+            'icon' => 'warning',
+            'confirmButtonText' => 'Ya, Tambahkan',
+            'cancelButtonText' => 'Batal',
+            'confirmUrl' => route('katalog.add'),
+        ]);
+    }
+
     public function checkInputNotNull(Request $request)
     {
         // aturan input
@@ -266,15 +278,15 @@ class C_Katalog extends Controller
 
 
     public function getSemuaKatalog() {
-        $katalogs = M_katalog::withTrashed()->get();
+        $katalogs = M_katalog::withTrashed()->paginate(10);
 
         $katalogs->each(function ($katalog) {
             $katalog->status = $katalog->trashed() ? 'Dihapus' : 'Aktif';
         });
         // reset index
-        $katalogs = $katalogs->values();
+        // $katalogs = $katalogs->values();
 
-        return view('dashboard.listKatalog', compact('katalogs'));
+        return view('dashboard.d-katalog.V_HalamanSemuaKatalog', compact('katalogs'));
     }
 
 

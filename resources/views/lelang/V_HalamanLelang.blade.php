@@ -88,15 +88,6 @@
                     <div class="bg-white shadow-lg rounded-lg p-2 h-full border-1 border-primer flex flex-row
                         sm:p-4 sm:bg-bsoft sm:border-bsoft sm:flex-col"
                         >
-                        {{-- <div class="w-full
-                            sm:hidden"
-                            >
-                            <button onclick=""
-                                class="w-full h-full px-2"
-                                >
-                                Filters
-                            </button>
-                        </div> --}}
                         @if (Auth::check() && ((Auth::user()->role->nama_role == 'pegawai') || (Auth::user()->role->nama_role == 'owner')))
                         <form action="{{ route('lelang.index') }}" method="GET"
                             class="space-y-3 h-full
@@ -203,86 +194,113 @@
                                 sm:w-48"
                                 >
                                 <!-- KARDS : FOTO, JUDUL, HARGA -->
-                                <div>
+                                <div class="flex flex-col gap-2">
+                                    <!-- KARDS : FOTO -->
                                     <img src="{{ asset('storage/' . $lelang->foto_produk) }}" alt="{{ $lelang->nama_produk_lelang }}"
-                                        class="w-full h-40 object-cover rounded-md"
+                                    class="w-full h-40 object-cover rounded-md"
                                     >
-                                    <h2 class="text-lg font-semibold my-2 border-b-1">
+                                    <!-- KARDS : JUDUL -->
+                                    <h2 class="text-lg font-semibold border-b-1">
                                         {{ $lelang->nama_produk_lelang }}
                                     </h2>
-                                    @if($lelang->pasangLelang->isNotEmpty())
-                                        <p class="font-thin text-xs">
-                                            Penawaran Tertinggi : Rp{{ number_format($lelang->pasangLelang->max('harga_pengajuan'), 0, ',', '.') }}
-                                        </p>
-                                    @else
-                                        <p class="font-thin text-xs">
-                                            Dibuka Mulai : Rp{{ number_format($lelang->harga_dibuka, 0, ',', '.') }}
-                                        </p>
-                                    @endif
+                                    <!-- KARDS : HARGA -->
+                                    <div class="w-full flex items-center gap-1">
+                                        <img src="{{ asset('images/icons/hargaIcon.svg') }}" class="w-5">
+                                        <span class="font-thin text-xs">Mulai Rp.
+                                            {{
+                                                $lelang->pasangLelang->isNotEmpty()
+                                                ? number_format($lelang->pasangLelang->max('harga_pengajuan'), 0, ',', '.')
+                                                : number_format($lelang->harga_dibuka, 0, ',', '.')
+                                            }}
+                                        </span>
+                                    </div>
+                                    <!-- KARDS : TENGGAT -->
+                                    <div class="w-full flex items-center gap-1">
+                                        <img src="{{ asset('images/icons/jamIcon.svg') }}" class="w-5">
+                                        <span class="font-thin text-xs text-start">
+                                            {{
+                                                (now()->greaterThanOrEqualTo($lelang->tanggal_dibuka) && now()->lessThan($lelang->tanggal_ditutup))
+                                                // ongoing
+                                                ? 'Berakhir : '.$lelang->tanggal_ditutup
+                                                : ( now()->lessThan($lelang->tanggal_dibuka)
+                                                    // belum dibuka
+                                                    ? 'Dibuka : '.$lelang->tanggal_dibuka
+                                                    // selesai
+                                                    : 'Selesai : '.$lelang->tanggal_ditutup
+                                                )
+                                            }}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <!-- KARDS : TOMBOL2 -->
                                 <div class="flex w-full text-sm justify-between gap-2 font-medium text-white">
-                                    @if(!($lelang->trashed()))
-                                        @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
-                                            <!-- PEGAWAI : EDIT -->
-                                            <a href="{{ route('lelang.edit', $lelang->id) }}"
-                                                class="w-full py-2 bg-blue-500 rounded-lg flex items-center justify-center
-                                                hover:bg-blue-600 transition"
+
+                                    <!-- PEGAWAI : RESTORE -->
+                                    @if ($lelang->trashed() && (Auth::check() && Auth::user()->role->nama_role == 'pegawai') && (now()->lessThan($lelang->tanggal_ditutup)))
+                                    <a class="w-full bg-yellow-500 rounded-lg
+                                        hover:bg-yellow-600 transition"
+                                        >
+                                        <form action="{{ route('lelang.restore', $lelang->id) }}" method="POST" id="formRestoreKatalog">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="button" id="btnRestoreKatalog" onclick="event.stopPropagation();"
+                                                class="w-full px-4 py-2"
                                                 >
-                                                <span>Edit</span>
-                                            </a>
-                                            <!-- DETAIL -->
-                                            <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
-                                                class="w-full py-2 bg-gray-500 rounded-lg flex items-center justify-center
-                                                hover:bg-gray-600 transition"
-                                                >
-                                                <span>Detail</span>
-                                            </a>
-                                        @else
-                                            <!-- PASANG BID -->
-                                            <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
-                                                class="w-full py-2 bg-blue-500 rounded-lg flex items-center justify-center
-                                                hover:bg-blue-600 transition"
-                                                >
-                                                <span>Pasang<br>Tawaran</span>
-                                            </a>
-                                            <!-- DETAIL -->
-                                            <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
-                                                class="w-full py-2 bg-gray-500 rounded-lg flex items-center justify-center
-                                                hover:bg-gray-600 transition"
-                                                >
-                                                <span>Detail</span>
-                                            </a>
-                                        @endif
-                                    @else
-                                        @if ((Auth::check() && Auth::user()->role->nama_role == 'pegawai'))
-                                            @if ($lelang->pemenang_id)
-                                                <!-- DUMMY BUTTON SELESAI -->
-                                                <button class="w-full px-4 py-2 bg-gray-300 text-white rounded-lg flex items-center justify-center">
-                                                    <span>Selesai</span>
-                                                </button>
-                                            @else
-                                                <!-- PEGAWAI : RESTORE -->
-                                                <a class="w-full px-4 py-2 bg-yellow-500 rounded-lg
-                                                    hover:bg-yellow-600 transition"
-                                                    >
-                                                    <form action="{{ route('lelang.restore', $lelang->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit">
-                                                            Restore
-                                                        </button>
-                                                    </form>
-                                                </a>
-                                            @endif
-                                        @else
-                                            <!-- DUMMY BUTTON -->
-                                            <button class="w-full px-4 py-4.5 bg-gray-300 text-white rounded-lg flex items-center justify-center">
-                                                <span>{{ $lelang->pemenang_id ? 'Selesai' : 'Dibatalkan' }}</span>
+                                                Restore
                                             </button>
-                                        @endif
+                                        </form>
+                                    </a>
+
+                                    <!-- ALL : DIHAPUS -->
+                                    @elseif ($lelang->trashed())
+                                    <button class="w-full px-4 py-2 bg-gray-300 text-white rounded-lg flex items-center justify-center">
+                                        <span>Dihapus</span>
+                                    </button>
+
+                                    <!-- ALL : SELESAI -->
+                                    @elseif ($lelang->pemenang_id || now()->greaterThanOrEqualTo($lelang->tanggal_ditutup))
+                                    <button class="w-full px-4 py-2 bg-gray-300 text-white rounded-lg flex items-center justify-center">
+                                        <span>Selesai</span>
+                                    </button>
+
+                                    <!-- CUSTOMER && GUEST : PASANG BID -->
+                                    @elseif ((!Auth::check() || (Auth::check() && Auth::user()->role->nama_role == 'customer')) && (now()->greaterThanOrEqualTo($lelang->tanggal_dibuka) && now()->lessThan($lelang->tanggal_ditutup)))
+                                    <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
+                                        class="w-full py-2 bg-blue-500 rounded-lg flex items-center justify-center
+                                        hover:bg-blue-600 transition"
+                                        >
+                                        <span>Pasang Tawaran</span>
+                                    </a>
+
+                                    <!-- PEGAWAI : EDIT -->
+                                    @elseif (Auth::check() && Auth::user()->role->nama_role == 'pegawai' && now()->lessThan($lelang->tanggal_dibuka))
+                                    <a href="{{ route('lelang.edit', $lelang->id) }}"
+                                        class="w-full py-2 bg-blue-500 rounded-lg flex items-center justify-center
+                                        hover:bg-blue-600 transition"
+                                        >
+                                        <span>Edit</span>
+                                    </a>
+
+                                    <!-- ALL : MENUNGGU DIBUKA -->
+                                    @elseif (now()->lessThan($lelang->tanggal_dibuka))
+                                    <a class="w-full py-2 bg-gray-500 rounded-lg flex items-center justify-center
+                                        hover:bg-gray-600 transition"
+                                        >
+                                        <span>Menunggu Dibuka</span>
+                                    </a>
+
+                                    <!-- ALL : DETAIL -->
+                                    @else
+                                    <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
+                                        class="w-full py-2 bg-gray-500 rounded-lg flex items-center justify-center
+                                        hover:bg-gray-600 transition"
+                                        >
+                                        <span>Detail</span>
+                                    </a>
+
                                     @endif
+
                                 </div>
                             </div>
                         @empty
@@ -296,4 +314,32 @@
         </div>
     </section>
 
+@endsection
+
+@section('scripts')
+    @if ((Auth::check()) && (Auth::user()->role->nama_role == 'pegawai'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('#btnRestoreKatalog');
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = this.closest('form');
+                    showAlert({
+                        title: 'Restore Produk?',
+                        text: 'Apakah Anda yakin ingin memunculkan kembali produk ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Restorasi Kembali',
+                        cancelButtonText: 'Batal',
+                        onConfirm: function () {
+                            form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    @endif
 @endsection

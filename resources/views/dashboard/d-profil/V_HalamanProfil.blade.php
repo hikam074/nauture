@@ -19,6 +19,7 @@
                     src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : asset('images/icons/defaultAvatarDark.svg') }}"
                     class="h-full w-full object-cover rounded-full border-2 border-white">
             </div>
+            @if (Auth::check() && Auth::user()->role->nama_role != 'owner')
             <div class="">
                 <a href="{{ route('profil.edit') }}"
                     class="border-2 border-dashed p-5 text-center
@@ -27,14 +28,9 @@
                     Ubah Profil
                 </a>
             </div>
+            @endif
         </div>
 
-        <div>
-            <label>Nama Lengkap</label>
-            <input type="text" value="{{ $profil->name }}" disabled
-                class="border-1 p-2 w-full border-primer"
-            >
-        </div>
         <div>
             <label>Nama Lengkap</label>
             <input type="text" value="{{ $profil->name }}" disabled

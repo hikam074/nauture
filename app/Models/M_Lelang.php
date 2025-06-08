@@ -51,7 +51,7 @@ class M_Lelang extends Model
     // deklarasi this lelang_id bisa punya banyak lelang_id di transaksis
     public function transaksi()
     {
-        return $this->hasMany(M_Transaksi::class);
+        return $this->hasMany(M_Transaksi::class, 'lelang_id', 'id');
     }
     // deklarasi this lelang_id bisa punya banyak lelang_id di notifications
     public function notification()

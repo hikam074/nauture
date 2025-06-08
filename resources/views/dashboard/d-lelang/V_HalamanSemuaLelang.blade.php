@@ -43,7 +43,7 @@
                 @foreach ($lelangs as $index => $lelang)
                     <tr class="border-b-1 border-bsoft w-full">
                         <!--NO.-->
-                        <td class="text-center">{{ $index + 1 }}.</td>
+                        <td class="text-center">{{ ($lelangs->currentPage() - 1) * $lelangs->perPage() + $index + 1 }}.</td>
                         <!--NAMA PRODUK-->
                         <td class="max-w-20">{{ $lelang->nama_produk_lelang }}</td>
                         <!--DESKRIPSI-->
@@ -89,25 +89,34 @@
                         <!--AKSI-->
                         <td class="text-white">
                             <div class="flex flex-col items-center justify-start text-center gap-2">
-                                @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                                 <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
                                     class="text-sm px-4 py-1 rounded-lg bg-canceledhov w-full
-                                        hover:bg-primer hover:text-white"
+                                    hover:bg-primer hover:text-white"
                                     >
                                     Lihat
                                 </a>
-                                <a href="{{ route('lelang.edit', ['id' => $lelang->id]) }}"
-                                    class="text-sm px-4 py-1 rounded-lg bg-edit w-full
-                                        hover:bg-edithov"
-                                    >
-                                    Edit
-                                </a>
-                                <a href="{{ route('lelang.destroy', ['id' => $lelang->id]) }}"
-                                    class="text-sm px-4 py-1 rounded-lg bg-hapus w-full
-                                        hover:bg-hapushov"
-                                    >
-                                    Hapus
-                                </a>
+                                @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
+                                    @if ($lelang->trashed())
+                                    <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
+                                        class="text-sm px-4 py-1 rounded-lg bg-restore w-full
+                                            hover:bg-restorehov"
+                                        >
+                                        Restore
+                                    </a>
+                                    @elseif(now()->lessThan($lelang->tanggal_dibuka) )
+                                    <a href="{{ route('lelang.edit', ['id' => $lelang->id]) }}"
+                                        class="text-sm px-4 py-1 rounded-lg bg-edit w-full
+                                            hover:bg-edithov"
+                                        >
+                                        Edit
+                                    </a>
+                                    <a href="{{ route('lelang.show', ['id' => $lelang->id]) }}"
+                                        class="text-sm px-4 py-1 rounded-lg bg-hapus w-full
+                                            hover:bg-hapushov"
+                                        >
+                                        Hapus
+                                    </a>
+                                    @endif
                                 @endif
                             </div>
                         </td>
@@ -115,6 +124,10 @@
                 @endforeach
                 </tbody>
             </table>
+            <!-- PAGINATION -->
+            <div class="mt-4">
+                {{ $lelangs->links() }}
+            </div>
         </div>
     </div>
 @endsection

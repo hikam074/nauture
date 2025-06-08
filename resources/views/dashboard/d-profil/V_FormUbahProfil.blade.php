@@ -60,7 +60,7 @@
                         value="{{ old($field, Auth::user()->$field) }}"
                         class="border-1 p-2 w-full border-canceledhov rounded"
                         {{ $field === 'email' ? 'type=email' : '' }}>
-                    <button type="submit" class="bg-edit text-white px-4 py-2 rounded
+                    <button type="button" class="confirm-save-btn bg-edit text-white px-4 py-2 rounded
                         hover:bg-edithov transition"
                     >
                         Simpan
@@ -130,8 +130,8 @@
                     @endif
                 </div>
                 <div>
-                    <button type="submit" id="submitBtn" disabled
-                        class="bg-edit text-white px-4 py-2 rounded
+                    <button type="button" id="submitBtn" disabled
+                        class="confirm-save-btn bg-edit text-white px-4 py-2 rounded
                             hover:bg-edithov transition"
                     >
                         Simpan
@@ -193,8 +193,8 @@
                 <!-- Tombol Simpan -->
                 <div>
                     <button
-                        type="submit"
-                        class="bg-edit text-white px-4 py-2 rounded
+                        type="button"
+                        class="confirm-save-btn bg-edit text-white px-4 py-2 rounded
                             hover:bg-edithov transition"
                     >
                         Simpan
@@ -276,28 +276,34 @@
                     submitBtn.disabled = !(provinsiSelect.value && citySelect.value && detailInput.value.trim() &&kodeposInput.value.trim());
                 });
             });
+
+            // Seleksi semua tombol simpan
+            const saveButtons = document.querySelectorAll('.confirm-save-btn');
+
+            // Tambahkan event listener ke setiap tombol
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault(); // Cegah pengiriman formulir langsung
+
+                    const form = this.closest('form'); // Ambil formulir terkait tombol
+
+                    // Tampilkan SweetAlert
+                    showAlert({
+                        title: 'Apakah Anda Yakin?',
+                        text: 'Perubahan akan disimpan!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Batal',
+                        onConfirm: function () {
+                            form.submit(); // Mengirim formulir jika pengguna mengonfirmasi
+                        }
+                    });
+                });
+            });
         });
-
-    // document.getElementById('provinsi').addEventListener('change', function () {
-    //     const provinsiId = this.value;
-    //     const cityDropdown = document.getElementById('city');
-    //     cityDropdown.innerHTML = '<option value="" disabled selected>Loading...</option>';
-
-    //     fetch(`/api/cari-city/${provinsiId}`)
-    //         .then(response => response.json())
-    //         .then(cities => {
-    //             cityDropdown.innerHTML = '<option value="" disabled selected>Pilih Kota</option>';
-    //             cities.forEach(city => {
-    //                 const option = document.createElement('option');
-    //                 option.value = city.id;
-    //                 option.textContent = city.nama;
-    //                 cityDropdown.appendChild(option);
-    //             });
-    //             cityDropdown.disabled = false;
-    //         })
-    //         .catch(error => console.error('Error fetching cities:', error));
-    // });
-
 
     </script>
 

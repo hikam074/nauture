@@ -98,10 +98,14 @@ class C_PasangLelang
     public function getDataLelangUserIni()
     {
         $id = Auth::user()->id;
-        $allBids = M_PasangLelang::with(['lelang', 'transaksi'])->get()->where('user_id', $id);
-        // $thisTransaksi = M_Transaksi::findOrFail();
 
-        $allBids->each(function ($bid) {
+        // Filter berdasarkan user_id sebelum paginasi
+        $allBids = M_PasangLelang::with(['lelang.pasangLelang', 'transaksi'])
+            ->where('user_id', $id)
+            ->paginate(10);
+
+        // Manipulasi data setelah paginasi
+        $allBids->getCollection()->transform(function ($bid) {
             if ($bid->lelang) {
                 // Cari bider tertinggi berdasarkan harga pengajuan
                 $topBid = $bid->lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
@@ -109,34 +113,40 @@ class C_PasangLelang
 
                 if (now()->lessThan($bid->lelang->tanggal_ditutup)) {
                     // Lelang masih berlangsung
-                    if ($biderTertinggiId == $bid->user_id) {
-                        $bid->status = 'Berlangsung, Penawar Tertinggi';
-                    } else {
-                        $bid->status = 'Berlangsung, BUKAN Penawar Tertinggi';
-                    }
+                    $bid->status = $biderTertinggiId == $bid->user_id
+                        ? 'Berlangsung, Penawar Tertinggi'
+                        : 'Berlangsung, BUKAN Penawar Tertinggi';
                 } else {
                     // Lelang telah selesai
                     $selisihWaktu = now()->diffInHours($bid->lelang->tanggal_ditutup);
-                    $settle = M_StatusTransaksi::where('kode_status_transaksi', 'settlement')->first()->id;
-                    $capture = M_StatusTransaksi::where('kode_status_transaksi', 'capture')->first()->id;
+                    $selesai = M_StatusTransaksi::whereIn('kode_status_transaksi', ['settlement', 'capture', 'delivering'])
+                        ->pluck('id')
+                        ->toArray();
+
                     $pending = M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id;
+                    $delivered = M_StatusTransaksi::where('kode_status_transaksi', 'delivered')->first()->id;
 
                     $transaksiIsSettlement = $bid->transaksi
                         ->where('pasang_lelang_id', $bid->id)
-                        ->whereIn('status_transaksi_id', [$settle, $capture])
+                        ->whereIn('status_transaksi_id', $selesai)
                         ->first();
                     $transaksiIsOngoing = $bid->transaksi
                         ->where('pasang_lelang_id', $bid->id)
                         ->where('status_transaksi_id', $pending)
                         ->first();
+                    $transaksiIsDelivered = $bid->transaksi
+                        ->where('pasang_lelang_id', $bid->id)
+                        ->where('status_transaksi_id', $delivered)
+                        ->first();
 
-                    if ($bid->id == $bid->lelang->pemenang_id)
-                    {
+                    if ($bid->id == $bid->lelang->pemenang_id) {
                         if ($transaksiIsSettlement) {
                             $bid->status = 'Menang, selesai dibayar';
+                        } elseif ($transaksiIsDelivered) {
+                            $bid->status = 'Menang, pesanan selesai';
                         } elseif ($selisihWaktu <= 3 && $transaksiIsOngoing) {
                             $bid->status = 'Menang, segera selesaikan pembayaran';
-                        } elseif ($selisihWaktu <= 3 ) {
+                        } elseif ($selisihWaktu <= 3) {
                             $bid->status = 'Menang, belum dibayar';
                         } else {
                             $bid->status = 'Dialihkan ke pemenang lain';
@@ -149,16 +159,17 @@ class C_PasangLelang
                 // Tidak ada data lelang yang terkait
                 $bid->status = 'TIDAK VALID';
             }
+            return $bid;
         });
-        // reset index
-        $allBids = $allBids->values();
+
         return $this->showDataLelangUserIni($allBids);
     }
 
     public function showDataLelangUserIni($allBids)
     {
-        return view('dashboard.V_HalamanLelangSaya', compact('allBids'));
+        return view('dashboard.d-lelang.V_HalamanLelangSaya', compact('allBids'));
     }
+
 
 
 

@@ -21,12 +21,12 @@ class M_PasangLelang extends Model
     // reference this lelang_id ke lelangs id
     public function lelang()
     {
-        return $this->belongsTo(M_Lelang::class, 'lelang_id');
+        return $this->belongsTo(M_Lelang::class, 'lelang_id')->withTrashed();
     }
     // reference this user_id ke users id
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
     public function transaksi()
     {
