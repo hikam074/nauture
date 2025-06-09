@@ -3,8 +3,8 @@
 use App\Http\Controllers\C_Alamat;
 use App\Http\Controllers\C_Midtrans;
 use App\Http\Controllers\C_Notifikasi;
-use App\Http\Controllers\C_OpenRoute;
 use App\Http\Controllers\C_RajaOngkir;
+use App\Http\Controllers\C_Whatsapp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,3 +25,5 @@ Route::get('/send-notification', [C_Notifikasi::class, 'sendNotification']);
 // GET this_database cari city
 Route::get('/cari-city/{id}', [C_Alamat::class, 'getDataCity'])
     ->name('nauture.cariCity');
+// POST fonnte kirim pesan
+Route::post('/send-whatsapp', [C_Whatsapp::class, 'sendMessage']);

@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\C_Whatsapp;
 use App\Models\M_Lelang;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 
 class SetWinner extends Command
 {
@@ -39,6 +42,16 @@ class SetWinner extends Command
 
                 DB::table('pasang_lelangs')->where('id', $highestBid->id)
                     ->update(['waktu_dimenangkan' => $now]);
+
+                // Kirim pesan WhatsApp
+                $this->sendWinnerNotification($highestBid->user_id, [
+                    'nama_produk_lelang' => $auction->nama_produk,
+                    'name' => DB::table('users')->where('id', $highestBid->user_id)->value('name'),
+                    'kode_lelang' => $auction->kode_lelang,
+                    'bid' => $highestBid->harga_pengajuan,
+                    'deadline' => $now->addHours(3)->toDateTimeString(),
+                    'url' => route('lelang.show', ['id' => $auction->id]),
+                ]);
 
                 Log::info('Pemenang pertama ditetapkan untuk lelang ID: ' . $auction->id);
             } else {
@@ -146,6 +159,16 @@ class SetWinner extends Command
                             ->update(['deleted_at' => $now]);
                         Log::info('[2 - 4] menghapus ID pasang_lelangs :'.$currentWinner->id);
 
+                        // Kirim pesan WhatsApp
+                        $this->sendWinnerNotification($nextHighestBid->user_id, [
+                            'nama_produk_lelang' => $auction->nama_produk,
+                            'name' => DB::table('users')->where('id', $nextHighestBid->user_id)->value('name'),
+                            'kode_lelang' => $auction->kode_lelang,
+                            'bid' => $nextHighestBid->harga_pengajuan,
+                            'deadline' => $now->addHours(3)->toDateTimeString(),
+                            'url' => route('lelang.show', ['id' => $auction->id]),
+                        ]);
+
                         Log::info('_____ Pemenang BERHASIL diganti untuk lelang ID: ' . $auction->id.' _____');
                     } else {
                         // Soft delete jika tidak ada bidder berikutnya
@@ -162,5 +185,21 @@ class SetWinner extends Command
 
         Log::info('Command lelang-set-winner completed.');
         $this->info('Auction statuses updated successfully.');
+    }
+
+    private function sendWinnerNotification($userId, $params)
+    {
+        $user = DB::table('users')->where('id', $userId)->first();
+        $controller = new C_Whatsapp;
+
+        if ($user && $user->phone) {
+            $controller->sendMessage(new HttpRequest([
+                'target' => $user->phone,
+                'template' => 'pemenang_lelang',
+                'params' => $params,
+            ]));
+        } else {
+            Log::warning('Gagal mengirim pesan, nomor telepon tidak ditemukan untuk user ID: ' . $userId);
+        }
     }
 }
