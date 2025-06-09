@@ -25,6 +25,7 @@ class C_Transaksi extends Controller
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
 
         // hanya bisa buat transaksi 3 jam setelah dinyatakan menang
+        // if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) < -3)) {
         if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) < -3)) {
             return redirect()->back()->with('error', [
                 'title' => 'Gagal',
@@ -43,6 +44,11 @@ class C_Transaksi extends Controller
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
         // cari data lelang berdasarkan pasangLelang
         $lelang = M_Lelang::findOrFail($pasang_lelang->lelang_id);
+        // ambil tenggat berdasarkan waktu dimenangkan
+        // $tenggat = Carbon::parse(now())->addHours(3);
+        $tenggat = Carbon::parse($pasang_lelang->waktu_dimenangkan)->addHours(3);
+        $deadline = abs(intval($tenggat->diffInMinutes(Carbon::now())));
+        // dd( $tenggat. '==='.intval($tenggat->diffInMinutes(Carbon::now())) .'======='.$deadline);
         // ambil input ongkir
         $ongkir = $request->input('ongkir');
         // calc harga total
@@ -122,6 +128,11 @@ class C_Transaksi extends Controller
                 'order_id' => $transaksi->order_id,
                 'gross_amount' => $transaksi->gross_amount,
             ),
+            'expiry' => [
+                'start_time' => Carbon::now()->format('Y-m-d H:i:s O'),
+                'duration' => $deadline,
+                'unit' => 'minute',
+            ],
             'items_details' => array(
                 "id" => $lelang->kode_lelang,
                 "price" => $harga_total,
@@ -152,7 +163,6 @@ class C_Transaksi extends Controller
                     'country_code' => "IDN"
                 )
             ),
-            // 'enabled_payments' => ['bank_transfer', 'qris', 'echannel'],
 
         );
 

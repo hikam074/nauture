@@ -19,10 +19,12 @@
                 <thead>
                     <tr class="border-b-1 border-primer py-1">
                         <th>No.</th>
+                        {{-- <th>ID Tawaran</th> --}}
                         <th>Kode Lelang</th>
                         <th>Judul Lelang</th>
                         <th>Tawaran Anda</th>
                         <th>Status Saat Ini</th>
+                        <th>Waktu Dimenangkan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -32,6 +34,8 @@
                         <tr class="border-b-1 border-bsoft">
                             <!-- No. -->
                             <td class="text-center">{{ ($allBids->currentPage() - 1) * $allBids->perPage() + $index + 1 }}.</td>
+                            {{-- <!-- ID Tawaran -->
+                            <td>{{ $myBid->id }}</td> --}}
                             <!-- Kode Lelang -->
                             <td>{{ $myBid->lelang->kode_lelang }}</td>
                             <!-- Judul Lelang -->
@@ -75,6 +79,8 @@
                                     {{ $myBid->status }}
                                 </td>
                             @endif
+                            <!-- Waktu menang -->
+                            <td>{{ $myBid->waktu_dimenangkan }}</td>
                             <!-- Aksi -->
                             <td class="text-white font-semibold text-sm">
                                 @if ($myBid->status ==='Menang, belum dibayar')

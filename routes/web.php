@@ -6,6 +6,7 @@ use App\Http\Controllers\C_Katalog;
 use App\Http\Controllers\C_Lelang;
 use App\Http\Controllers\C_Login;
 use App\Http\Controllers\C_Notifikasi;
+use App\Http\Controllers\C_Pegawai;
 use App\Http\Controllers\C_Registrasi;
 use App\Http\Controllers\C_Profil;
 use App\Http\Controllers\C_Rating;
@@ -61,6 +62,10 @@ Route::prefix('/dashboard')->group(function () {
     Route::get('/profil', [C_Profil::class, 'getDataProfil'])->middleware('auth')->name('profil.index'); // GET show halaman profil
     Route::get('/profil/ubah', [C_Profil::class, 'showFormUbahDataProfil'])->middleware('auth')->name('profil.edit'); // POST update profil
     Route::post('/profil/ubah', [C_Profil::class, 'checkInputDataProfilTerbaru'])->middleware('auth')->name('profil.update'); // POST update profil
+
+    Route::get('/pegawai-saya', [C_Pegawai::class, 'getDataProfilPegawai'])->middleware('auth')->middleware('role:owner')->name('pegawai.index'); // GET [owner] all data profil pegawai
+    Route::get('/pegawai-saya/add', [C_Pegawai::class, 'showFormAddPegawai'])->middleware('auth')->middleware('role:owner')->name('pegawai.add'); // GET [owner] form add pegawai
+    Route::post('/pegawai-saya/add', [C_Pegawai::class, 'tambahkanPegawai'])->middleware('auth')->middleware('role:owner')->name('pegawai.store'); // GET [owner] form add pegawai
 
     Route::get('/', [C_Dashboard::class, 'getDataLaporan'])->middleware('auth')->name('dashboard.index'); // GET show halaman dashboard
     Route::get('/notifikasi', [C_Notifikasi::class, 'getDataNotifikasi'])->middleware('auth')->name('dashboard.notifikasi'); // GET show dashboard

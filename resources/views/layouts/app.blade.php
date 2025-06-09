@@ -20,7 +20,10 @@
     @if (View::hasSection('show-sidebar'))
         <main class="mt-16">
             <div class="flex gap-5 mt-4">
-                @include('components.sidebar')
+                <div class="">
+                    @include('components.sidebar')
+                    <div class="hidden sm:block sm:w-55"></div>
+                </div>
                 <div class="w-full mt-8 mr-5 text-primer">
                     @yield('content')
                 </div>

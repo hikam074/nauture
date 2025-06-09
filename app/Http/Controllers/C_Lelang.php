@@ -103,7 +103,7 @@ class C_Lelang
         // cari apakah user yang logged sudah nge bid
         $userBids = $lelang->pasangLelang->where('user_id', Auth::id())->first();
         // cari bid an tertinggi
-        $topBid = $lelang->pasangLelang->sortByDesc('harga_pengajuan')->first();
+        $topBid = $lelang->pasangLelang->whereNull('deleted_at')->sortByDesc('harga_pengajuan')->first();
         // cari ini sudah selesai atau belum
         $adaTransaksi = $userBids
             ? M_Transaksi::where('pasang_lelang_id', $userBids->id)->first()

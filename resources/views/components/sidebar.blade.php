@@ -3,82 +3,68 @@
     <div
         id="sidebar"
         class="fixed flex flex-col left-0 top-16 bg-sekunder text-white text-lg p-8 gap-5 h-screen w-55 transform -translate-x-full
-            sm:min-w-55 sm:static sm:translate-x-0 transition-transform duration-300 ease-in-out"
+            sm:min-w-55 sm:fixed sm:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto"
         >
+        <!-- ALL : DASHBOARD -->
         <a href="{{ route('dashboard.index') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg fill="#ffffff" width="40px" height="40px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier">
-                <defs>
-                <style>.cls-1{fill:none;}</style>
-                </defs>
-                <title>dashboard</title>
-                <rect x="24" y="21" width="2" height="5"/>
-                <rect x="20" y="16" width="2" height="10"/>
-                <path d="M11,26a5.0059,5.0059,0,0,1-5-5H8a3,3,0,1,0,3-3V16a5,5,0,0,1,0,10Z"/>
-                <path d="M28,2H4A2.002,2.002,0,0,0,2,4V28a2.0023,2.0023,0,0,0,2,2H28a2.0027,2.0027,0,0,0,2-2V4A2.0023,2.0023,0,0,0,28,2Zm0,9H14V4H28ZM12,4v7H4V4ZM4,28V13H28.0007l.0013,15Z"/>
-                <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
-                </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/dashboard-icon.svg') }}" alt="Sidebar-Dashboard"
+                class="h-10 w-10"
+            >
             Dashboard
         </a>
+        <!-- ALL : PROFIL -->
         <a href="{{ route('profil.index') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier"> <path d="M22 12C22 6.49 17.51 2 12 2C6.49 2 2 6.49 2 12C2 14.9 3.25 17.51 5.23 19.34C5.23 19.35 5.23 19.35 5.22 19.36C5.32 19.46 5.44 19.54 5.54 19.63C5.6 19.68 5.65 19.73 5.71 19.77C5.89 19.92 6.09 20.06 6.28 20.2C6.35 20.25 6.41 20.29 6.48 20.34C6.67 20.47 6.87 20.59 7.08 20.7C7.15 20.74 7.23 20.79 7.3 20.83C7.5 20.94 7.71 21.04 7.93 21.13C8.01 21.17 8.09 21.21 8.17 21.24C8.39 21.33 8.61 21.41 8.83 21.48C8.91 21.51 8.99 21.54 9.07 21.56C9.31 21.63 9.55 21.69 9.79 21.75C9.86 21.77 9.93 21.79 10.01 21.8C10.29 21.86 10.57 21.9 10.86 21.93C10.9 21.93 10.94 21.94 10.98 21.95C11.32 21.98 11.66 22 12 22C12.34 22 12.68 21.98 13.01 21.95C13.05 21.95 13.09 21.94 13.13 21.93C13.42 21.9 13.7 21.86 13.98 21.8C14.05 21.79 14.12 21.76 14.2 21.75C14.44 21.69 14.69 21.64 14.92 21.56C15 21.53 15.08 21.5 15.16 21.48C15.38 21.4 15.61 21.33 15.82 21.24C15.9 21.21 15.98 21.17 16.06 21.13C16.27 21.04 16.48 20.94 16.69 20.83C16.77 20.79 16.84 20.74 16.91 20.7C17.11 20.58 17.31 20.47 17.51 20.34C17.58 20.3 17.64 20.25 17.71 20.2C17.91 20.06 18.1 19.92 18.28 19.77C18.34 19.72 18.39 19.67 18.45 19.63C18.56 19.54 18.67 19.45 18.77 19.36C18.77 19.35 18.77 19.35 18.76 19.34C20.75 17.51 22 14.9 22 12ZM16.94 16.97C14.23 15.15 9.79 15.15 7.06 16.97C6.62 17.26 6.26 17.6 5.96 17.97C4.44 16.43 3.5 14.32 3.5 12C3.5 7.31 7.31 3.5 12 3.5C16.69 3.5 20.5 7.31 20.5 12C20.5 14.32 19.56 16.43 18.04 17.97C17.75 17.6 17.38 17.26 16.94 16.97Z" fill="#ffffff"/> <path d="M12 6.92969C9.93 6.92969 8.25 8.60969 8.25 10.6797C8.25 12.7097 9.84 14.3597 11.95 14.4197C11.98 14.4197 12.02 14.4197 12.04 14.4197C12.06 14.4197 12.09 14.4197 12.11 14.4197C12.12 14.4197 12.13 14.4197 12.13 14.4197C14.15 14.3497 15.74 12.7097 15.75 10.6797C15.75 8.60969 14.07 6.92969 12 6.92969Z" fill="#ffffff"/> </g>
-            </svg>
+            <img src="{{ asset('images/icons/defaultAvatarLight.png') }}" alt="Sidebar-Profi"
+                class="w-10 h-10"
+            >
             Profil
         </a>
         @if (Auth::user()->role->nama_role == 'customer')
+        <!-- CUST : LELANG ANDA -->
         <a href="{{ route('lelang.saya') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M4.58968 11.411L12.1067 3.894C12.3654 3.63533 12.7848 3.63533 13.0435 3.89401L17.2196 8.07013C17.4783 8.32881 17.4783 8.7482 17.2196 9.00687L9.70255 16.5239C9.44388 16.7826 9.02448 16.7826 8.76581 16.5239L4.58968 12.3478C4.33101 12.0891 4.33101 11.6697 4.58968 11.411ZM3.3876 13.5499C2.46504 12.6273 2.46504 11.1315 3.3876 10.209L10.9046 2.69192C11.8272 1.76936 13.323 1.76936 14.2455 2.69192L18.4217 6.86805C19.3442 7.79062 19.3442 9.28639 18.4217 10.209L16.9298 11.7008L20.2756 15.0466C21.5274 16.2984 21.5274 18.328 20.2756 19.5798C19.0237 20.8316 16.9942 20.8316 15.7423 19.5798L12.3966 16.234L10.9046 17.726C9.98207 18.6486 8.48629 18.6485 7.56373 17.726L3.3876 13.5499ZM13.5986 15.032L16.9444 18.3777C17.5323 18.9657 18.4856 18.9657 19.0735 18.3777C19.6614 17.7898 19.6614 16.8366 19.0735 16.2487L15.7277 12.9029L13.5986 15.032Z" fill="#fff"/> <path d="M2.89832 21.1017H7.62306" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/> </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/lelang-icon.svg') }}" alt="Sidebar-Lelang"
+                class="w-10 h-10"
+            >
             Lelang anda
         </a>
+        <!-- CUST : TRANSAKSI -->
         <a href="{{ route('transaksi.index') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier">
-                <path d="M914.29 219.43c0-80.66-65.62-146.29-146.29-146.29H274.29c-84.57 0-155.45 64.11-164.57 146.29v475.43h146.29v256h585.14V346.08c43.69-25.34 73.14-72.62 73.14-126.65z m-585.14 73.14c0-19.55 15.43-35.57 34.75-36.53a90.403 90.403 0 0 1-16.44 36.53h-18.31zM182.87 621.71v-384c0-50.41 41.02-91.43 91.43-91.43 30.46 0 57.48 14.97 74.1 37.94-52.3 8.33-92.39 53.74-92.39 108.34v329.15h-73.14z m585.14 256H329.15V365.72h438.86v511.99z m0-585.14H429.54c6.12-17.37 9.32-35.86 9.32-54.86 0-33.81-10.25-65.26-27.8-91.43H768c40.34 0 73.14 32.8 73.14 73.14s-32.79 73.15-73.13 73.15z" fill="#fff"/>
-                <path d="M416.392 762.75L635.83 449.3l44.933 31.456-219.438 313.45zM457.15 588.27c42.34 0 76.8-34.46 76.8-76.8s-34.46-76.8-76.8-76.8c-42.34 0-76.8 34.46-76.8 76.8s34.46 76.8 76.8 76.8z m0-109.72c18.14 0 32.91 14.77 32.91 32.91 0 18.14-14.77 32.91-32.91 32.91-18.14 0-32.91-14.77-32.91-32.91 0-18.14 14.77-32.91 32.91-32.91zM563.2 731.46c0 42.34 34.46 76.8 76.8 76.8s76.8-34.46 76.8-76.8-34.46-76.8-76.8-76.8-76.8 34.46-76.8 76.8z m109.72 0c0 18.14-14.77 32.91-32.91 32.91s-32.91-14.77-32.91-32.91c0-18.14 14.77-32.91 32.91-32.91s32.91 14.77 32.91 32.91z" fill="#fff"/>
-                </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/transaksi-icon.svg') }}" alt="Sidebar-Transaksi"
+                class="h-10 w-10"
+            >
             Transaksi
         </a>
         @elseif (Auth::user()->role->nama_role == 'pegawai' || Auth::user()->role->nama_role == 'owner')
+        <!-- PEGAWAI & OWNER : KATALOG -->
         <a href="{{ route('dashboard.katalog') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier"> <path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#fff" stroke-width="1.5"/> <path d="M8 7H16" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/> <path d="M8 10.5H13" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/> <path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/> <path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/> </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/katalog-icon.svg') }}" alt="Sidebar-Katalog"
+                class="w-10 h-10"
+            >
             Katalog
         </a>
+        <!-- PEGAWAI & OWNER : LELANG -->
         <a href="{{ route('dashboard.lelang') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M4.58968 11.411L12.1067 3.894C12.3654 3.63533 12.7848 3.63533 13.0435 3.89401L17.2196 8.07013C17.4783 8.32881 17.4783 8.7482 17.2196 9.00687L9.70255 16.5239C9.44388 16.7826 9.02448 16.7826 8.76581 16.5239L4.58968 12.3478C4.33101 12.0891 4.33101 11.6697 4.58968 11.411ZM3.3876 13.5499C2.46504 12.6273 2.46504 11.1315 3.3876 10.209L10.9046 2.69192C11.8272 1.76936 13.323 1.76936 14.2455 2.69192L18.4217 6.86805C19.3442 7.79062 19.3442 9.28639 18.4217 10.209L16.9298 11.7008L20.2756 15.0466C21.5274 16.2984 21.5274 18.328 20.2756 19.5798C19.0237 20.8316 16.9942 20.8316 15.7423 19.5798L12.3966 16.234L10.9046 17.726C9.98207 18.6486 8.48629 18.6485 7.56373 17.726L3.3876 13.5499ZM13.5986 15.032L16.9444 18.3777C17.5323 18.9657 18.4856 18.9657 19.0735 18.3777C19.6614 17.7898 19.6614 16.8366 19.0735 16.2487L15.7277 12.9029L13.5986 15.032Z" fill="#fff"/> <path d="M2.89832 21.1017H7.62306" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/> </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/lelang-icon.svg') }}" alt="Sidebar-Lelang"
+                class="w-10 h-10"
+            >
             Lelang
         </a>
+        <!-- PEGAWAI & OWNER : TRANSAKSI -->
         <a href="{{ route('dashboard.transaksi') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
-            <svg width="40px" height="40px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier">
-                <path d="M914.29 219.43c0-80.66-65.62-146.29-146.29-146.29H274.29c-84.57 0-155.45 64.11-164.57 146.29v475.43h146.29v256h585.14V346.08c43.69-25.34 73.14-72.62 73.14-126.65z m-585.14 73.14c0-19.55 15.43-35.57 34.75-36.53a90.403 90.403 0 0 1-16.44 36.53h-18.31zM182.87 621.71v-384c0-50.41 41.02-91.43 91.43-91.43 30.46 0 57.48 14.97 74.1 37.94-52.3 8.33-92.39 53.74-92.39 108.34v329.15h-73.14z m585.14 256H329.15V365.72h438.86v511.99z m0-585.14H429.54c6.12-17.37 9.32-35.86 9.32-54.86 0-33.81-10.25-65.26-27.8-91.43H768c40.34 0 73.14 32.8 73.14 73.14s-32.79 73.15-73.13 73.15z" fill="#fff"/>
-                <path d="M416.392 762.75L635.83 449.3l44.933 31.456-219.438 313.45zM457.15 588.27c42.34 0 76.8-34.46 76.8-76.8s-34.46-76.8-76.8-76.8c-42.34 0-76.8 34.46-76.8 76.8s34.46 76.8 76.8 76.8z m0-109.72c18.14 0 32.91 14.77 32.91 32.91 0 18.14-14.77 32.91-32.91 32.91-18.14 0-32.91-14.77-32.91-32.91 0-18.14 14.77-32.91 32.91-32.91zM563.2 731.46c0 42.34 34.46 76.8 76.8 76.8s76.8-34.46 76.8-76.8-34.46-76.8-76.8-76.8-76.8 34.46-76.8 76.8z m109.72 0c0 18.14-14.77 32.91-32.91 32.91s-32.91-14.77-32.91-32.91c0-18.14 14.77-32.91 32.91-32.91s32.91 14.77 32.91 32.91z" fill="#fff"/>
-                </g>
-            </svg>
+            <img src="{{ asset('images/icons/sidebar/transaksi-icon.svg') }}" alt="Sidebar-Transaksi"
+                class="h-10 w-10"
+            >
             Transaksi
         </a>
+            @if (Auth::user()->role->nama_role == 'owner')
+            <!-- OWNER : PEGAWAI SAYA -->
+            <a href="{{ route('pegawai.index') }}" class="flex gap-3 items-center p-1 hover:bg-aksen">
+                <img src="{{ asset('images/icons/sidebar/employee-icon.svg') }}" alt="Sidebar-Pegawai"
+                    class="w-10 h-10"
+                >
+                Pegawai Saya
+            </a>
+            @endif
         @endif
     </div>
 

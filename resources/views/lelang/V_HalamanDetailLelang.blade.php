@@ -229,7 +229,7 @@
                         @if ($lelang->pasangLelang->isNotEmpty())
                         <!-- 3 penawar teratas -->
                             @foreach ($lelang->pasangLelang->sortByDesc('harga_pengajuan')->take(5) as $bid)
-                                <li class="py-2 border-b flex justify-between items-center"
+                                <li class="p-2 border-b flex justify-between items-center {{ $bid->deleted_at ? 'bg-hapus' : '' }}"
                                     >
                                     <div class="flex items-center space-x-3">
                                         <!-- foto profil -->

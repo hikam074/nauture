@@ -55,6 +55,14 @@
                 class="border-1 p-2 w-full border-primer"
             >
         </div>
+        @if (Auth::check() && Auth::user()->role->nama_role != 'owner')
+        <div>
+            <label>Suspend Point</label>
+            <input type="text" value="{{ $profil->suspend_point }}" disabled
+                class="border-1 p-2 w-full border-primer"
+            >
+        </div>
+        @endif
         <div>
             <label>Alamat</label>
             @if($profil->alamat_id)

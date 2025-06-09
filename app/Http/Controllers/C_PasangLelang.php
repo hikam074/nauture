@@ -148,11 +148,13 @@ class C_PasangLelang
                             $bid->status = 'Menang, segera selesaikan pembayaran';
                         } elseif ($selisihWaktu <= 3) {
                             $bid->status = 'Menang, belum dibayar';
-                        } else {
-                            $bid->status = 'Dialihkan ke pemenang lain';
                         }
                     } else {
-                        $bid->status = 'Kalah';
+                        if ($bid->deleted_at) {
+                            $bid->status = 'Dialihkan ke pemenang lain';
+                        } else {
+                            $bid->status = 'Kalah';
+                        }
                     }
                 }
             } else {

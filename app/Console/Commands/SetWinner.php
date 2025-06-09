@@ -9,65 +9,158 @@ use Illuminate\Support\Facades\Log;
 
 class SetWinner extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'lelang-set-winner';
+    protected $description = 'Menentukan pemenang lelang dan mengganti pemenang jika pemenang awal tidak menyelesaikan transaksi dalam waktu tertentu';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        Log::info('Command lelang-set-winner started.');
+        Log::info('.');
+        Log::info('Command lelang-set-winner started. step 1');
         $now = now();
 
-        // Ambil lelang yang sudah mencapai batas waktu
-        $auctions = DB::table('lelangs')
+        // Langkah 1: Menentukan pemenang pertama
+        $auctionsWithoutWinner = DB::table('lelangs')
             ->where('tanggal_ditutup', '<=', $now)
-            ->whereNull('deleted_at') // Hanya yang belum dihapus
-            ->whereNull('pemenang_id')
-            ->get();
-        // Ambil lelang yang sudah mencapai batas waktu
-        $pasang_auctions = DB::table('pasang_lelangs')
+            ->whereNull('deleted_at') // Lelang yang belum dihapus
+            ->whereNull('pemenang_id') // Lelang yang belum memiliki pemenang
             ->get();
 
-        foreach ($auctions as $auction) {
+        foreach ($auctionsWithoutWinner as $auction) {
             $highestBid = DB::table('pasang_lelangs')
                 ->where('lelang_id', $auction->id)
+                ->whereNull('deleted_at')
                 ->orderBy('harga_pengajuan', 'desc')
                 ->first();
 
             if ($highestBid) {
-                // Update lelang dengan pemenang
+                // Update pemenang pertama
                 DB::table('lelangs')->where('id', $auction->id)
-                    ->update([
-                        'pemenang_id' => $highestBid->id,
-                ]);
-                DB::table('pasang_lelangs')
-                    ->where('id', $highestBid->id)
-                    ->update([
-                        'waktu_dimenangkan' => now(),
-                ]);
-                Log::info('Auctions updated');
+                    ->update(['pemenang_id' => $highestBid->id]);
+
+                DB::table('pasang_lelangs')->where('id', $highestBid->id)
+                    ->update(['waktu_dimenangkan' => $now]);
+
+                Log::info('Pemenang pertama ditetapkan untuk lelang ID: ' . $auction->id);
             } else {
-                // Soft delete lelang
-                $data = M_Lelang::find($auction->id);
-                $data->delete();
-                Log::info('Auctions deleted id: '.$auction->id);
+                // Soft delete jika tidak ada bidder sama sekali
+                DB::table('lelangs')->where('id', $auction->id)
+                    ->update(['deleted_at' => $now]);
+
+                Log::info('Lelang dihapus karena tidak ada bidder, ID: ' . $auction->id);
             }
         }
-        Log::info('Auctions found: ' . $auctions->count());
 
+        // Langkah 2: Mengganti pemenang jika pemenang tidak menyelesaikan transaksi
+        $auctionsWithWinner = DB::table('lelangs')
+            ->whereNotNull('pemenang_id')
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $idSafeStatuses = DB::table('status_transaksis')
+            ->whereIn('kode_status_transaksi', ['capture', 'settlement', 'delivering', 'delivered', 'expire'])
+            ->pluck('id')
+            ->toArray();
+
+        $idPendingStatuses = DB::table('status_transaksis')
+            ->whereIn('kode_status_transaksi', ['applying', 'pending', 'cancel', 'deny'])
+            ->pluck('id')
+            ->toArray();
+
+        // id expired
+        $id_expire = DB::table('status_transaksis')
+            ->where('kode_status_transaksi', 'expire')
+            ->value('id');
+
+        // MODE DEV ---------------------------------------------------------------------------------------------
+        // $limit = 1; // Batasi hingga x iterasi
+        // $count = 0;
+        // MODE DEV
+
+        Log::info('Command lelang-set-winner started. step 2');
+
+        foreach ($auctionsWithWinner as $auction) {
+
+            $currentWinner = DB::table('pasang_lelangs')
+                ->where('id', $auction->pemenang_id)
+                ->first();
+
+            if ($currentWinner && $currentWinner->waktu_dimenangkan && $now->diffInHours($currentWinner->waktu_dimenangkan) < -3) {
+
+                // MODE DEV ---------------------------------------------------------------------------------------------
+                // if ($count >= $limit) {
+                //     break;
+                // }
+                // MODE DEV
+
+                // Periksa status transaksi
+                $transaction = DB::table('transaksis')
+                    ->where('lelang_id', $auction->id)
+                    ->first();
+
+                if ($transaction && in_array($transaction->status_transaksi_id, $idSafeStatuses)) {
+                    Log::info('Transaksi aman untuk ID transaksi: ' . $transaction->id . ' - Tidak ada penggantian pemenang.');
+                    continue;
+                }
+
+                if (!$transaction || in_array($transaction->status_transaksi_id, $idPendingStatuses)) {
+                    Log::info('________________ OVERDUE FOUND ________________');
+                    Log::info('[1] Transaksi ini status pending atau tidak transaksi melebihi 3 jam , ID pasang_lelangs :'.$currentWinner->id.' ID user :'.$currentWinner->user_id);
+                    // break;
+
+                    // Cari bidder berikutnya
+                    $nextHighestBid = DB::table('pasang_lelangs')
+                        ->where('lelang_id', $auction->id)
+                        ->where('id', '<>', $auction->pemenang_id)
+                        ->whereNull('deleted_at')
+                        ->orderBy('harga_pengajuan', 'desc')
+                        ->first();
+
+                    if ($nextHighestBid) {
+                        if ($transaction) {
+                            Log::info('[2] karena tidak ada transaksi maka ID pasang_lelangs :'.$currentWinner->id.' akan diganti ke id : '.$nextHighestBid->id);
+                        } else {
+                            Log::info('[2] karena transaksi tidak kunjung bayar maka ID pasang_lelangs :'.$currentWinner->id.' akan diganti ke id : '.$nextHighestBid->id);
+                        }
+
+                        // Update pemenang baru
+                        DB::table('lelangs')->where('id', $auction->id)
+                            ->update(['pemenang_id' => $nextHighestBid->id]);
+                        Log::info('[2 - 1] pemenang baru ID pasang_lelangs :'.$nextHighestBid->id);
+
+                        DB::table('pasang_lelangs')->where('id', $nextHighestBid->id)
+                            ->update(['waktu_dimenangkan' => $now]);
+                        Log::info('[2 - 2] waktu dimenangkan baru :'.$now);
+
+                        if ($transaction) {
+                            DB::table('transaksis')->where('id', $transaction->id)
+                                ->update(['status_transaksi_id' => $id_expire]); // expire
+                            Log::info('[2 - 2 - 1] karena ada transaksi maka di jadikan expire untuk ID transaksi :'.$transaction->id);
+                        }
+
+                        DB::table('users')->where('id', $currentWinner->user_id)
+                            ->increment('suspend_point');
+                        Log::info('[2 - 3] menghukum suspend point untuk ID user :'.$currentWinner->user_id);
+
+                        DB::table('pasang_lelangs')->where('id', $currentWinner->id)
+                            ->update(['deleted_at' => $now]);
+                        Log::info('[2 - 4] menghapus ID pasang_lelangs :'.$currentWinner->id);
+
+                        Log::info('_____ Pemenang BERHASIL diganti untuk lelang ID: ' . $auction->id.' _____');
+                    } else {
+                        // Soft delete jika tidak ada bidder berikutnya
+                        DB::table('lelangs')->where('id', $auction->id)
+                            ->update(['deleted_at' => $now]);
+
+                        Log::info('Lelang dihapus karena tidak ada bidder berikutnya, ID LELANG: ' . $auction->id);
+                    }
+                }
+                // $count++;
+            }
+
+        }
+
+        Log::info('Command lelang-set-winner completed.');
         $this->info('Auction statuses updated successfully.');
     }
 }

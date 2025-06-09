@@ -18,7 +18,8 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b-1 border-primer py-1">
-                        <th>No.</th>
+                        {{-- <th>No.</th> --}}
+                        {{-- <th>ID Tawaran</th> --}}
                         <th>Kode Transaksi</th>
                         <th>Kode Lelang</th>
                         <th>Harga</th>
@@ -32,8 +33,10 @@
                 <tbody>
                     @foreach ($transaksis as $index => $transaksi)
                         <tr class="border-b-1 border-bsoft">
-                            <!--NO.-->
-                            <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td>
+                            {{-- <!--NO.-->
+                            <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td> --}}
+                            {{-- <!--ID TAWARAN-->
+                            <td class="max-w-30">{{ $transaksi->pasang_lelang_id }}</td> --}}
                             <!--KODE TRANSAKSI-->
                             <td class="max-w-30">{{ $transaksi->order_id }}</td>
                             <!--KODE LELANG-->

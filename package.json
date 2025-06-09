@@ -20,6 +20,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.8.4",
+    "chart.js": "^4.4.9",
+    "chartjs-adapter-date-fns": "^3.0.0",
     "laravel-vite-plugin": "^1.2.0",
     "sweetalert2": "^11.17.2",
     "tailwindcss": "^4.1.4",
@@ -30,5 +32,4 @@
     "dev": "vite",
     "build": "vite build"
   }
-  
 }

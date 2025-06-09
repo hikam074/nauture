@@ -2,21 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\M_Role;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
 
-class C_Registrasi extends Controller
+class C_Pegawai extends Controller
 {
-
-    public function showFormRegistrasiAkun() {
-        return view('auth.V_FormRegistrasi');
+    public function getDataProfilPegawai()
+    {
+        $roleIdPegawai = M_Role::where('nama_role', 'pegawai')->first()->id;
+        $pegawais = User::with('alamat.city.provinsi')->where('role_id', $roleIdPegawai)->paginate(10);
+        return $this->showDataProfilPegawai($pegawais);
     }
 
-    public function checkInputDataValid(Request $request) {
-        // aturan input
+    public function showDataProfilPegawai($pegawais)
+    {
+        return view('dashboard.d-pegawai.V_HalamanPegawai', compact('pegawais'));
+    }
+
+
+
+
+    public function showFormAddPegawai()
+    {
+        return view('dashboard.d-pegawai.V_FormTambahPegawai');
+    }
+
+    public function tambahkanPegawai(Request $request)
+    {
         $rules = [
             'name' => 'required|string|max:128',
             'email' => 'required|string|email|max:128|unique:users',
@@ -35,7 +50,6 @@ class C_Registrasi extends Controller
             'no_telp.max' => 'Nomor telepon tidak boleh lebih dari 19 karakter.',
             'no_telp.unique' => 'Nomor telepon ini sudah digunakan.',
         ];
-
         // Buat validasi manual
         $validator = Validator::make($request->all(), $rules, $pesan);
 
@@ -43,13 +57,7 @@ class C_Registrasi extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput($request->except('password'));
         }
-        else {
-            // lanjut periksa akun null tidaknya
-            return $this->countDataAkun($request);
-        }
-    }
 
-    public function countDataAkun(Request $request) {
         // Cek apakah email sudah terdaftar
         $existingUser = User::where('email', $request->email)->first();
         if ($existingUser) {
@@ -58,6 +66,7 @@ class C_Registrasi extends Controller
                     'message'  => 'Email sudah digunakan. Gunakan email lain.'
                 ])->withInput($request->except('email'));
         }
+
         // Cek apakah no_telp sudah terdaftar
         $existingNumber = User::where('no_telp', $request->no_telp)->first();
         if ($existingNumber) {
@@ -66,37 +75,31 @@ class C_Registrasi extends Controller
                     'message'  => 'Nomor telepon sudah digunakan. Gunakan nomor lain.'
                 ])->withInput($request->except('no_telp'));
         }
-        return $this->register($request);
-    }
 
-    public function register(Request $request) {
         try {
             // Simpan pengguna baru ke database
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role_id' => 3,
+                'role_id' => 2,
                 'suspend_point' => 0,
                 'no_telp' => $request->no_telp,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            // Login pengguna setelah registrasi
-            Auth::login($user);
-            $request->session()->regenerate();
+
             // Redirect ke homepage
-            return redirect()->intended(route('homepage'))->with('success', [
-                    'title' => 'Registrasi Berhasil!',
-                    'message'  => 'Registrasi Berhasil! Selamat datang!'
+            return redirect()->route('pegawai.index')->with('success', [
+                    'title' => $request->name.' berhasil ditambahkan!',
+                    'message'  => 'Silahkan minta pegawai untuk melengkapi data lainnya secara mandiri'
                 ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', [
                     'title' => 'Kesalahan Sistem',
-                    'message'  => 'Tidak dapat memproses registrasi. Silakan coba lagi.'
+                    'message'  => 'Tidak dapat memproses data. Silakan coba lagi.'
                 ])
             ->withInput($request->except('password'));
         }
     }
-
 }
