@@ -6,24 +6,34 @@
     
 [DIGUNAKAN : LARAVEL, ARTISAN, NPM, VITE, TOASTR, SWEETALERT2, AXIOS, TAILWINDCSS, MIDTRANS, KOMERCE RAJAONGKIR, ONESIGNAL]
 
+// last commit
 <img alt="last-commit" src="https://img.shields.io/github/last-commit/hikam074/nauture?style=flat&amp;logo=git&amp;logoColor=white&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
+// top languange
 <img alt="repo-top-language" src="https://img.shields.io/github/languages/top/hikam074/nauture?style=flat&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
+// languanges count
 <img alt="repo-language-count" src="https://img.shields.io/github/languages/count/hikam074/nauture?style=flat&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <p><em>Built with the tools and technologies:</em></p>
-<img alt="JSON" src="https://img.shields.io/badge/JSON-000000.svg?style=flat&amp;logo=JSON&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Markdown" src="https://img.shields.io/badge/Markdown-000000.svg?style=flat&amp;logo=Markdown&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="npm" src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&amp;logo=npm&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Composer" src="https://img.shields.io/badge/Composer-885630.svg?style=flat&amp;logo=Composer&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&amp;logo=JavaScript&amp;logoColor=black" class="inline-block mx-1" style="margin: 0px 2px;">
-<br>
-<img alt="XML" src="https://img.shields.io/badge/XML-005FAD.svg?style=flat&amp;logo=XML&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="PHP" src="https://img.shields.io/badge/PHP-777BB4.svg?style=flat&amp;logo=PHP&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&amp;logo=Vite&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Axios" src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&amp;logo=Axios&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Chart.js" src="https://img.shields.io/badge/Chart.js-FF6384.svg?style=flat&amp;logo=chartdotjs&amp;logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
+<img alt="Laravel" src="https://img.shields.io/badge/Laravel-FF2D20.svg?style=flat&logo=laravel&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="PHP" src="https://img.shields.io/badge/PHP-777BB4.svg?style=flat&logo=PHP&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Axios" src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="npm" src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Composer" src="https://img.shields.io/badge/Composer-885630.svg?style=flat&logo=Composer&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Toastr" src="https://img.shields.io/badge/Toastr-gray?style=flat&logo=toastr&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="SweetAlert2" src="https://img.shields.io/badge/SweetAlert2-blue?style=flat&logo=sweetalert2&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Chart.js" src="https://img.shields.io/badge/Chart.js-FF6384.svg?style=flat&logo=chartdotjs&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Midtrans" src="https://img.shields.io/badge/Midtrans-blue?style=flat&logo=midtrans&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="RajaOngkir" src="https://img.shields.io/badge/RajaOngkir-blue?style=flat&logo=rajaongkir&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="OneSignal" src="https://img.shields.io/badge/OneSignal-blue?style=flat&logo=onesignal&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 </div>
+
 <br>
 <hr>
+
 <h2>Table of Contents</h2>
 <ul class="list-disc pl-4 my-0">
 <li class="my-0"><a href="#overview">Overview</a></li>
