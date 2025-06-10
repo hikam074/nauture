@@ -22,7 +22,9 @@
 
 <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-<img alt="Axios" src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+            <img alt="Axios" class="inline-block mx-1" style="margin: 0px 2px;"
+                src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white"
+            >
 
 <img alt="npm" src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
