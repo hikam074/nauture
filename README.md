@@ -13,23 +13,33 @@
 <p><em>Built with the tools and technologies:</em></p>
 
 <img alt="Laravel" src="https://img.shields.io/badge/Laravel-FF2D20.svg?style=flat&logo=laravel&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="PHP" src="https://img.shields.io/badge/PHP-777BB4.svg?style=flat&logo=PHP&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="Axios" src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="npm" src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="Composer" src="https://img.shields.io/badge/Composer-885630.svg?style=flat&logo=Composer&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="Chart.js" src="https://img.shields.io/badge/Chart.js-FF6384.svg?style=flat&logo=chartdotjs&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Toastr" src="https://img.shields.io/badge/Toastr-gray?style=flat&logo=bell&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-<img alt="SweetAlert2" src="https://img.shields.io/badge/SweetAlert2-blue?style=flat&logo=exclamation-circle&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Toastr" src="https://img.shields.io/badge/Toastr-gray?style=flat&logo=data:image/png;base64,<base64_encoded_image>&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-<img alt="Midtrans" src="https://img.shields.io/badge/Midtrans-00A9F4.svg?style=flat&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="SweetAlert2" src="https://img.shields.io/badge/SweetAlert2-blue?style=flat&logo=data:image/png;base64,<base64_encoded_image>&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-<img alt="RajaOngkir" src="https://img.shields.io/badge/RajaOngkir-007bff.svg?style=flat&logo=sync-alt&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="Midtrans" src="https://img.shields.io/badge/Midtrans-00A9F4.svg?style=flat&logo=data:image/png;base64,<base64_encoded_image>&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-<img alt="OneSignal" src="https://img.shields.io/badge/OneSignal-2F69DA.svg?style=flat&logo=OneSignal&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+<img alt="RajaOngkir" src="https://img.shields.io/badge/RajaOngkir-007bff.svg?style=flat&logo=data:image/png;base64,<base64_encoded_image>&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
+<img alt="OneSignal" src="https://img.shields.io/badge/OneSignal-2F69DA.svg?style=flat&logo=data:image/png;base64,<base64_encoded_image>&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 
 
 
