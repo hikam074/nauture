@@ -25,10 +25,15 @@
 <img alt="Composer" src="https://img.shields.io/badge/Composer-885630.svg?style=flat&logo=Composer&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 <img alt="Chart.js" src="https://img.shields.io/badge/Chart.js-FF6384.svg?style=flat&logo=chartdotjs&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 <img alt="Toastr" src="https://img.shields.io/badge/Toastr-gray?style=flat&logo=bell&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="SweetAlert2" src="https://img.shields.io/badge/SweetAlert2-blue?style=flat&logo=exclamation-circle&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
-<img alt="Midtrans" src="https://img.shields.io/badge/Midtrans-00A9F4.svg?style=flat&logo=midtrans&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
+<img alt="Midtrans" src="https://img.shields.io/badge/Midtrans-00A9F4.svg?style=flat&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="RajaOngkir" src="https://img.shields.io/badge/RajaOngkir-007bff.svg?style=flat&logo=sync-alt&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 <img alt="OneSignal" src="https://img.shields.io/badge/OneSignal-2F69DA.svg?style=flat&logo=OneSignal&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
+
 
 
 <br>
