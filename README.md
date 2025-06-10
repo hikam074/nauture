@@ -75,6 +75,8 @@
             >
             <br>
             <hr>
+        </div>
+        <div>
             <h2>Table of Contents</h2>
                 <ul class="list-disc pl-4 my-0">
                     <li class="my-0"><a href="#overview">Overview</a></li>
