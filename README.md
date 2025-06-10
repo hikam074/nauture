@@ -1,10 +1,11 @@
-<div class="border border-border rounded-lg bg-background p-6 shadow-sm"><div class="prose prose-sm md:prose-base lg:prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600" style="user-select: none;"><div id="top" class="">
-
-<div align="center" class="text-center">
-<h1>NAUTURE</h1>
-<p><em>Empowering seamless auctions for a vibrant marketplace.</em></p>
-    
-<img alt="last-commit" src="https://img.shields.io/github/last-commit/hikam074/nauture?style=flat&amp;logo=git&amp;logoColor=white&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
+<div class="border border-border rounded-lg bg-background p-6 shadow-sm">
+    <div class="prose prose-sm md:prose-base lg:prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600" style="user-select: none;">
+        <div align="center" class="text-center">
+            <h1>NAUTURE</h1>
+            <p><em>Empowering seamless auctions for a vibrant marketplace.</em></p>
+            <img alt="last-commit"  class="inline-block mx-1" style="margin: 0px 2px;"
+                src="https://img.shields.io/github/last-commit/hikam074/nauture?style=flat&amp;logo=git&amp;logoColor=white&amp;color=0080ff"
+            >
 
 <img alt="repo-top-language" src="https://img.shields.io/github/languages/top/hikam074/nauture?style=flat&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
 
@@ -22,9 +23,7 @@
 
 <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
-            <img alt="Axios" class="inline-block mx-1" style="margin: 0px 2px;"
-                src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white"
-            >
+<img alt="Axios" class="inline-block mx-1" style="margin: 0px 2px;" src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white">
 
 <img alt="npm" src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" class="inline-block mx-1" style="margin: 0px 2px;">
 
@@ -55,7 +54,6 @@
 <li class="my-0"><a href="#prerequisites">Prerequisites</a></li>
 <li class="my-0"><a href="#installation">Installation</a></li>
 <li class="my-0"><a href="#usage">Usage</a></li>
-<li class="my-0"><a href="#testing">Testing</a></li>
 </ul>
 </li>
 </ul>
@@ -110,14 +108,7 @@
 <p><strong>Using <a href="https://www.npmjs.com/">npm</a>:</strong></p>
 <pre><code class="language-sh">npm start
 </code></pre>
-<h3>Testing</h3>
-<p>Nauture uses the {<strong>test_framework</strong>} test framework. Run the test suite with:</p>
-<p><strong>Using <a href="https://www.php.net/">composer</a>:</strong></p>
-<pre><code class="language-sh">vendor/bin/phpunit
-</code></pre>
-<p><strong>Using <a href="https://www.npmjs.com/">npm</a>:</strong></p>
-<pre><code class="language-sh">npm test
-</code></pre>
-<hr>
-<div align="left" class=""><a href="#top">⬆ Return</a></div>
-<hr></div></div></div>
+
+</div>
+</div>
+</div>
