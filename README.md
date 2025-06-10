@@ -4,9 +4,6 @@
 <h1>NAUTURE</h1>
 <p><em>Empowering seamless auctions for a vibrant marketplace.</em></p>
     
-[DIGUNAKAN : LARAVEL, ARTISAN, NPM, VITE, TOASTR, SWEETALERT2, AXIOS, TAILWINDCSS, MIDTRANS, KOMERCE RAJAONGKIR, ONESIGNAL]
-
-
 <img alt="last-commit" src="https://img.shields.io/github/last-commit/hikam074/nauture?style=flat&amp;logo=git&amp;logoColor=white&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
 
 <img alt="repo-top-language" src="https://img.shields.io/github/languages/top/hikam074/nauture?style=flat&amp;color=0080ff" class="inline-block mx-1" style="margin: 0px 2px;">
@@ -59,7 +56,6 @@
 <ul class="list-disc pl-4 my-0">
 <li class="my-0">🎛️ <strong>Artisan Command Execution:</strong> Simplifies command-line interactions with Laravel, enhancing developer productivity.</li>
 <li class="my-0">⚡ <strong>Vite Integration:</strong> Streamlines asset management and hot module replacement for a smoother development experience.</li>
-<li class="my-0">🧪 <strong>Automated Testing with PHPUnit:</strong> Ensures code quality and reliability through organized test suites.</li>
 <li class="my-0">🌱 <strong>Database Seeders:</strong> Pre-populates the database with essential data for testing and development, saving setup time.</li>
 <li class="my-0">🔒 <strong>User Role Management:</strong> Facilitates secure access control, enhancing application security and user experience.</li>
 <li class="my-0">📬 <strong>Dynamic Notifications:</strong> Integrates real-time notifications to keep users engaged and informed.</li>
