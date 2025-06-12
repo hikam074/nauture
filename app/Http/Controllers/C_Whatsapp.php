@@ -16,7 +16,7 @@ class C_Whatsapp extends Controller
     {
         $templates = [
             'pemenang_lelang' =>
-                "🎉 *[ANDA MEMENANGKAN LELANG!]* 🎉\n" .
+            "🎉 *[ANDA MEMENANGKAN LELANG!]* 🎉\n" .
                 "Selamat! Anda memenangkan lelang *{nama_produk_lelang}* di *NauTure* sebagai penawar tertinggi! 🏆\n\n" .
                 "📋 *Detail Pemenang*:\n" .
                 "> 🧑‍💼 *Nama Anda* : {name}\n" .

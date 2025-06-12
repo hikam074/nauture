@@ -11,7 +11,7 @@ use App\Models\M_StatusTransaksi;
 use App\Models\M_Transaksi;
 use Exception;
 
-class C_PasangLelang
+class C_PasangLelang extends Controller
 {
     public function showFormPasangLelang() {
         if (Auth::check()) {

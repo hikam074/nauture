@@ -32,18 +32,26 @@ class C_Transaksi extends Controller
                 'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
             ]);
         }
+        dd($request->all());
         // dd(now()->diffInHours($pasang_lelang->waktu_dimenangkan));
         return $this->insertDataTransaksi($request);
     }
 
     public function insertDataTransaksi(Request $request)
     {
+        // dd($request->pasang_lelang_id);
+        // dd($request->pasang_lelang_id);
         // dapatkan pasangLelangID
         $pasang_lelang_id = $request->input('pasang_lelang_id');
+        // $pasang_lelang_id = $request->;
+        // dd($request->pasang_lelang_id);
+
         // cari data pasangLelang berdasarkan ID diatas
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
+
         // cari data lelang berdasarkan pasangLelang
         $lelang = M_Lelang::findOrFail($pasang_lelang->lelang_id);
+        // dd('cp');
         // ambil tenggat berdasarkan waktu dimenangkan
         // $tenggat = Carbon::parse(now())->addHours(3);
         $tenggat = Carbon::parse($pasang_lelang->waktu_dimenangkan)->addHours(3);

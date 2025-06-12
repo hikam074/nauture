@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
-class C_Lelang
+class C_Lelang extends Controller
 {
     protected $notifController;
     public function __construct(C_Notifikasi $notifController)
@@ -49,7 +49,10 @@ class C_Lelang
         } elseif ($filter === 'all') {
             $query->withTrashed();
         } else {
-            $query->whereNull(['deleted_at', 'pemenang_id']); // Default: Lelang yang masih berlangsung.
+            $query->where('tanggal_ditutup', '>', now())
+            ->whereNull('deleted_at')
+                ;
+                // Default: Lelang yang masih berlangsung.
         }
 
         // Ambil data di tabel `pasang_lelangs` jika ada
@@ -63,7 +66,7 @@ class C_Lelang
         if (!empty($search)) {
             // Filter berdasarkan nama produk atau deskripsi
             $query->where('nama_produk_lelang', 'LIKE', "%$search%")
-                ->orWhere('deskripsi_produk', 'LIKE', "%$search%");
+                ->orWhere('keterangan', 'LIKE', "%$search%");
         }
 
         // Logika sort berdasarkan pilihan
@@ -75,7 +78,8 @@ class C_Lelang
             $query->orderBy('harga_dibuka', 'desc'); // Mengurutkan berdasarkan harga tertinggi
         } elseif ($sortBy === 'closed_soon') {
             $query->orderBy('tanggal_ditutup', 'asc'); // Mengurutkan berdasarkan paling deket ditutup
-        }
+        }//dd($query->toSql(), $query->getBindings());
+
 
         // kalo pagination
         $lelangs = $query->paginate(12)->appends($request->query());
@@ -141,11 +145,11 @@ class C_Lelang
             'waktu_dibuka' => [
                 'required',
                 'regex:/^([01]\d|2[0-3]):00$/',
-                ],
+            ],
             'waktu_ditutup' => [
-                    'required',
-                    'regex:/^([01]\d|2[0-3]):00$/',
-                ],
+                'required',
+                'regex:/^([01]\d|2[0-3]):00$/',
+            ],
             'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'katalog_id' => 'required|exists:katalogs,id',
             'current_img' => 'nullable|string', // URL gambar jika dari katalog
@@ -169,27 +173,23 @@ class C_Lelang
         $waktuDibuka = $request->input('waktu_dibuka');
         $waktuDitutup = $request->input('waktu_ditutup');
 
-        // Cek jika tanggal buka dan tutupnya sama
-        if ($tanggalDibuka == $tanggalDitutup) {
-            // Gabungkan tanggal dan waktu untuk membandingkan dengan waktu sekarang
-            $tanggalWaktuDibuka = Carbon::parse("$tanggalDibuka $waktuDibuka");
-            $tanggalWaktuDitutup = Carbon::parse("$tanggalDitutup $waktuDitutup");
+        // Gabungkan tanggal dan waktu
+        $tanggalWaktuDibuka = Carbon::parse("$tanggalDibuka $waktuDibuka");
+        $tanggalWaktuDitutup = Carbon::parse("$tanggalDitutup $waktuDitutup");
 
-            // Pastikan waktu dibuka lebih dari waktu sekarang
-            if ($tanggalWaktuDibuka <= Carbon::now()) {
-                return redirect()->back()->with('error', [
-                    'title' => 'Gagal',
-                    'message' => 'Waktu dibuka harus lebih besar dari waktu sekarang!'
-                ])->withInput();
-            }
-
-            // Pastikan waktu tutup lebih besar dari waktu buka
-            if ($tanggalWaktuDitutup <= $tanggalWaktuDibuka) {
-                return redirect()->back()->with('error', [
-                    'title' => 'Gagal',
-                    'message' => 'Waktu tutup harus lebih besar dari waktu buka!'
-                ])->withInput();
-            }
+        // Validasi waktu dibuka harus lebih besar dari sekarang
+        if ($tanggalWaktuDibuka <= Carbon::now()) {
+            return redirect()->back()->with('error', [
+                'title' => 'Gagal',
+                'message' => 'Waktu dibuka harus lebih besar dari waktu sekarang!',
+            ])->withInput();
+        }
+        // Validasi waktu tutup harus lebih besar dari waktu buka
+        if ($tanggalWaktuDitutup <= $tanggalWaktuDibuka) {
+            return redirect()->back()->with('error', [
+                'title' => 'Gagal',
+                'message' => 'Waktu tutup harus lebih besar dari waktu buka!',
+            ])->withInput();
         }
 
         // Buat validasi manual
@@ -206,14 +206,14 @@ class C_Lelang
                 'title' => 'Gagal',
                 'message'  => 'Harga yang ditetapkan harus kelipatan Rp10.000!'
             ])->withInput();
-        }
-        else {
+        } else {
             // eksekusi simpan datanya
             return $this->insertDataLelang($request);
         }
     }
 
-    public function insertDataLelang(Request $request) {
+    public function insertDataLelang(Request $request)
+    {
         try {
             // Hitung jumlah lelang hari ini untuk katalog tertentu
             $currentDate = Carbon::now()->format('Y-m-d');
@@ -237,7 +237,7 @@ class C_Lelang
             if ($request->hasFile('foto_produk') && $request->selected_image == 'foto unggahan baru') {
                 // Jika ada file upload, simpan langsung ke folder `lelangs`
                 $fotoProdukPath = $request->file('foto_produk')->store('lelangs', 'public');
-            // } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
+                // } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
             } else {
                 // Jika menggunakan gambar dari katalog, salin ke folder `lelangs`
                 $imageUrl = str_replace(url('/storage'), '', $request->current_img); // Menghapus URL base jika ada
@@ -245,6 +245,12 @@ class C_Lelang
                 if (file_exists($sourcePath)) {
                     $newFileName = 'lelangs/' . uniqid() . '-' . basename($imageUrl);
                     $destinationPath = public_path('storage/' . $newFileName);
+                    // dd([
+                    //     'imageUrl' => $imageUrl,
+                    //     'sourcePath' => $sourcePath,
+                    //     'isFile' => is_file($sourcePath),
+                    // ]);
+
                     copy($sourcePath, $destinationPath);
                     $fotoProdukPath = $newFileName; // Simpan path baru
                 }
@@ -259,7 +265,7 @@ class C_Lelang
                 'kode_lelang' => $kodeLelang,
                 'nama_produk_lelang' => $request->nama_produk_lelang,
                 'keterangan' => $request->keterangan,
-                'jumlah_kg' =>$request->jumlah_kg,
+                'jumlah_kg' => $request->jumlah_kg,
                 'harga_dibuka' => $request->harga_dibuka,
                 'tanggal_dibuka' => $datetime_dibuka,
                 'tanggal_ditutup' => $datetime_ditutup,
@@ -268,24 +274,23 @@ class C_Lelang
             ]);
 
             // generate notif
-            if($lelang) {
+            if ($lelang) {
                 $idLelang = $lelang->id;
                 $judul = 'LELANG BARU DIBUKA!';
-                $pesan = 'Lelang '.$lelang->nama_produk_lelang.' mulai dari '.$lelang->harga_dibuka.'! ditutup : '.$lelang->tanggal_ditutup;
-                $url = config('onesignal.this_app_url').'/lelang/'.$lelang->id;
+                $pesan = 'Lelang ' . $lelang->nama_produk_lelang . ' mulai dari ' . $lelang->harga_dibuka . '! ditutup : ' . $lelang->tanggal_ditutup;
+                $url = config('onesignal.this_app_url') . '/lelang/' . $lelang->id;
                 $this->notifController->sendNotification($idLelang, $judul, $pesan, $url);
             }
 
             return redirect()->route('lelang.index')->with('success', [
-                    'title' => 'Berhasil',
-                    'message'  => 'Lelang berhasil ditambahkan dengan kode: ' . $kodeLelang
+                'title' => 'Berhasil',
+                'message'  => 'Lelang berhasil ditambahkan dengan kode: ' . $kodeLelang
             ]);
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', [
-                    'title' => 'Kesalahan Sistem',
-                    'message'  => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
-                ])->withInput();
+                'title' => 'Kesalahan Sistem',
+                'message'  => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+            ])->withInput();
         }
     }
 
@@ -328,9 +333,9 @@ class C_Lelang
         // dd($lelang->lelang_id);
         if (!$lelang) {
             return back()->with('error', [
-                    'title' => 'Gagal',
-                    'message'  => 'ID lelang tidak ditemukan'
-                ])->withInput();
+                'title' => 'Gagal',
+                'message'  => 'ID lelang tidak ditemukan'
+            ])->withInput();
         }
 
         // Validasi tanggal dan waktu dibuka
@@ -346,41 +351,41 @@ class C_Lelang
         // Validasi tanggal dibuka
         if ($datetimeDibuka && $datetimeDibuka->isPast()) {
             return back()->with('error', [
-                    'title' => 'Tanggal waktu dibuka tidak valid!',
-                    'message'  => 'Tanggal & waktu dibuka tidak boleh di masa lalu'
-                ])->withInput();
+                'title' => 'Tanggal waktu dibuka tidak valid!',
+                'message'  => 'Tanggal & waktu dibuka tidak boleh di masa lalu'
+            ])->withInput();
         }
 
         // Validasi waktu dibuka (hanya jika tanggal dibuka hari ini)
         if ($datetimeDibuka && $datetimeDibuka->isToday() && $datetimeDibuka->format('H:i') < now()->format('H:i')) {
             return back()->with('error', [
-                    'title' => 'Tanggal waktu dibuka tidak valid!',
-                    'message'  => 'Waktu dibuka tidak boleh kurang dari waktu saat ini'
-                ])->withInput();
+                'title' => 'Tanggal waktu dibuka tidak valid!',
+                'message'  => 'Waktu dibuka tidak boleh kurang dari waktu saat ini'
+            ])->withInput();
         }
 
         // Validasi tanggal ditutup
         if ($datetimeDitutup && $datetimeDitutup->isPast()) {
             return back()->with('error', [
-                    'title' => 'Tanggal waktu ditutup tidak valid!',
-                    'message'  => 'Tanggal & waktu ditutup tidak boleh di masa lalu'
-                ])->withInput();
+                'title' => 'Tanggal waktu ditutup tidak valid!',
+                'message'  => 'Tanggal & waktu ditutup tidak boleh di masa lalu'
+            ])->withInput();
         }
 
         // Validasi tanggal ditutup setelah atau sama dengan tanggal dibuka
         if ($datetimeDitutup && $datetimeDibuka && $datetimeDitutup->lessThan($datetimeDibuka)) {
             return back()->with('error', [
-                    'title' => 'Tanggal waktu ditutup tidak valid!',
-                    'message'  => 'Tanggal & waktu ditutup harus setelah tanggal dan waktu dibuka'
-                ])->withInput();
+                'title' => 'Tanggal waktu ditutup tidak valid!',
+                'message'  => 'Tanggal & waktu ditutup harus setelah tanggal dan waktu dibuka'
+            ])->withInput();
         }
 
         // Validasi waktu ditutup (jika tanggal ditutup sama dengan hari ini)
         if ($datetimeDitutup && $datetimeDitutup->isToday() && $datetimeDitutup->format('H:i') < now()->format('H:i')) {
             return back()->with('error', [
-                    'title' => 'Tanggal waktu ditutup tidak valid!',
-                    'message'  => 'Waktu ditutup tidak boleh kurang dari waktu saat ini'
-                ])->withInput();
+                'title' => 'Tanggal waktu ditutup tidak valid!',
+                'message'  => 'Waktu ditutup tidak boleh kurang dari waktu saat ini'
+            ])->withInput();
         }
 
         // Validasi data
@@ -411,11 +416,11 @@ class C_Lelang
             'waktu_dibuka' => [
                 'required',
                 'regex:/^([01]\d|2[0-3]):00$/',
-                ],
+            ],
             'waktu_ditutup' => [
-                    'required',
-                    'regex:/^([01]\d|2[0-3]):00$/',
-                ],
+                'required',
+                'regex:/^([01]\d|2[0-3]):00$/',
+            ],
             'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'katalog_id' => 'nullable|exists:katalogs,id', // Validasi foreign key ke tabel katalog
             'current_img' => 'nullable|string', // URL gambar jika dari katalog
@@ -455,9 +460,9 @@ class C_Lelang
             $destinationPath = 'lelangs/' . basename($katalog->foto_produk);
             Storage::copy($sourcePath, $destinationPath);
             $lelang->foto_produk = 'lelangs/' . basename($katalog->foto_produk);
-        // foto saat ini, tidak ada perubahan
+            // foto saat ini, tidak ada perubahan
         } elseif ($request->selected_image == 'foto saat ini') {
-        // foto unggahan baru
+            // foto unggahan baru
         } elseif ($request->selected_image == 'foto unggahan baru') {
             // Simpan file baru
             $filePath = $request->file('foto_produk')->store('lelangs', 'public');
@@ -477,7 +482,8 @@ class C_Lelang
 
 
 
-    public function getSemuaLelang() {
+    public function getSemuaLelang()
+    {
         $lelangs = M_Lelang::withTrashed()->with(['pasangLelang.user', 'pemenang'])->paginate(10);
 
         $lelangs->each(function ($lelang) {
@@ -546,9 +552,7 @@ class C_Lelang
             // Membuat instance controller C_PasangLelang dan memanggil forceDelete
             $pasangLelangController = new C_PasangLelang();
             return $pasangLelangController->forceDelete($id);
-        }
-
-        else {
+        } else {
             abort(403, 'Unauthorized action [C_Lelang::handleDelete]');
         }
     }
@@ -572,5 +576,4 @@ class C_Lelang
 
         return redirect()->route('lelang.index')->with('success', 'Produk berhasil dikembalikan.');
     }
-
 }

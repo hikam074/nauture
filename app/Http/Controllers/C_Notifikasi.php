@@ -6,10 +6,10 @@ use App\Models\M_Notifikasi;
 use Illuminate\Http\Request;
 use App\Services\OneSignalService;
 
-class C_Notifikasi
+class C_Notifikasi extends Controller
 {
     public function getDataNotifikasi() {
-        $notifs = M_Notifikasi::all();
+        $notifs = M_Notifikasi::orderBy('created_at', 'desc')->get();
         return $this->showHalamanNotifikasi($notifs);
     }
 

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\M_Lelang;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,35 +18,28 @@ class M_PasangLelangFactory extends Factory
      */
     public function definition(): array
     {
-        // Pilih lelang secara random
-        $lelang = M_Lelang::inRandomOrder()->first();
-
-        if (!$lelang) {
-            throw new \Exception("Tidak ada data lelang di database.");
-        }
-
-        // Pilih user secara random
-        $userId = $this->faker->numberBetween(1, 20);
-
-        // Harga pengajuan lebih tinggi dari harga pembukaan dan kelipatan 10,000
-        $minimalHarga = $lelang->harga_dibuka + 10000;
-        $hargaPengajuan = $this->faker->numberBetween($minimalHarga, $minimalHarga + 500000);
-        $hargaPengajuan = ceil($hargaPengajuan / 10000) * 10000;
-
-        // Cek apakah user sudah membuat pasang_lelang untuk lelang ini
-        $existingPasangLelang = \App\Models\M_PasangLelang::where('lelang_id', $lelang->id)
-            ->where('user_id', $userId)
-            ->exists();
-
-        // Jika user sudah memiliki pasang_lelang untuk lelang ini, skip
-        if ($existingPasangLelang) {
-            return $this->definition();
-        }
-
         return [
-            'lelang_id' => $lelang->id,
-            'user_id' => $userId,
-            'harga_pengajuan' => $hargaPengajuan,
+            // lelang_id dan user_id akan di-override dari seeder
+            'lelang_id' => M_Lelang::inRandomOrder()->first()->id,
+            'user_id' => User::inRandomOrder()->first()->id,
+
+            // Closure ini akan dijalankan setelah lelang_id ditetapkan
+            'harga_pengajuan' => function (array $attributes) {
+                // Cari lelang berdasarkan ID yang diberikan
+                $lelang = M_Lelang::find($attributes['lelang_id']);
+
+                if (!$lelang) {
+                    // Fallback jika lelang tidak ditemukan
+                    return 10000;
+                }
+
+                // Harga pengajuan lebih tinggi dari harga pembukaan dan kelipatan 10,000
+                $minimalHarga = $lelang->harga_dibuka + 10000;
+                $hargaPengajuan = $this->faker->numberBetween($minimalHarga, $minimalHarga + 500000);
+
+                // Pembulatan ke kelipatan 10000 terdekat
+                return ceil($hargaPengajuan / 10000) * 10000;
+            },
             'waktu_dimenangkan' => null,
         ];
     }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\M_Lelang;
 use App\Models\M_PasangLelang;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,24 +15,39 @@ class PasangLelangSeeder extends Seeder
      */
     public function run(): void
     {
-        // Generate data dengan factory untuk user ID 1-20
-        M_PasangLelang::factory(100)->create();
-
-        // Tambahkan bid untuk user ID 23 pada setiap lelang
         $lelangs = M_Lelang::all();
+        $userKhususId = 21; // ID user yang harus selalu ada
+
+        // Pastikan user dengan ID 21 ada di database
+        if (!User::where('id', $userKhususId)->exists()) {
+            $this->command->warn("User dengan ID {$userKhususId} tidak ditemukan, proses bid khusus dilewati.");
+        }
 
         foreach ($lelangs as $lelang) {
-            // Cek bid tertinggi
-            $highestBid = $lelang->pasangLelang()->max('harga_pengajuan') ?? $lelang->harga_dibuka;
+            // Ambil semua ID user kecuali user khusus dan acak urutannya
+            $userIds = User::where('id', '!=', $userKhususId)->pluck('id')->shuffle();
 
-            // Tambahkan bid ID 23 jika belum ada
-            $existingBid = $lelang->pasangLelang()->where('user_id', 23)->exists();
-            if (!$existingBid) {
-                M_PasangLelang::create([
+            // Tentukan jumlah penawar acak (misalnya, antara 1 sampai 4)
+            $jumlahPenawarAcak = rand(1, min(4, $userIds->count()));
+
+            // Buat bid dari user acak
+            for ($i = 0; $i < $jumlahPenawarAcak; $i++) {
+                $userId = $userIds->pop();
+                if ($userId) {
+                    M_PasangLelang::factory()->create([
+                        'lelang_id' => $lelang->id,
+                        'user_id' => $userId,
+                    ]);
+                }
+            }
+
+            // Selalu tambahkan bid untuk user_id 21
+            // Cek dulu apakah user dengan ID 21 sudah ada
+            if (User::where('id', $userKhususId)->exists()) {
+                // Gunakan factory untuk membuat bid agar logikanya konsisten
+                M_PasangLelang::factory()->create([
                     'lelang_id' => $lelang->id,
-                    'user_id' => 23,
-                    'harga_pengajuan' => $highestBid + 20000,
-                    'waktu_dimenangkan' => null,
+                    'user_id' => $userKhususId,
                 ]);
             }
         }
