@@ -110,7 +110,7 @@ class TransaksiSeeder extends Seeder
             $snapToken = Midtrans\Snap::getSnapToken($params);
             // --- Akhir Logika Snap Token ---
 
-            M_Transaksi::updateOrCreate(
+            $transaksi = M_Transaksi::updateOrCreate(
                 ['pasang_lelang_id' => $pemenang->id],
                 [
                     'order_id'            => $kodeTransaksi,
@@ -124,6 +124,10 @@ class TransaksiSeeder extends Seeder
                     'no_resi'             => 'NAU' . rand(100000000, 999999999),
                 ]
             );
+            $waktuSelesaiLelang = Carbon::parse($lelang->tanggal_ditutup);
+            $transaksi->created_at = $waktuSelesaiLelang;
+            $transaksi->updated_at = $waktuSelesaiLelang;
+            $transaksi->save();
 
             if ($saldo) {
                 $saldo->increment('saldo', $gross_amount);

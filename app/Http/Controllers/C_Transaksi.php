@@ -32,7 +32,7 @@ class C_Transaksi extends Controller
                 'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
             ]);
         }
-        dd($request->all());
+        // dd($request->all());
         // dd(now()->diffInHours($pasang_lelang->waktu_dimenangkan));
         return $this->insertDataTransaksi($request);
     }

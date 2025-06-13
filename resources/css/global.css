@@ -25,47 +25,76 @@ a, button {
 }
 
 
+/* Transitions */
+.popup-bg {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.popup-form {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transform: translateY(-10%);
+  opacity: 0;
+}
+
+.popup-form.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
-    opacity: 1;
+    opacity: 0.3;
   }
 }
+
 @keyframes fadeOut {
   from {
-    opacity: 1;
+    opacity: 0.3;
   }
   to {
     opacity: 0;
   }
 }
+
 @keyframes moveDown {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-10%);
+    opacity: 0;
   }
   to {
     transform: translateY(0);
+    opacity: 1;
   }
 }
+
 @keyframes moveUp {
   from {
     transform: translateY(0);
+    opacity: 1;
   }
   to {
-    transform: translateY(-100%);
+    transform: translateY(-10%);
+    opacity: 0;
   }
 }
+
+/* Animations */
 .fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.3s ease-in-out forwards;
 }
+
 .fade-out {
-  animation: fadeOut 0.5s ease-in forwards;
+  animation: fadeOut 0.3s ease-in-out forwards;
 }
+
 .move-down {
-  animation: moveDown 0.5s ease-out forwards;
+  animation: moveDown 0.3s ease-in-out forwards;
 }
+
 .move-up {
-  animation: moveUp 0.5s ease-in forwards;
+  animation: moveUp 0.3s ease-in-out forwards;
 }

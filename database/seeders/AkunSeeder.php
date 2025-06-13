@@ -17,7 +17,7 @@ class AkunSeeder extends Seeder
     public function run(): void
     {
         User::factory()->count(20)->create();
-        
+
         if (!DB::table('users')->where('email', 'hikam@example.com')->exists()) {
             DB::table('users')->insert([
                 'name' => 'Mohammad Al Hikam',
@@ -31,10 +31,10 @@ class AkunSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
-        if (!DB::table('users')->where('email', 'owner@example.com')->exists()) {
+        if (!DB::table('users')->where('email', 'owner@nauture.com')->exists()) {
             DB::table('users')->insert([
                 'name' => 'Owner',
-                'email' => 'owner@example.com',
+                'email' => 'owner@nauture.com',
                 'password' => Hash::make('1'),
                 'role_id' => 1,
                 'suspend_point' => 0,

@@ -1,6 +1,6 @@
 <div id="popup-resi" class="hidden fixed top-0 left-0 w-full h-full items-center justify-center">
-    <div class=" fixed top-0 left-0 w-full h-full items-center justify-center bg-black opacity-30 z-0"></div>
-    <div class="bg-white rounded-lg p-6 w-1/3 z-1">
+    <div class="popup-bg fixed top-0 left-0 w-full h-full bg-black opacity-30 z-0"></div>  <!--INI BACKGROUND-->
+    <div class="popup-form bg-white rounded-lg p-6 w-1/3 z-10">
         <h2 class="text-lg font-bold mb-4">{{ isset($transaksi->no_resi) ? 'Ubah Nomor Resi' : 'Masukkan Nomor Resi' }} </h2>
         <form id="popup-resi-form" action="" method="POST">
             @csrf

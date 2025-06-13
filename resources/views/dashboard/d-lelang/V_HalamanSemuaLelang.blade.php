@@ -31,7 +31,6 @@
                     <tr class="border-b-1 border-primer py-1 w-full">
                         <th>No.</th>
                         <th class="">Nama Lelang</th>
-                        <th class="">Deskripsi</th>
                         <th class="">Waktu Pelaksanaan</th>
                         <th class="">Harga Dibuka</th>
                         <th class="">Foto Produk</th>
@@ -46,8 +45,6 @@
                         <td class="text-center">{{ ($lelangs->currentPage() - 1) * $lelangs->perPage() + $index + 1 }}.</td>
                         <!--NAMA PRODUK-->
                         <td class="max-w-20">{{ $lelang->nama_produk_lelang }}</td>
-                        <!--DESKRIPSI-->
-                        <td class="max-w-40">{{ $lelang->keterangan }}</td>
                         <!--WAKTU-->
                         <td class="">{{ $lelang->tanggal_dibuka }}<br>s.d<br>{{ $lelang->tanggal_ditutup }}</td>
                         <!--HARGA.-->

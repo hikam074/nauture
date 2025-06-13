@@ -17,8 +17,29 @@ class SetWinner extends Command
 
     public function handle()
     {
-        Log::info('.');
+        $toggleSchedulerOn = env('TURN_ON_SCHEDULER', false);
 
+        // --- INI ADALAH LOGIKA UTAMA YANG DIPERBAIKI ---
+        // Proses akan berjalan JIKA:
+        // 1. Toggle utama di .env AKTIF.
+        // ATAU
+        // 2. Ada flag --initial-only yang dikirim (kasus untuk seeder).
+        if ($toggleSchedulerOn || $this->option('initial-only')) {
+            // Jika dipanggil dari seeder dengan toggle mati, beri info khusus.
+            if (!$toggleSchedulerOn && $this->option('initial-only')) {
+                $this->info('INFO: Menjalankan set-winner karena flag --initial-only (dipanggil dari seeder/manual).');
+                Log::info('INFO: Menjalankan set-winner karena flag --initial-only (dipanggil dari seeder/manual).');
+            }
+            $this->startHandle();
+        } else {
+            $this->info('INFO: Scheduler dinonaktifkan via .env dan tidak ada flag --initial-only.');
+            Log::info('INFO: Scheduler dinonaktifkan via .env dan tidak ada flag --initial-only.');
+        }
+    }
+
+    private function startHandle()
+    {
+        Log::info('Memulai proses penentuan pemenang...');
         $this->info('Memproses penentuan pemenang...');
 
         // 1. Selalu jalankan proses penentuan pemenang awal untuk lelang yang baru berakhir.
@@ -30,6 +51,7 @@ class SetWinner extends Command
         }
 
         $this->info('Proses penentuan pemenang selesai.');
+        Log::info('Proses penentuan pemenang selesai.');
     }
 
     private function setInitialWinners()

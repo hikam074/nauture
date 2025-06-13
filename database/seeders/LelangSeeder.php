@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\M_Lelang;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -84,7 +85,12 @@ class LelangSeeder extends Seeder
         ];
 
         foreach ($availableDates as $date) {
-            M_Lelang::factory()->withDate($date)->create();
+            $lelang = M_Lelang::factory()->withDate($date)->create();
+            // Atur created_at dan updated_at sesuai tanggal mulai lelang
+            $createdAt = Carbon::parse($lelang->tanggal_dibuka)->startOfDay();
+            $lelang->created_at = $createdAt;
+            $lelang->updated_at = $createdAt;
+            $lelang->save();
         }
     }
 }

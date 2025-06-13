@@ -55,7 +55,7 @@
                                 class="w-full h-20 object-cover rounded-md"
                                 >
                             </td>
-                            <!--AKSI-->
+                            <!--STATUS-->
                             <td class="">
                                 <div class="flex flex-row items-center justify-center">
                                     @if($katalog->status == 'Aktif')
@@ -68,37 +68,36 @@
                                 </div>
                             </td>
                             <!--AKSI-->
-                            <td class="flex items-center justify-end text-center gap-2 text-white">
-                                <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
-                                    class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer
-                                        hover:bg-primer hover:text-white"
-                                    >
-                                    Lihat
-                                </a>
-                                @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
-                                    @if ($katalog->trashed())
+                            <td class="">
+                                <div class="flex flex-col items-center gap-2 text-white">
                                     <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
-                                        class="text-sm px-4 py-2 rounded-lg bg-restore
-                                            hover:bg-restorehov"
-                                        >
-                                        Restore
+                                        class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer
+                                            hover:bg-primer hover:text-white w-full text-center">
+                                        Lihat
                                     </a>
-                                    @else
-                                    <a href="{{ route('katalog.edit', ['id' => $katalog->id]) }}"
-                                        class="text-sm px-4 py-2 rounded-lg bg-edit
-                                            hover:bg-edithov"
-                                        >
-                                        Edit
-                                    </a>
-                                    <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
-                                        class="text-sm px-4 py-2 rounded-lg bg-hapus
-                                            hover:bg-hapushov"
-                                        >
-                                        Hapus
-                                    </a>
+                                    @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
+                                        @if ($katalog->trashed())
+                                            <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
+                                                class="text-sm px-4 py-2 rounded-lg bg-restore
+                                                    hover:bg-restorehov w-full text-center">
+                                                Restore
+                                            </a>
+                                        @else
+                                            <a href="{{ route('katalog.edit', ['id' => $katalog->id]) }}"
+                                                class="text-sm px-4 py-2 rounded-lg bg-edit
+                                                    hover:bg-edithov w-full text-center">
+                                                Edit
+                                            </a>
+                                            <a href="{{ route('katalog.show', ['id' => $katalog->id]) }}"
+                                                class="text-sm px-4 py-2 rounded-lg bg-hapus
+                                                    hover:bg-hapushov w-full text-center">
+                                                Hapus
+                                            </a>
+                                        @endif
                                     @endif
-                                @endif
+                                </div>
                             </td>
+
                         </tr>
                     @endforeach
                 </tbody>

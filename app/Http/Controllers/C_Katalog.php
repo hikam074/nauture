@@ -116,7 +116,7 @@ class C_Katalog extends Controller
     {
         // aturan input
         $rules = [
-            'nama_produk' => 'required|string|max:128',
+            'nama_produk' => 'required|string|max:128|unique:katalogs,nama_produk',
             'deskripsi_produk' => 'nullable|string',
             'harga_perkilo' => 'required|integer',
             'foto_produk' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -124,6 +124,7 @@ class C_Katalog extends Controller
         //pesan error validasi
         $pesan = [
             'nama_produk.required' => 'Nama produk harus diisi!',
+            'nama_produk.unique' => 'Nama produk sudah digunakan, pilih nama lain!',
             'harga_perkilo.required' => 'Harga perkilo harus diisi!',
             'foto_produk.required' => 'Foto produk harus diisi!',
         ];
@@ -194,7 +195,7 @@ class C_Katalog extends Controller
     {
         try {
             $validated = $request->validate([
-                'nama_produk' => 'required|string|max:255',
+                'nama_produk' => 'required|string|max:255|unique:katalogs,nama_produk',
                 'deskripsi_produk' => 'nullable|string',
                 'harga_perkilo' => 'required|integer',
                 'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

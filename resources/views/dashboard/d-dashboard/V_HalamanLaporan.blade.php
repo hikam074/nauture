@@ -161,20 +161,40 @@
     <script>
         function showPopup(transaksiId, formAction) {
             const popup = document.getElementById('popup-resi');
-            const form = document.getElementById('popup-resi-form');
+            const background = popup.querySelector('.popup-bg');
+            const form = popup.querySelector('.popup-form');
             const transaksiInput = document.getElementById('popup-transaksi-id');
 
             transaksiInput.value = transaksiId;
-            form.action = formAction;
+            document.getElementById('popup-resi-form').action = formAction;
 
             popup.classList.remove('hidden');
             popup.classList.add('flex');
+
+            setTimeout(() => {
+                background.classList.add('fade-in');
+                background.classList.remove('fade-out');
+                form.classList.add('show');
+            }, 10); // Delay untuk memastikan transisi diterapkan
         }
 
         function closePopup() {
             const popup = document.getElementById('popup-resi');
-            popup.classList.add('hidden');
-            popup.classList.remove('flex');
+            const background = popup.querySelector('.popup-bg');
+            const form = popup.querySelector('.popup-form');
+
+            background.classList.remove('fade-in');
+            background.classList.add('fade-out');
+            form.classList.remove('show');
+
+            form.addEventListener(
+                'transitionend',
+                () => {
+                    popup.classList.add('hidden');
+                    popup.classList.remove('flex');
+                },
+                { once: true }
+            );
         }
     </script>
 @endsection

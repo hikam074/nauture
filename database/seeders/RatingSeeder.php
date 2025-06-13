@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\M_Rating;
 use App\Models\M_StatusTransaksi;
 use App\Models\M_Transaksi;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -30,13 +31,21 @@ class RatingSeeder extends Seeder
         ];
 
         foreach ($transaksis as $transaksi) {
-            M_Rating::updateOrCreate(
+            $rating = M_Rating::updateOrCreate(
                 ['transaksi_id' => $transaksi->id],
                 [
-                    'rating' => rand(3, 5), // Rating acak antara 4 dan 5
+                    'rating' => rand(4, 5),
                     'ulasan' => $ulasan[array_rand($ulasan)],
                 ]
             );
+
+            // Atur created_at dan updated_at satu hari setelah lelang berakhir
+            if ($transaksi->lelang) {
+                $waktuRating = Carbon::parse($transaksi->lelang->tanggal_ditutup)->addDay();
+                $rating->created_at = $waktuRating;
+                $rating->updated_at = $waktuRating;
+                $rating->save();
+            }
         }
     }
 }

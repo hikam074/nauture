@@ -26,7 +26,7 @@
                         <th>Status Saat Ini</th>
                         <th>Waktu Dibayar</th>
                         <th>No. Resi</th>
-                        <th>Metode Pembayaran</th>
+                        <th class="max-w-30">Metode Pembayaran</th>
                         @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                         <th>Aksi : Ubah Status</th>
                         @endif
@@ -83,7 +83,7 @@
                             <!--NO RESI-->
                             <td>{{ $transaksi->no_resi ? $transaksi->no_resi : '-' }}</td>
                             <!--PAYMENT NETHOD-->
-                            <td>{{ $transaksi->payment_method_id ? $transaksi->paymentMethod->nama_payment_method : '-' }}</td>
+                            <td class="max-w-30">{{ $transaksi->payment_method_id ? $transaksi->paymentMethod->nama_payment_method : '-' }}</td>
                             <!--AKSI-->
                             @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                             <td>
@@ -125,20 +125,35 @@
     <script>
         function showPopup(transaksiId, formAction) {
             const popup = document.getElementById('popup-resi');
-            const form = document.getElementById('popup-resi-form');
-            const transaksiInput = document.getElementById('popup-transaksi-id');
-
-            transaksiInput.value = transaksiId;
-            form.action = formAction;
-
-            popup.classList.remove('hidden');
             popup.classList.add('flex');
+            const form = popup.querySelector('.popup-form');
+            const background = popup.querySelector('.popup-bg');
+
+            // Update form action and value
+            document.getElementById('popup-transaksi-id').value = transaksiId;
+            document.getElementById('popup-resi-form').action = formAction;
+
+            // Add animation classes
+            background.classList.remove('fade-out');
+            background.classList.add('fade-in');
+            form.classList.remove('move-up');
+            form.classList.add('move-down');
         }
 
         function closePopup() {
             const popup = document.getElementById('popup-resi');
-            popup.classList.add('hidden');
-            popup.classList.remove('flex');
+            const form = popup.querySelector('.popup-form');
+            const background = popup.querySelector('.popup-bg');
+
+            background.classList.remove('fade-in');
+            background.classList.add('fade-out');
+            form.classList.remove('move-down');
+            form.classList.add('move-up');
+
+            setTimeout(() => {
+                popup.classList.remove('flex');
+                popup.classList.add('hidden');
+            }, 300);
         }
     </script>
 
