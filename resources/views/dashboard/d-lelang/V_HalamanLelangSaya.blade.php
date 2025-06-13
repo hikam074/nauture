@@ -173,17 +173,17 @@
             document.getElementById('kodeLelang').innerText = kodeLelang;
             document.getElementById('konfirmasiBiayaLelang').innerText = hargaBid.toLocaleString('id-ID');
 
-            popup.classList.remove('hidden', 'fade-out');
+            popup.classList.remove('hidden', 'fade-out-full');
             popupContent.classList.remove('move-up');
-            popup.classList.add('fade-in', 'flex');
+            popup.classList.add('fade-in-full', 'flex');
             popupContent.classList.add('move-down');
         }
 
         // Close popup when "Batal" is clicked
         closePopup.addEventListener('click', () => {
-            popup.classList.remove('fade-in');
+            popup.classList.remove('fade-in-full');
             popupContent.classList.remove('move-down');
-            popup.classList.add('fade-out');
+            popup.classList.add('fade-out-full');
             popupContent.classList.add('move-up');
 
             // Tunggu hingga animasi selesai, lalu sembunyikan popup

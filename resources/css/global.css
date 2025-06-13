@@ -59,6 +59,23 @@ a, button {
     opacity: 0;
   }
 }
+@keyframes fadeInFull {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutFull {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 
 @keyframes moveDown {
   from {
@@ -89,6 +106,13 @@ a, button {
 
 .fade-out {
   animation: fadeOut 0.3s ease-in-out forwards;
+}
+.fade-in-full {
+  animation: fadeInFull 0.3s ease-in-out forwards;
+}
+
+.fade-out-full {
+  animation: fadeOutFull 0.3s ease-in-out forwards;
 }
 
 .move-down {
