@@ -7,6 +7,7 @@ use App\Models\M_Katalog;
 use App\Models\M_Transaksi;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Storage;
@@ -225,34 +226,53 @@ class C_Lelang extends Controller
                 $lelangCountToday + 1
             );
 
-            // dd($request->current_img);
-            // dd($request->selected_image);
-
-            // Simpan file foto ke folder `lelangs`
+            // --- LOGIKA PENANGANAN GAMBAR YANG LEBIH ANDAL ---
             $fotoProdukPath = null;
-            if ($request->hasFile('foto_produk') && $request->selected_image == 'foto unggahan baru') {
-                // Jika ada file upload, simpan langsung ke folder `lelangs`
+            
+            // Prioritas 1: Cek apakah ada file baru yang diunggah.
+            if ($request->hasFile('foto_produk')) {
                 $fotoProdukPath = $request->file('foto_produk')->store('lelangs', 'public');
-                // } elseif ($request->current_img  && $request->selected_image == 'foto dari katalog') {
-            } else {
-                // Jika menggunakan gambar dari katalog, salin ke folder `lelangs`
-                $imageUrl = str_replace(url('/storage'), '', $request->current_img); // Menghapus URL base jika ada
-                $sourcePath = public_path('storage' . $imageUrl);
-                if (file_exists($sourcePath)) {
-                    $newFileName = 'lelangs/' . uniqid() . '-' . basename($imageUrl);
-                    $destinationPath = public_path('storage/' . $newFileName);
-                    // dd([
-                    //     'imageUrl' => $imageUrl,
-                    //     'sourcePath' => $sourcePath,
-                    //     'isFile' => is_file($sourcePath),
-                    // ]);
-
-                    copy($sourcePath, $destinationPath);
-                    $fotoProdukPath = $newFileName; // Simpan path baru
+            } 
+            // Prioritas 2: Jika tidak ada file baru, cek dari input gambar yang sudah ada (normal case).
+            else if ($request->filled('current_img')) {
+                $sourceRelativePath = str_replace(url('/storage') . '/', '', $request->current_img);
+                
+                if (Storage::disk('public')->exists($sourceRelativePath)) {
+                    // Jika gambar sudah ada di folder lelang (mode edit), jangan salin.
+                    if (Str::startsWith($sourceRelativePath, 'lelangs/')) {
+                        $fotoProdukPath = $sourceRelativePath;
+                    } else { // Jika gambar dari folder katalog, salin.
+                        $newFileName = 'lelangs/' . Str::random(40) . '.' . pathinfo($sourceRelativePath, PATHINFO_EXTENSION);
+                        Storage::disk('public')->copy($sourceRelativePath, $newFileName);
+                        $fotoProdukPath = $newFileName;
+                    }
+                } else {
+                    throw new \Exception('File gambar referensi tidak ditemukan.');
+                }
+            } 
+            // Prioritas 3: Fallback jika validasi gagal & redirect.
+            // `current_img` kosong, tapi `katalog_id` ada dari `withInput()`.
+            else if ($request->filled('katalog_id')) {
+                $katalog = M_Katalog::find($request->katalog_id);
+                if ($katalog && $katalog->foto_produk) {
+                    $sourceRelativePath = $katalog->foto_produk; // Path dari DB: "katalogs/abc.jpg"
+                    if (Storage::disk('public')->exists($sourceRelativePath)) {
+                        $newFileName = 'lelangs/' . Str::random(40) . '.' . pathinfo($sourceRelativePath, PATHINFO_EXTENSION);
+                        Storage::disk('public')->copy($sourceRelativePath, $newFileName);
+                        $fotoProdukPath = $newFileName;
+                    } else {
+                        throw new \Exception('File gambar dari katalog tidak ditemukan di storage.');
+                    }
                 }
             }
 
-            //gabungkan date dan time inputan
+            // Pengecekan final untuk memastikan gambar tidak kosong
+            if (is_null($fotoProdukPath)) {
+                throw new \Exception('Gambar lelang wajib dipilih, baik dari katalog ataupun unggahan baru.');
+            }
+            // --- AKHIR LOGIKA PENANGANAN GAMBAR ---
+
+            // Gabungkan date dan time inputan
             $datetime_dibuka = $request->input('tanggal_dibuka') . ' ' . $request->input('waktu_dibuka') . ':00';
             $datetime_ditutup = $request->input('tanggal_ditutup') . ' ' . $request->input('waktu_ditutup') . ':00';
 
@@ -269,7 +289,7 @@ class C_Lelang extends Controller
                 'katalog_id' => $request->katalog_id,
             ]);
 
-            // generate notif
+            // Generate notif
             if ($lelang) {
                 $idLelang = $lelang->id;
                 $judul = 'LELANG BARU DIBUKA!';
@@ -280,12 +300,12 @@ class C_Lelang extends Controller
 
             return redirect()->route('lelang.index')->with('success', [
                 'title' => 'Berhasil',
-                'message'  => 'Lelang berhasil ditambahkan dengan kode: ' . $kodeLelang
+                'message'   => 'Lelang berhasil ditambahkan dengan kode: ' . $kodeLelang
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', [
                 'title' => 'Kesalahan Sistem',
-                'message'  => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+                'message'   => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
             ])->withInput();
         }
     }
