@@ -98,6 +98,7 @@
                     </div>
                     <input type="hidden" id="selected-shipping-option" name="shipping_method" value="">
                     <input type="hidden" id="ongkir" name="ongkir" value="">
+                    <input type="hidden" id="ongkirJson" name="ongkirJson">
                 </div>
             </div>
 
@@ -157,7 +158,7 @@
 </div>
 
 
-<script>
+{{-- <script>
     // PEMILIHAN ALAMAT
     const searchButton = document.getElementById('searchLocation');
     searchButton.removeEventListener('click', searchHandler);
@@ -165,6 +166,8 @@
     const body = document.body;
 
     let destinations = [];
+    let shippingOptions = [];
+    let selectedShippingObject = null;
 
     function searchHandler() {
         const query = document.getElementById('destinationSearch').value;
@@ -234,6 +237,8 @@
 
         const container = document.getElementById('shipping-options-container');
         container.innerHTML = ''; // Bersihkan opsi sebelumnya
+        shippingOptions = []; // Reset opsi pengiriman
+        selectedShippingObject = null; // Reset pilihan
 
         // matikan tombol
         body.style.cursor = 'wait';
@@ -261,6 +266,7 @@
                 return response.json();
             })
             .then(data => {
+                shippingOptions = data; // Simpan semua opsi dari API
                 data.forEach(option => {
                     const card = document.createElement('div');
                     card.className = "border p-4 rounded shadow hover:bg-gray-100 cursor-pointer shipping-card text-sm";
@@ -275,6 +281,7 @@
                         document.querySelectorAll('.shipping-card').forEach(c => c.classList.remove('bg-blue-100'));
                         card.classList.add('bg-blue-100'); // Highlight kartu yang dipilih
                         document.getElementById('selected-shipping-option').value = option.service; // Simpan nilai ke hidden input
+                        selectedShippingObject = option;
                         updateConfirmation(option.cost, { name: option.name, service: option.service });
                     });
                     container.appendChild(card);
@@ -302,7 +309,15 @@
                 updateConfirmation(0, { name: 'Ambil Sendiri', service: 'takeaway' });
             });
             container.appendChild(card);
+
             document.getElementById('selected-shipping-option').value = 'takeaway';
+            selectedShippingObject = {
+                name: "Ambil Sendiri",
+                service: "takeaway",
+                description: "Ambil langsung di lokasi",
+                cost: 0,
+                etd: "N/A"
+            };
             updateConfirmation(0, { name: 'Ambil Sendiri', service: 'takeaway' }); // Update konfirmasi
             toastr.success('Ambil sendiri gratis, silahkan pilih opsi yang tersedia', 'Tarif ditemukan')
             document.getElementById('ongkir').value = 0;
@@ -358,6 +373,8 @@
             konfirBiaya.textContent = `Rp. ${hargaTotal.toLocaleString('id-ID')}`;
             konfirOngkir.textContent = `Rp. ${selectedCost.toLocaleString('id-ID')}`;
             document.getElementById('harga_total').value = hargaTotal;
+
+            // document.getElementById('ongkirJson').value = JSON.stringify(selectedData); HARUSNYA GANTI
         } else {
             const selectedShippingOption = document.getElementById('selected-shipping-option').value;
             if (selectedShippingOption === 'takeaway') {
@@ -369,6 +386,7 @@
                 konfirOngkir.textContent = 'Rp. -';
                 konfirBiaya.textContent = 'Rp. -';
             }
+            document.getElementById('ongkirJson').value = '';
         }
     }
 
@@ -399,4 +417,235 @@
     });
 
 
+</script> --}}
+
+<script>
+    // Variabel global untuk menyimpan state pilihan
+    let destinations = [];
+    let shippingOptions = [];
+    let selectedShippingObject = null;
+
+    // --- PEMILIHAN ALAMAT ---
+    const searchButton = document.getElementById('searchLocation');
+    const body = document.body;
+
+    function searchHandler() {
+        const query = document.getElementById('destinationSearch').value;
+        if (query.length < 3) {
+            toastr.warning('Masukkan minimal 3 karakter untuk mencari lokasi.', 'Peringatan');
+            return;
+        }
+
+        body.style.cursor = 'wait';
+        searchButton.disabled = true;
+        toastr.info('Mencari lokasi...', 'Lokasi');
+
+        fetch(`/api/cari-lokasi?search=${query}`)
+        .then(response => response.json())
+        .then(data => {
+            destinations = data || [];
+            const select = document.getElementById('destinationList');
+            if (!destinations.length) {
+                select.innerHTML = '<option value="">Lokasi tidak ditemukan</option>';
+                throw new Error("Destinations kosong");
+            }
+            select.innerHTML = destinations.map(loc =>
+                `<option value="${loc.id}">${loc.province_name}, ${loc.city_name}, ${loc.district_name}, ${loc.subdistrict_name} ${loc.zip_code}</option>`
+            ).join('');
+
+            if (select.options.length > 0) {
+                select.selectedIndex = 0;
+                updateConfirmation();
+            }
+            toastr.success('Silahkan pilih alamat anda', 'Lokasi ditemukan');
+        })
+        .catch(err => {
+            console.error('Error fetching destinations:', err);
+            toastr.error('Terjadi kesalahan saat mencari lokasi.', 'Error');
+        })
+        .finally(() => {
+            body.style.cursor = 'default';
+            searchButton.disabled = false;
+        });
+    }
+
+    // --- KALKULASI ONGKIR ---
+    const calculateButton = document.getElementById('calculateCost');
+
+    function calculateCostHandler() {
+        const destination = document.getElementById('destinationList').value;
+        const shippingMethod = document.querySelector('input[name="shippingMethod"]:checked')?.value;
+        const berat = document.getElementById('weight').value;
+
+        if (!destination || !shippingMethod) {
+            toastr.warning('Harap pilih lokasi tujuan dan metode pengiriman terlebih dahulu.', 'Peringatan');
+            return;
+        }
+
+        const container = document.getElementById('shipping-options-container');
+        container.innerHTML = ''; // Bersihkan opsi sebelumnya
+        shippingOptions = []; // Reset data
+        selectedShippingObject = null; // Reset pilihan
+        updateConfirmation(); // Update UI untuk mereset
+
+        body.style.cursor = 'wait';
+        calculateButton.disabled = true;
+
+        if (shippingMethod === 'expedition') {
+            toastr.info('Menghitung ongkos kirim...', 'Pengiriman');
+            fetch('/api/cek-ongkir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    destination,
+                    weight: berat,
+                    courier: 'jne:pos:tiki:sicepat:jnt:sap:ncs:wahana:lion:rex'
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal menghitung ongkir');
+                return response.json();
+            })
+            .then(data => {
+                shippingOptions = data; // Simpan semua opsi dari API
+                if (shippingOptions.length === 0) {
+                    container.innerHTML = '<span class="text-canceled italic text-sm">Tidak ada layanan ekspedisi untuk tujuan ini.</span>';
+                    return;
+                }
+                
+                shippingOptions.forEach(option => {
+                    const card = document.createElement('div');
+                    card.className = "border p-4 rounded shadow hover:bg-gray-100 cursor-pointer shipping-card text-sm";
+                    card.dataset.service = option.service;
+                    card.innerHTML = `
+                        <h3 class="font-bold">${option.name} - ${option.service}</h3>
+                        <p>${option.description}</p>
+                        <p><strong>Biaya:</strong> Rp ${option.cost.toLocaleString('id-ID')}</p>
+                        <p><strong>Estimasi:</strong> ${option.etd}</p>
+                    `;
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.shipping-card').forEach(c => c.classList.remove('bg-blue-100'));
+                        card.classList.add('bg-blue-100');
+                        selectedShippingObject = option; // Simpan seluruh objek yang dipilih
+                        updateConfirmation();
+                    });
+                    container.appendChild(card);
+                });
+                toastr.success('Silahkan pilih layanan yang sesuai', 'Tarif dihitung');
+            })
+            .catch(err => {
+                console.error('Error hitung ongkir:', err);
+                container.innerHTML = '<span class="text-red-500 italic text-sm">Gagal memuat tarif. Coba lagi.</span>';
+                toastr.error('Terjadi kesalahan saat menghitung ongkir.', 'Error');
+            })
+            .finally(() => {
+                body.style.cursor = 'default';
+                calculateButton.disabled = false;
+            });
+        } else { // Jika "Ambil Sendiri"
+            const card = document.createElement('div');
+            card.className = "border p-4 rounded shadow hover:bg-gray-100 cursor-pointer shipping-card bg-blue-100";
+            card.innerHTML = `<h3 class="font-bold">Ambil Sendiri</h3><p><strong>Biaya:</strong> Rp 0</p>`;
+            container.appendChild(card);
+            
+            selectedShippingObject = {
+                name: "Ambil Sendiri",
+                service: "takeaway",
+                description: "Ambil langsung di lokasi",
+                cost: 0,
+                etd: "N/A"
+            };
+            updateConfirmation();
+            toastr.success('Ambil sendiri gratis', 'Tarif ditemukan');
+            body.style.cursor = 'default';
+            calculateButton.disabled = false;
+        }
+    }
+
+    // --- UPDATE TEKS KONFIRMASI ---
+    function updateConfirmation() {
+        const selectedLocationEl = document.getElementById('destinationList');
+        const addressDetail = document.getElementById('addressDetail').value;
+        const hargaBid = parseInt(document.getElementById('hargaBid').value) || 0;
+
+        // Elemen UI Konfirmasi
+        const konfirAlamatDr = document.getElementById('konfirAlamatDr');
+        const konfirAlamatIsi = document.getElementById('konfirAlamatIsi');
+        const konfirPengiriman = document.getElementById('konfirPengiriman');
+        const konfirBiaya = document.getElementById('konfirBiaya');
+        const konfirOngkir = document.getElementById('konfirOngkir');
+
+        // Update Alamat
+        if (selectedLocationEl && selectedLocationEl.selectedIndex >= 0) {
+            konfirAlamatDr.textContent = selectedLocationEl.options[selectedLocationEl.selectedIndex].text;
+            konfirAlamatIsi.textContent = addressDetail || 'Belum diisi';
+            
+            const selectedId = selectedLocationEl.value;
+            const selectedData = destinations.find(d => d.id == selectedId);
+            document.getElementById('destinationJson').value = selectedData ? JSON.stringify(selectedData) : '';
+        } else {
+            konfirAlamatDr.textContent = 'Belum dipilih';
+            konfirAlamatIsi.textContent = addressDetail || 'Belum diisi';
+            document.getElementById('destinationJson').value = '';
+        }
+
+        // Update Pengiriman dan Biaya
+        if (selectedShippingObject) {
+            konfirPengiriman.textContent = `${selectedShippingObject.name} - ${selectedShippingObject.service}`;
+            const selectedCost = selectedShippingObject.cost;
+            const hargaTotal = selectedCost + hargaBid;
+            
+            konfirOngkir.textContent = `Rp. ${selectedCost.toLocaleString('id-ID')}`;
+            konfirBiaya.textContent = `Rp. ${hargaTotal.toLocaleString('id-ID')}`;
+            
+            document.getElementById('ongkir').value = selectedCost;
+            document.getElementById('selected-shipping-option').value = selectedShippingObject.service;
+            document.getElementById('harga_total').value = hargaTotal;
+            document.getElementById('ongkirJson').value = JSON.stringify(selectedShippingObject);
+        } else {
+            konfirPengiriman.textContent = 'Belum dipilih';
+            konfirOngkir.textContent = 'Rp. -';
+            konfirBiaya.textContent = `Rp. ${hargaBid.toLocaleString('id-ID')}`;
+            
+            document.getElementById('ongkir').value = '';
+            document.getElementById('selected-shipping-option').value = '';
+            document.getElementById('harga_total').value = hargaBid;
+            document.getElementById('ongkirJson').value = '';
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    searchButton.addEventListener('click', searchHandler);
+    calculateButton.addEventListener('click', calculateCostHandler);
+    document.getElementById('destinationList').addEventListener('change', updateConfirmation);
+    document.getElementById('addressDetail').addEventListener('input', updateConfirmation);
+    document.querySelectorAll('input[name="shippingMethod"]').forEach(method => {
+        method.addEventListener('change', () => {
+            // Reset pilihan ongkir saat metode diubah
+            const container = document.getElementById('shipping-options-container');
+            container.innerHTML = '<span class="text-canceled italic text-sm">silahkan pilih metode terlebih dahulu</span>';
+            selectedShippingObject = null;
+            updateConfirmation();
+        });
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', function (e) {
+        e.preventDefault();
+        showAlert({
+            title: 'Apakah Anda yakin ingin membuat pesanan?',
+            text: "Anda tidak bisa mengubah pesanan setelah ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Lanjutkan!',
+            cancelButtonText: 'Batal',
+            onConfirm: function () {
+                document.getElementById('pengirimans').submit();
+            }
+        });
+    });
 </script>

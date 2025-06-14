@@ -102,6 +102,7 @@ class C_PasangLelang extends Controller
         // Filter berdasarkan user_id sebelum paginasi
         $allBids = M_PasangLelang::with(['lelang.pasangLelang', 'transaksi'])
             ->where('user_id', $id)
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         // Manipulasi data setelah paginasi

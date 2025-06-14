@@ -83,7 +83,7 @@
                 @elseif (Auth::user()->role->nama_role == 'owner')
                 Transaksi Terbaru
                 @else
-                Lelang Belum Dibayar
+                Transaksi Belum Dibayar
                 @endif
             </h2>
             <div>
@@ -154,6 +154,55 @@
                 </a>
             </div>
         </div>
+        @if (Auth::user()->role->nama_role == 'customer')
+        <div class="w-full border-1 border-canceled rounded shadow-lg p-4">
+            <h2 class="font-semibold text-xl py-2">
+                Lelang Belum Dibayar
+            </h2>
+            <div>
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-1 border-primer py-1">
+                            <th>No.</th>
+                            <th>Kode Lelang</th>
+                            <th>Nama Lelang</th>
+                            <th>Harga Total</th>
+                            <th>Waktu Dimenangkan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($pasangLelangs as $index => $bid)
+                            <tr @if ($index % 2 == 0) class="bg-gray-50" @else class="bg-white" @endif>
+                                <td class="text-center">{{ $index + 1 }}.</td>
+                                <td>{{ $bid->lelang->kode_lelang }}</td>
+                                <td>{{ $bid->lelang->nama_produk_lelang }}</td>
+                                <td>Rp. {{ number_format($bid->harga_pengajuan, 0, ',', '.') }}</td>
+                                <td>{{ $bid->waktu_dimenangkan }}</td>
+                                <td>
+                                    <!-- Aksi -->
+                                    <div class="flex flex-col items-center justify-center gap-2 max-w-30">
+                                        <a class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
+                                            href="{{ route('lelang.saya') }}"
+                                        >
+                                            Buat Pembayaran
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="w-full flex justify-end mt-5">
+                <a href="" class="text-xs py-2 px-4 bg-primer text-white rounded border-1 border-primer
+                    hover:bg-white hover:text-primer transition"
+                    >
+                    Lihat lebih banyak...
+                </a>
+            </div>
+        </div>
+        @endif
     </div>
 @endsection
 

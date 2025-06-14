@@ -8,11 +8,20 @@
     <title>Nauture | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @vite(['resources/css/global.css'])
-    @vite(['resources/js/sweetalert.js'])
-    @include('includes.toastr')
-    @include('includes.sweetalert')
+    {{-- @vite(['resources/js/sweetalert.js']) --}}
+    {{-- @vite(['resources/js/anime.js']) --}}
+    {{-- @include('includes.toastr')
+    @include('includes.sweetalert') --}}
 </head>
 <body>
+    @if(session('success')) data-toastr-success='{{ json_encode(session('success')) }}' @endif
+    @if(session('error')) data-toastr-error='{{ json_encode(session('error')) }}' @endif
+    @if(session('info')) data-toastr-info='{{ json_encode(session('info')) }}' @endif
+    @if(session('warning')) data-toastr-warning='{{ json_encode(session('warning')) }}' @endif
+
+    @if(session('alert')) data-sweetalert='{{ json_encode(session('alert')) }}' @endif
+
+
     @unless (View::hasSection('hide-navbar'))
         <x-navbar :showSidebar="View::hasSection('show-sidebar')" />
     @endunless

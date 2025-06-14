@@ -15,48 +15,75 @@ use App\Models\User;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class C_Transaksi extends Controller
 {
     public function checkBatasWaktuPembayaran(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'pasang_lelang_id' => 'required|integer|exists:pasang_lelangs,id',
+            'weight'           => 'required|numeric|min:0',
+            'harga_pengajuan'  => 'required|numeric|min:0',
+            'harga_total'      => 'required|numeric|min:0',
+            'ongkir'           => 'required|numeric|min:0',
+            'destination'      => 'required|numeric',
+            'destinationJson'  => 'required|json',
+            'ongkirJson'       => 'required|json',
+            'detail_alamat'    => 'required|string|max:255',
+            'shippingMethod'   => 'required|string|in:pickup,expedition',
+            'shipping_method'  => 'required|string|max:50',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->with('error', [
+                    'title' => 'Input Tidak Valid',
+                    'message' => 'Harap periksa kembali data yang Anda masukkan. Pastikan semua kolom terisi.'
+                ])
+                ->withInput();
+        }
+
         // dapatkan pasangLelangID
         $pasang_lelang_id = $request->input('pasang_lelang_id');
         // cari data pasangLelang berdasarkan ID diatas
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
-
         // hanya bisa buat transaksi 3 jam setelah dinyatakan menang
-        // if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) < -3)) {
+        // if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) > -3)) {
         if ($pasang_lelang->waktu_dimenangkan && (now()->diffInHours($pasang_lelang->waktu_dimenangkan) < -3)) {
             return redirect()->back()->with('error', [
                 'title' => 'Gagal',
                 'message' => 'Waktu pembayaran telah habis. Anda tidak dapat melakukan pembayaran lagi.',
             ]);
         }
-        // dd($request->all());
+
+        // Cek apakah transaksi untuk penawaran ini sudah pernah dibuat
+        $existingTransaction = M_Transaksi::where('pasang_lelang_id', $pasang_lelang->id)->first();
+        if ($existingTransaction) {
+             return redirect()->route('transaksi.index')->with('error', [
+                'title' => 'Transaksi Sudah Ada',
+                'message' => 'Anda sudah pernah membuat transaksi untuk penawaran ini. Silakan cek halaman transaksi Anda.',
+            ]);
+        }
+
         // dd(now()->diffInHours($pasang_lelang->waktu_dimenangkan));
         return $this->insertDataTransaksi($request);
     }
 
-    public function insertDataTransaksi(Request $request)
+    private function insertDataTransaksi(Request $request)
     {
-        // dd($request->pasang_lelang_id);
-        // dd($request->pasang_lelang_id);
-        // dapatkan pasangLelangID
         $pasang_lelang_id = $request->input('pasang_lelang_id');
-        // $pasang_lelang_id = $request->;
-        // dd($request->pasang_lelang_id);
 
         // cari data pasangLelang berdasarkan ID diatas
         $pasang_lelang = M_PasangLelang::findOrFail($pasang_lelang_id);
 
         // cari data lelang berdasarkan pasangLelang
         $lelang = M_Lelang::findOrFail($pasang_lelang->lelang_id);
-        // dd('cp');
+
         // ambil tenggat berdasarkan waktu dimenangkan
         // $tenggat = Carbon::parse(now())->addHours(3);
         $tenggat = Carbon::parse($pasang_lelang->waktu_dimenangkan)->addHours(3);
         $deadline = abs(intval($tenggat->diffInMinutes(Carbon::now())));
-        // dd( $tenggat. '==='.intval($tenggat->diffInMinutes(Carbon::now())) .'======='.$deadline);
+
         // ambil input ongkir
         $ongkir = $request->input('ongkir');
         // calc harga total
@@ -122,15 +149,11 @@ class C_Transaksi extends Controller
 
         // DAPATKAN SNAP TOKEN UNTUK MIDTRANS
 
-        // Set your Merchant Server Key
         \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
         \Midtrans\Config::$isProduction = config('midtrans.isProduction');
-        // Set sanitization on (default)
         \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
-        // Set 3DS transaction for credit card to true
         \Midtrans\Config::$is3ds = config('midtrans.is3ds');
-
+        // generate params
         $params = array(
             'transaction_details' => array(
                 'order_id' => $transaksi->order_id,
@@ -173,9 +196,9 @@ class C_Transaksi extends Controller
             ),
 
         );
-
+        // print params
         Log::info('Midtrans Params:', $params);
-
+        //generate snap token
         $snapToken = \Midtrans\Snap::getSnapToken($params);
         $transaksi->snap_token = $snapToken;
         $transaksi->save();
@@ -209,6 +232,7 @@ class C_Transaksi extends Controller
             ->whereHas('pasangLelang', function ($query) {
                 $query->where('user_id', Auth::id());
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
         return $this->showDataTransaksiUserIni($transaksis);
     }

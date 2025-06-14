@@ -47,3 +47,58 @@ export function renderChart(chartId, type, labels, data, options = {}) {
         },
     });
 }
+
+export function initCharts() {
+    const chartsConfig = [
+        {
+            id: 'dailyChart',
+            type: 'bar',
+            label: 'Pendapatan Harian',
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            scales: {
+                x: { type: 'time', time: { unit: 'day', tooltipFormat: 'd MMM yyyy' } },
+                y: { beginAtZero: true },
+            },
+        },
+        {
+            id: 'weeklyChart',
+            type: 'bar',
+            label: 'Pendapatan Mingguan',
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+        },
+        {
+            id: 'monthlyChart',
+            type: 'line',
+            label: 'Pendapatan Bulanan',
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+        },
+        {
+            id: 'yearlyChart',
+            type: 'pie',
+            label: 'Pendapatan Tahunan',
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+            ],
+            borderWidth: 1,
+        },
+    ];
+
+    chartsConfig.forEach((config) => {
+        const chartEl = document.getElementById(config.id);
+        if (chartEl && chartEl.dataset.labels && chartEl.dataset.data) {
+            const labels = JSON.parse(chartEl.dataset.labels);
+            const data = JSON.parse(chartEl.dataset.data);
+            renderChart(config.id, config.type, labels, data, config);
+        }
+    });
+}

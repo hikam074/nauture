@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\M_PasangLelang;
 use App\Models\M_Saldo;
 use App\Models\M_StatusTransaksi;
 use App\Models\M_Transaksi;
@@ -35,7 +36,18 @@ class C_Dashboard extends Controller
             ->whereNull('payment_time')
             ->orderBy('created_at', 'asc')
             ->get();
-            return $this->showDataLaporan($transaksis);
+
+            // Mendapatkan pasang_lelang yang dimenangkan tetapi belum memiliki transaksi
+            $pasangLelangs = M_PasangLelang::with('lelang')
+                ->whereHas('lelang', function ($query) {
+                    $query->where('pemenang_id', '!=', null); // Lelang sudah memiliki pemenang
+                })
+                ->whereDoesntHave('lelang.transaksi') // Belum memiliki transaksi terkait
+                ->where('user_id', $userId)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            return $this->showDataLaporan($transaksis, $pasangLelangs);
 
         }
         elseif (($userRole === 'owner') || ($userRole === 'pegawai'))
@@ -160,7 +172,7 @@ class C_Dashboard extends Controller
 
                 $saldo = M_Saldo::find(1);
 
-                return $this->showDataLaporan($transaksis, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
+                return $this->showDataLaporan($transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
 
             }
 
@@ -187,7 +199,7 @@ class C_Dashboard extends Controller
 
                 $saldo = M_Saldo::find(1);
 
-                return $this->showDataLaporan($transaksis, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
+                return $this->showDataLaporan($transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
             }
         }
         else
@@ -196,8 +208,8 @@ class C_Dashboard extends Controller
         }
     }
 
-    public function showDataLaporan($transaksis, $saldo = 0, $incomeMingguIni = 0, $incomeBulanIni = 0, $weeklyIncome = null, $monthlyIncome = null, $yearlyIncome = null, $dailyIncome = null)
+    public function showDataLaporan($transaksis, $pasangLelangs = null, $saldo = 0, $incomeMingguIni = 0, $incomeBulanIni = 0, $weeklyIncome = null, $monthlyIncome = null, $yearlyIncome = null, $dailyIncome = null)
     {
-        return view('dashboard.d-dashboard.V_HalamanLaporan', compact('transaksis','saldo', 'incomeMingguIni', 'incomeBulanIni', 'weeklyIncome', 'monthlyIncome', 'yearlyIncome', 'dailyIncome'));
+        return view('dashboard.d-dashboard.V_HalamanLaporan', compact('transaksis', 'pasangLelangs', 'saldo', 'incomeMingguIni', 'incomeBulanIni', 'weeklyIncome', 'monthlyIncome', 'yearlyIncome', 'dailyIncome'));
     }
 }

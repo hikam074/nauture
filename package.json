@@ -19,6 +19,7 @@
   "homepage": "https://github.com/hikam074/nautureBreeze#readme",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
+    "animejs": "^4.0.2",
     "axios": "^1.8.4",
     "chart.js": "^4.4.9",
     "chartjs-adapter-date-fns": "^3.0.0",

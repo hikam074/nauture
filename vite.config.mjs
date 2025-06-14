@@ -13,6 +13,9 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/bootstrap.js',
                 'resources/js/sweetalert.js',
+                'resources/js/chart.js',
+                'resources/js/toastr.js',
+                // 'resources/js/anime.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
             resolve: {
