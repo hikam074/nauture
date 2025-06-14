@@ -20,15 +20,21 @@
         </div>
         @if (Auth::check() && (Auth::user()->role->nama_role == 'pegawai' || Auth::user()->role->nama_role == 'owner'))
         <div class="flex gap-5 w-full flex-wrap lg:flex-nowrap">
-            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg">
+            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg
+                animasi-fade animasi-slide"
+                >
                 <p class="mb-2">Penjualan berhasil Minggu Ini</p>
                 <h2 class="mb-2 font-bold text-3xl">Rp. {{ number_format($incomeMingguIni, 0, ',', '.') }}</h2>
             </div>
-            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg">
+            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg
+                animasi-fade animasi-slide"
+                >
                 <p class="mb-2">Penjualan berhasil bulan ini</p>
                 <h2 class="mb-2 font-bold text-3xl">Rp. {{ number_format($incomeBulanIni, 0, ',', '.') }}</h2>
             </div>
-            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg">
+            <div class="border p-4 rounded-md min-w-55 w-full shadow-lg
+                animasi-fade animasi-slide"
+                >
                 <p class="mb-2">Saldo NauTure Saat Ini</p>
                 <h2 class="mb-2 font-bold text-3xl">Rp. {{ number_format($saldo->saldo, 0, ',', '.') }}</h2>
             </div>
@@ -36,7 +42,9 @@
 
         <div class="flex gap-5 flex-wrap justify-between w-full h-full">
             {{-- Chart Harian --}}
-            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2 chart-container">
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide"
+                >
                 <canvas id="dailyChart"
                     data-width="200px"
                     data-height="200px"
@@ -46,7 +54,9 @@
             </div>
 
             {{-- Chart Mingguan --}}
-            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2 chart-container">
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide"
+                >
                 <canvas id="weeklyChart"
                     data-width="200px"
                     data-height="200px"
@@ -56,7 +66,9 @@
             </div>
 
             {{-- Chart Bulanan --}}
-            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2 chart-container">
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide"
+                >
                 <canvas id="monthlyChart"
                     data-width="200px"
                     data-height="200px"
@@ -66,7 +78,9 @@
             </div>
 
             {{-- Chart Tahunan --}}
-            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2 chart-container">
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide"
+                >
                 <canvas id="yearlyChart"
                     data-width="200px"
                     data-height="200px"
@@ -76,7 +90,9 @@
             </div>
         </div>
         @endif
-        <div class="w-full border-1 border-canceled rounded shadow-lg p-4">
+        <div class="w-full border-1 border-canceled rounded shadow-lg p-4
+            animasi-fade animasi-slide"
+            >
             <h2 class="font-semibold text-xl py-2">
                 @if (Auth::user()->role->nama_role == 'pegawai')
                 Pesanan Perlu Diantar
@@ -155,7 +171,9 @@
             </div>
         </div>
         @if (Auth::user()->role->nama_role == 'customer')
-        <div class="w-full border-1 border-canceled rounded shadow-lg p-4">
+        <div class="w-full border-1 border-canceled rounded shadow-lg p-4
+            animasi-fade animasi-slide"
+            >
             <h2 class="font-semibold text-xl py-2">
                 Lelang Belum Dibayar
             </h2>

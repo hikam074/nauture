@@ -1,27 +1,23 @@
-// Import library Anime.js dengan cara standar.
-// Ini akan berfungsi setelah Anda mengganti nama file ini menjadi "animations.js".
-import anime from 'animejs';
+import { animate, stagger } from 'animejs';
 
-// Fungsi ini akan menjalankan semua animasi global
 export function initAnimations() {
     // Animasi Fade In
     if (document.querySelector('.animasi-fade')) {
-        anime({
-            targets: '.animasi-fade',
+        animate('.animasi-fade', {
             opacity: [0, 1],
-            duration: 1200,
+            delay: stagger(100),
+            duration: 500,
             easing: 'easeInOutQuad'
         });
     }
 
     // Animasi Slide Up
     if (document.querySelector('.animasi-slide')) {
-        anime({
-            targets: '.animasi-slide',
+        animate('.animasi-slide', {
             translateY: [40, 0],
             opacity: [0, 1],
-            delay: anime.stagger(150),
-            duration: 900,
+            delay: stagger(100),
+            duration: 500,
             easing: 'easeOutExpo'
         });
     }

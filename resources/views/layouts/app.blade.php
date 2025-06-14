@@ -8,10 +8,6 @@
     <title>Nauture | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @vite(['resources/css/global.css'])
-    {{-- @vite(['resources/js/sweetalert.js']) --}}
-    {{-- @vite(['resources/js/anime.js']) --}}
-    {{-- @include('includes.toastr')
-    @include('includes.sweetalert') --}}
 </head>
 <body
     @if(session('success')) data-toastr-success='{{ json_encode(session('success')) }}' @endif

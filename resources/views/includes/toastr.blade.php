@@ -1,4 +1,4 @@
-<script>
+{{-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         toastr.options = {
             "closeButton": true,
@@ -61,4 +61,4 @@
             @endforeach
         @endif
     });
-</script>
+</script> --}}
