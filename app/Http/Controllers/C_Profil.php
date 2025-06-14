@@ -174,7 +174,7 @@ class C_Profil extends Controller
             'icon' => 'warning',
             'confirmButtonText' => 'Ya, Logout!',
             'cancelButtonText' => 'Batal',
-            'confirmUrl' => route('logout.process'),
+            'onConfirm' => route('logout.process'),
         ]);
 
         return redirect()->back();

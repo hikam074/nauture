@@ -15,7 +15,8 @@ export default defineConfig({
                 'resources/js/sweetalert.js',
                 'resources/js/chart.js',
                 'resources/js/toastr.js',
-                // 'resources/js/anime.js',
+                'resources/js/onesignal.js',
+                'resources/js/animations.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
             resolve: {

@@ -94,10 +94,8 @@ import './bootstrap';
 import { initToastr } from './toastr.js';
 import { initSweetAlert } from './sweetalert.js';
 import { initCharts } from './chart.js';
-// import { initAnimations } from './anime.js';
 import { initOneSignal } from './onesignal.js';
-
-
+import { initAnimations } from './animations.js'; 
 
 // ====== FUNGSI UTAMA ======
 /**
@@ -108,7 +106,7 @@ function main() {
     initToastr();
     initSweetAlert();
     initOneSignal();
-    // initAnimations();
+    initAnimations();
     initCharts();
 
     console.log('Semua skrip telah diinisialisasi secara terpusat.');

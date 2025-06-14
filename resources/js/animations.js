@@ -1,3 +1,5 @@
+// Import library Anime.js dengan cara standar.
+// Ini akan berfungsi setelah Anda mengganti nama file ini menjadi "animations.js".
 import anime from 'animejs';
 
 // Fungsi ini akan menjalankan semua animasi global
