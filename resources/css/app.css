@@ -6,74 +6,15 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    /* sesuaikan lagi warnanya */
-    --color-primer: oklch(0.3 0.0749 145.58); /*0F3714*/
-    --color-sekunder: oklch(0.59 0.1239 130.44); /*638b35*/
-    --color-sekunderDark: oklch(0.42 0.1051 142.54); /*255B22*/
-    --color-tersier: oklch(0.61 0.0801 131.78); /*728E5B*/
-    --color-kuarter: oklch(0.91 0.1501 123.02); /*CEF17B*/
-    --color-bsoft: oklch(0.91 0.0845 130.49); /*CEEDB2 */
-    --color-bkrem: oklch(0.94 0.0825 112.34); /*ECF2B2*/
-    --color-bblue: oklch(0.88 0.0495 153.41); /*BEE0C7*/
-    --color-warning: oklch(0.924 0.12 95.746); /*#fee685*/
 
-    --color-restore: oklch(79.5% 0.184 86.047); /*yellow-500*/
-    --color-restorehov: oklch(68.1% 0.162 75.834); /*yellow-600*/
-    --color-hapus: oklch(63.7% 0.237 25.331); /*red-500*/
-    --color-hapushov: oklch(57.7% 0.245 27.325); /*red-600*/
-    --color-edit: oklch(62.3% 0.214 259.815); /*blue-500*/
-    --color-edithov: oklch(54.6% 0.245 262.881); /*blue-600*/
-    --color-canceled: oklch(87.2% 0.01 258.338); /*gray-300*/
-    --color-canceledhov: oklch(70.7% 0.022 261.325); /*gray-500*/
-    --color-info: oklch(0.66 0.1105 212.17); /*#17a2b8*/
-    --color-infohov: oklch(0.51 0.09034776642657427 215.94395528514525); /*#007287*/
-    --color-success: oklch(0.64 0.1751 146.74); /*#28a745*/
-    --color-successhov: oklch(0.51 0.1650683709419067 143.84687596291317); /*#007b15*/
-}
-@layer utilities {
-    table td, table th {
-      @apply px-2 py-1;
-    }
-}
+/* Impor variabel dan tema Anda */
+@import './global.css';
 
-pre {
-    white-space: pre-wrap; /* Agar teks membungkus */
-    font-family: inherit;  /* Gunakan font dari elemen induk */
-    font-size: inherit;    /* Ikuti ukuran font induk */
-    color: inherit;        /* Ikuti warna teks induk */
-    background-color: transparent; /* Hapus latar belakang bawaan */
-    border: none;          /* Hapus border bawaan */
-    padding: 0;            /* Hapus padding bawaan */
-    margin: 0;             /* Hapus margin bawaan */
-}
+/* Impor variabel dan tema Anda */
+@import './config/theme.css';
 
-/* Kustomisasi untuk tipe toast */
-/* @import "~toastr/toastr.css"; */
-@import 'toastr/build/toastr.min.css';
+/* Impor gaya untuk pre */
+@import './base/pre.css';
 
-.toast-success {
-    background-color: #28a745 !important; /* Hijau sukses */
-    color: white !important;
-    opacity: 100% !important;
-}
-
-.toast-error {
-    background-color: #dc3545 !important; /* Merah error */
-    color: white !important;
-    opacity: 100% !important;
-}
-
-.toast-warning {
-    background-color: #ffc107 !important; /* Kuning warning */
-    color: black !important;
-    opacity: 100% !important;
-}
-
-.toast-info {
-    background-color: #17a2b8 !important; /* Biru info */
-    color: white !important;
-    opacity: 100% !important;
-}
+/* Impor gaya untuk library pihak ketiga (paling akhir) */
+@import './vendors/toastr.css';

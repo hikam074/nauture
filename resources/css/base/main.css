@@ -1,0 +1,9 @@
+/* Reset dasar dan font global */
+* {
+    font-family: var(--font-sans); /* Gunakan variabel dari theme.css */
+}
+
+/* Gaya default untuk elemen interaktif */
+a, button {
+    cursor: pointer;
+}

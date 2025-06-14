@@ -1,0 +1,11 @@
+/* Gaya untuk tag <pre> agar terlihat seperti teks biasa */
+pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}

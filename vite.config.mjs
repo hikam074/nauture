@@ -9,14 +9,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/css/global.css',
                 'resources/js/app.js',
-                'resources/js/bootstrap.js',
-                'resources/js/sweetalert.js',
-                'resources/js/chart.js',
-                'resources/js/toastr.js',
-                'resources/js/onesignal.js',
-                'resources/js/animations.js',
             ], // Sesuaikan dengan file yang kamu gunakan
             refresh: true,
             resolve: {

@@ -195,7 +195,7 @@ class C_Katalog extends Controller
     {
         try {
             $validated = $request->validate([
-                'nama_produk' => 'required|string|max:255|unique:katalogs,nama_produk',
+                'nama_produk' => 'required|string|max:255|unique:katalogs,nama_produk,' . $id,
                 'deskripsi_produk' => 'nullable|string',
                 'harga_perkilo' => 'required|integer',
                 'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -209,7 +209,7 @@ class C_Katalog extends Controller
                 ])->withInput();
             }
             else {
-                return $this->updateDataLelang($request, $id);
+                return $this->updateDataKatalog($request, $id);
             }
 
         } catch (ValidationException $e) {
@@ -222,7 +222,7 @@ class C_Katalog extends Controller
         }
     }
 
-    public function updateDataLelang(Request $request, string $id)
+    public function updateDataKatalog(Request $request, string $id)
     {
         $katalog = M_Katalog::findOrFail($id);
 
