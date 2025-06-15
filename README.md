@@ -75,7 +75,7 @@
             >
             <!-- CHART.JS -->
             <img alt="Chart.js" class="inline-block mx-1" style="margin: 0px 2px;"
-                src="https://img.shields.io/badge/Anime.js-v3.2.1-orange?style=flat-square&logo=anime.js"
+                src="https://img.shields.io/badge/Anime.js-FF6384.svg?style=flat&logo=chartdotjs&logoColor=white"
             >
             <br>
             <hr>
