@@ -77,6 +77,10 @@
             <img alt="Chart.js" class="inline-block mx-1" style="margin: 0px 2px;"
                 src="https://img.shields.io/badge/Anime.js-FF6384.svg?style=flat&logo=chartdotjs&logoColor=white"
             >
+            <!-- WHATSAPP -->
+            <img alt="WhatsApp" class="inline-block mx-1" style="margin: 0px 2px;" 
+                src="https://img.shields.io/badge/Fonnte-25D366.svg?style=flat&logo=whatsapp&logoColor=white"
+            />
             <br>
             <hr>
         </div>
