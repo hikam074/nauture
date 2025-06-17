@@ -83,7 +83,7 @@
             />
             <!-- DOMPDF -->
             <img alt="DomPDF" class="inline-block mx-1" style="margin: 0px 2px;" 
-                src="https://img.shields.io/badge/DomPDF-3399FF.svg?style=flat&logo=collaboraoffice&logoColor=white"
+                src="https://img.shields.io/badge/DomPDF-3399FF.svg?style=flat&logo=collaboraonline&logoColor=white"
             />
             <br>
             <hr>
