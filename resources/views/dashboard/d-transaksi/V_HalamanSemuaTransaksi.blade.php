@@ -89,14 +89,12 @@
                             <!--AKSI-->
                             @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                             <td>
-                                <!-- Popup -->
-                                @include('dashboard.d-transaksi.V_FormTambahResi')
                                 <!-- Tombol -->
                                 @if ($transaksi->statusTransaksi->kode_status_transaksi === 'settlement')
                                 <div class="flex flex-col items-center justify-center gap-2 max-w-30">
                                     <button
                                         class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
-                                        onclick="showPopup({{ $transaksi->id }}, '{{ route('dashboard.updateStatsTransaksi') }}')"
+                                        onclick="showPopupResi({{ $transaksi->id }}, '{{ $transaksi->order_id }}', '{{ route('dashboard.updateStatsTransaksi') }}', null)"
                                     >
                                         Ubah Pesanan<br>Menjadi Dikirim
                                     </button>
@@ -105,7 +103,7 @@
                                 <div class="flex flex-col items-center justify-center gap-2 max-w-30">
                                     <button
                                         class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
-                                        onclick="showPopup({{ $transaksi->id }}, '{{ route('dashboard.updateStatsTransaksi') }}')"
+                                        onclick="showPopupResi({{ $transaksi->id }}, '{{ $transaksi->order_id }}', '{{ route('dashboard.updateStatsTransaksi') }}', '{{ $transaksi->no_resi }}')"
                                     >
                                         Ubah<br>Nomor Resi
                                     </button>
@@ -124,9 +122,20 @@
         </div>
     </div>
 
+    <!-- Popup -->
+    @include('dashboard.d-transaksi.V_FormTambahResi')
+
+@endsection
+
+@section('scripts')
+    @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
     <script>
-        function showPopup(transaksiId, formAction) {
+        function showPopupResi(transaksiId, kodeTransaksi, formAction, noResi) {
+            console.log("transaksiId:", transaksiId, "kodeTransaksi:", kodeTransaksi, "formAction:", formAction, "resi:", noResi);
+
             const popup = document.getElementById('popup-resi');
+
+            popup.classList.remove('hidden');
             popup.classList.add('flex');
             const form = popup.querySelector('.popup-form');
             const background = popup.querySelector('.popup-bg');
@@ -134,6 +143,11 @@
             // Update form action and value
             document.getElementById('popup-transaksi-id').value = transaksiId;
             document.getElementById('popup-resi-form').action = formAction;
+            document.getElementById('popup-title').textContent = (noResi === null) ? 'Masukkan Nomor Resi' : 'Ubah Nomor Resi';
+            document.getElementById('popup-order-id-teks').textContent = 'Kode Transaksi : '+kodeTransaksi;
+            document.getElementById('popup-nomor-resi').value = noResi || '';
+
+            console.log(document.getElementById('popup-nomor-resi').value);
 
             // Add animation classes
             background.classList.remove('fade-out');
@@ -142,7 +156,7 @@
             form.classList.add('move-down');
         }
 
-        function closePopup() {
+        function closePopupResi() {
             const popup = document.getElementById('popup-resi');
             const form = popup.querySelector('.popup-form');
             const background = popup.querySelector('.popup-bg');
@@ -158,10 +172,8 @@
             }, 300);
         }
     </script>
-
-
+    @endif
 @endsection
-
 
 
 

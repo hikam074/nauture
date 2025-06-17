@@ -134,12 +134,10 @@
                                 @endif
                                 @if (Auth::check() && Auth::user()->role->nama_role == 'pegawai')
                                 <td>
-                                    <!-- Popup -->
-                                    @include('dashboard.d-transaksi.V_FormTambahResi')
                                     <!-- Aksi -->
                                     <div class="flex flex-col items-center justify-center gap-2 max-w-30">
                                         <a class="text-sm px-4 py-2 rounded-lg bg-white border-1 text-primer text-center hover:bg-primer hover:text-white"
-                                            onclick="showPopup({{ $transaksi->id }}, '{{ route('dashboard.updateStatsTransaksi') }}')"
+                                            onclick="showPopupResi({{ $transaksi->id }}, '{{ $transaksi->order_id }}', '{{ route('dashboard.updateStatsTransaksi') }}')"
                                         >
                                             Kirim
                                         </a>
@@ -269,50 +267,53 @@
             </div>
         </div>
 
+        <!-- Popup -->
+        @include('dashboard.d-transaksi.V_FormTambahResi')
+
     </div>
 @endsection
 
 @section('scripts')
     <script>
-        function showPopup(transaksiId, formAction) {
-            const popup = document.getElementById('popup-resi');
-            const background = popup.querySelector('.popup-bg');
-            const form = popup.querySelector('.popup-form');
-            const transaksiInput = document.getElementById('popup-transaksi-id');
+        function showPopupResi(transaksiId, kodeLelang, formAction) {
+            console.log("transaksiId:", transaksiId, "kodeLelang:", kodeLelang, "formAction:", formAction);
 
-            transaksiInput.value = transaksiId;
-            document.getElementById('popup-resi-form').action = formAction;
+            const popup = document.getElementById('popup-resi');
 
             popup.classList.remove('hidden');
             popup.classList.add('flex');
+            const form = popup.querySelector('.popup-form');
+            const background = popup.querySelector('.popup-bg');
 
-            setTimeout(() => {
-                background.classList.add('fade-in');
-                background.classList.remove('fade-out');
-                form.classList.add('show');
-            }, 10); // Delay untuk memastikan transisi diterapkan
+            // Update form action and value
+            document.getElementById('popup-transaksi-id').value = transaksiId;
+            document.getElementById('popup-resi-form').action = formAction;
+            document.getElementById('popup-order-id-teks').textContent = 'Kode Transaksi : '+kodeLelang;
+
+            // Add animation classes
+            background.classList.remove('fade-out');
+            background.classList.add('fade-in');
+            form.classList.remove('move-up');
+            form.classList.add('move-down');
         }
 
-        function closePopup() {
+        function closePopupResi() {
             const popup = document.getElementById('popup-resi');
-            const background = popup.querySelector('.popup-bg');
             const form = popup.querySelector('.popup-form');
+            const background = popup.querySelector('.popup-bg');
 
             background.classList.remove('fade-in');
             background.classList.add('fade-out');
-            form.classList.remove('show');
+            form.classList.remove('move-down');
+            form.classList.add('move-up');
 
-            form.addEventListener(
-                'transitionend',
-                () => {
-                    popup.classList.add('hidden');
-                    popup.classList.remove('flex');
-                },
-                { once: true }
-            );
+            setTimeout(() => {
+                popup.classList.remove('flex');
+                popup.classList.add('hidden');
+            }, 300);
         }
     </script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Cek apakah elemen form ada

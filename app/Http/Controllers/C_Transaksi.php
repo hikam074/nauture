@@ -202,6 +202,7 @@ class C_Transaksi extends Controller
         $snapToken = \Midtrans\Snap::getSnapToken($params);
         $transaksi->snap_token = $snapToken;
         $transaksi->save();
+        Log::info('transaksi berhasil dibuat:'.$transaksi);
 
         return redirect()->back()->with('success', [
             'title' => 'Berhasil menginisiasi transaksi!',
@@ -215,8 +216,8 @@ class C_Transaksi extends Controller
     public function getDataTransaksiChekout($id) {
         $transaksi = M_Transaksi::with(['pasangLelang', 'lelang'])->findOrFail($id);
         // transaksi sudah tidak dimenangkan oleh ybs
-        if( !$transaksi->lelang || ($transaksi->lelang->pemenang_id != $id) ) {
-            return redirect()->back()->with('error', 'Transaksi ini sudah tidak valid');
+        if( !$transaksi->lelang || ($transaksi->lelang->pemenang_id != $transaksi->pasang_lelang_id) ) {
+            return redirect()->back()->with('error', 'Transaksi ini sudah tidak dimenangkan oleh anda');
         }
         // transaksi sdh diselesaikan / batal
         if ($transaksi->status_transaksi_id != M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id) {
@@ -256,7 +257,7 @@ class C_Transaksi extends Controller
 
 
     public function getDataTransaksi() {
-        $transaksis = M_Transaksi::with('pasangLelang', 'paymentMethod')->paginate(10);
+        $transaksis = M_Transaksi::with('pasangLelang', 'paymentMethod')->orderBy('created_at', 'desc')->paginate(10);
         return $this->showDataTransaksi($transaksis);
     }
     public function showDataTransaksi($transaksis) {

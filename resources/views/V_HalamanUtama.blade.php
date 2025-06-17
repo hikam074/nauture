@@ -114,7 +114,8 @@
                 <a href="{{ route('lelang.index') }}"
                     class="text-sm font-medium border border-primer px-4 py-2 rounded-lg shadow-lg
                     hover:bg-primer hover:text-white transition hover:shadow-xl
-                    block w-27 sm:inline sm:w-auto"
+                    block w-27 sm:inline sm:w-auto
+                    animasi-slide-keatas"
                     >
                     Lihat Lebih Banyak...
                 </a>
@@ -123,7 +124,8 @@
                     <a href="{{ route('lelang.add') }}"
                         class="text-sm font-medium text-white bg-primer px-4 py-2 shadow-lg rounded-lg
                         hover:bg-black transition
-                        block w-20 sm:inline sm:w-auto"
+                        block w-20 sm:inline sm:w-auto
+                        animasi-slide-keatas"
                         >
                         Tambah Lelang
                     </a>
@@ -138,7 +140,7 @@
                     <div class="flex flex-col w-[49%] bg-white rounded-lg shadow-lg p-4 cursor-pointer text-center gap-1
                         transform transition-transform hover:scale-102 hover:shadow-2xl
                         sm:w-48
-                        animasi-fade"
+                        animasi-slide-keatas"
                         onclick="window.location.href='{{ route('lelang.show', ['id' => $lelang->id]) }}'"
                         >
                         <img src="{{ asset('storage/' . $lelang->foto_produk) }}" alt="[{{ $lelang->nama_produk }}]"

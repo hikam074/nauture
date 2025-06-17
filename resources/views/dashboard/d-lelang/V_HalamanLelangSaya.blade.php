@@ -30,7 +30,6 @@
                 </thead>
                 <tbody>
                     @foreach ($allBids as $index => $myBid)
-                        @include('dashboard.d-lelang.V_FormTambahPembayaran')
                         <tr class="border-b-1 border-bsoft
                             animasi-slide-kekanan
                             ">
@@ -145,7 +144,9 @@
                 {{ $allBids->links() }}
             </div>
         </div>
+        <!--popup lelang-->
     </div>
+    @include('dashboard.d-lelang.V_FormTambahPembayaran')
 @endsection
 
 @section('scripts')
