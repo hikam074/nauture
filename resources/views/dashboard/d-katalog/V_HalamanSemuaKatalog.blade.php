@@ -19,8 +19,8 @@
             <a href="{{ route('katalog.add') }}"
                 class="text-sm font-medium text-white bg-primer px-4 py-2 shadow-lg rounded-lg
                 hover:bg-black transition
-                block w-20 sm:inline sm:w-auto"
-                >
+                block w-20 sm:inline sm:w-auto
+                ">
                 Tambah Katalog
             </a>
         </div>
@@ -40,7 +40,9 @@
                 </thead>
                 <tbody>
                     @foreach ($katalogs as $index => $katalog)
-                        <tr class="border-b-1 border-bsoft">
+                        <tr class="border-b-1 border-bsoft
+                            animasi-slide-kekanan
+                            ">
                             <!--NO.-->
                             <td class="text-center">{{ ($katalogs->currentPage() - 1) * $katalogs->perPage() + $index + 1 }}.</td>
                             <!--NAMA PRODUK-->

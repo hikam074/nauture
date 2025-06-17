@@ -32,7 +32,9 @@
                 </thead>
                 <tbody>
                     @foreach ($transaksis as $index => $transaksi)
-                        <tr class="border-b-1 border-bsoft">
+                        <tr class="border-b-1 border-bsoft
+                             animasi-slide-kekanan"
+                            >
                             {{-- <!--NO.-->
                             <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td> --}}
                             {{-- <!--ID TAWARAN-->

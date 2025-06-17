@@ -24,7 +24,10 @@ class PasangLelangSeeder extends Seeder
         }
 
         foreach ($lelangs as $lelang) {
-            $userIds = User::where('id', '!=', $userKhususId)->pluck('id')->shuffle();
+            $userIds = User::whereRelation('role', 'nama_role', 'customer')
+                ->where('id', '!=', $userKhususId)
+                ->pluck('id')
+                ->shuffle();
             $jumlahPenawarAcak = rand(1, min(4, $userIds->count()));
 
             // Buat bid dari user acak

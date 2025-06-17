@@ -1,5 +1,5 @@
 <div id="popupAlamat"
-    class="fixed top-0 bottom-0 left-0 right-0 mt-16 hidden items-center justify-center z-10"
+    class="fixed top-0 bottom-0 left-0 right-0 mt-16 hidden items-center justify-center z-1000"
 >
     <form id="pengirimans" action="{{ route('transaksi.create') }}" method="POST">
         @csrf
@@ -515,7 +515,7 @@
                     container.innerHTML = '<span class="text-canceled italic text-sm">Tidak ada layanan ekspedisi untuk tujuan ini.</span>';
                     return;
                 }
-                
+
                 shippingOptions.forEach(option => {
                     const card = document.createElement('div');
                     card.className = "border p-4 rounded shadow hover:bg-gray-100 cursor-pointer shipping-card text-sm";
@@ -550,7 +550,7 @@
             card.className = "border p-4 rounded shadow hover:bg-gray-100 cursor-pointer shipping-card bg-blue-100";
             card.innerHTML = `<h3 class="font-bold">Ambil Sendiri</h3><p><strong>Biaya:</strong> Rp 0</p>`;
             container.appendChild(card);
-            
+
             selectedShippingObject = {
                 name: "Ambil Sendiri",
                 service: "takeaway",
@@ -582,7 +582,7 @@
         if (selectedLocationEl && selectedLocationEl.selectedIndex >= 0) {
             konfirAlamatDr.textContent = selectedLocationEl.options[selectedLocationEl.selectedIndex].text;
             konfirAlamatIsi.textContent = addressDetail || 'Belum diisi';
-            
+
             const selectedId = selectedLocationEl.value;
             const selectedData = destinations.find(d => d.id == selectedId);
             document.getElementById('destinationJson').value = selectedData ? JSON.stringify(selectedData) : '';
@@ -597,10 +597,10 @@
             konfirPengiriman.textContent = `${selectedShippingObject.name} - ${selectedShippingObject.service}`;
             const selectedCost = selectedShippingObject.cost;
             const hargaTotal = selectedCost + hargaBid;
-            
+
             konfirOngkir.textContent = `Rp. ${selectedCost.toLocaleString('id-ID')}`;
             konfirBiaya.textContent = `Rp. ${hargaTotal.toLocaleString('id-ID')}`;
-            
+
             document.getElementById('ongkir').value = selectedCost;
             document.getElementById('selected-shipping-option').value = selectedShippingObject.service;
             document.getElementById('harga_total').value = hargaTotal;
@@ -609,7 +609,7 @@
             konfirPengiriman.textContent = 'Belum dipilih';
             konfirOngkir.textContent = 'Rp. -';
             konfirBiaya.textContent = `Rp. ${hargaBid.toLocaleString('id-ID')}`;
-            
+
             document.getElementById('ongkir').value = '';
             document.getElementById('selected-shipping-option').value = '';
             document.getElementById('harga_total').value = hargaBid;

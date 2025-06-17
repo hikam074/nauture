@@ -7,15 +7,17 @@ import { initOneSignal } from './onesignal.js';
 import { initAnimations } from './animations.js';
 
 // ====== FUNGSI UTAMA ======
+
 function main() {
     initToastr();
     initSweetAlert();
-    initOneSignal();
     initCharts();
     initAnimations();
+    initOneSignal();
 
     console.log('Semua skrip telah diinisialisasi secara terpusat.');
 }
 
 // ====== EVENT LISTENER TUNGGAL ======
 document.addEventListener('DOMContentLoaded', main);
+

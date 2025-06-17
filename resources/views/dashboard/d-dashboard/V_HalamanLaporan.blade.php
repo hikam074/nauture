@@ -221,6 +221,54 @@
             </div>
         </div>
         @endif
+
+        <!--CETAK LAPORAN-->
+        @if (Auth::check() && (Auth::user()->role->nama_role == 'owner'))
+        <div class="w-full border-1 border-canceled rounded shadow-lg p-4 animasi-fade animasi-slide-keatas">
+            <h2 class="font-semibold text-xl py-2">Tampilkan Laporan</h2>
+            <div id="laporan-form-wrapper" class="flex flex-col md:flex-row items-end gap-4">
+                <div>
+                    <label for="periode" class="block text-sm font-medium text-gray-700">Periode</label>
+                    <select id="periode" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-1 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="bulanan">Bulanan</option>
+                        <option value="tahunan">Tahunan</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="tahun" class="block text-sm font-medium text-gray-700">Tahun</label>
+                    <select id="tahun" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-1 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        {{-- Pilihan tahun diisi oleh JS --}}
+                    </select>
+                </div>
+                <div id="bulan-wrapper">
+                    <label for="bulan" class="block text-sm font-medium text-gray-700">Bulan</label>
+                    <select id="bulan" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-1 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        {{-- Pilihan bulan diisi oleh JS --}}
+                    </select>
+                </div>
+                <button type="button" id="tampilkan-laporan-btn" class="bg-primer text-white px-4 py-2 rounded-md hover:bg-sekunderDark transition-colors h-10">
+                    Tampilkan
+                </button>
+            </div>
+            <div id="laporan-preview-container" class="mt-8">
+                <!-- Preview laporan akan muncul di sini -->
+            </div>
+        </div>
+        @endif
+
+        <div id="pdf-popup" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-lg font-bold">Preview Laporan PDF</h3>
+                    <button onclick="closePdfPopup()" class="text-2xl font-bold text-gray-600 hover:text-red-500">&times;</button>
+                </div>
+                <div id="pdf-viewer-container" class="flex-grow p-2">
+                    {{-- Iframe untuk menampilkan PDF akan dimasukkan di sini oleh JS --}}
+                    <p id="pdf-loading-indicator" class="text-center p-8">Memuat PDF...</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 @endsection
 
@@ -263,5 +311,100 @@
                 { once: true }
             );
         }
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek apakah elemen form ada
+            const laporanFormContainer = document.getElementById('laporan-form-wrapper');
+            if (laporanFormContainer) {
+                const periodeSelect = document.getElementById('periode');
+                const tahunSelect = document.getElementById('tahun');
+                const bulanWrapper = document.getElementById('bulan-wrapper');
+                const bulanSelect = document.getElementById('bulan');
+                const tampilkanBtn = document.getElementById('tampilkan-laporan-btn');
+                const previewContainer = document.getElementById('laporan-preview-container');
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1;
+
+                function populateTahun() {
+                    tahunSelect.innerHTML = '';
+                    for (let i = 0; i < 5; i++) {
+                        const year = currentYear - i;
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        tahunSelect.appendChild(option);
+                    }
+                }
+
+                function populateBulan() {
+                    const selectedYear = parseInt(tahunSelect.value);
+                    bulanSelect.innerHTML = '';
+                    const endMonth = (selectedYear === currentYear) ? currentMonth : 12;
+                    for (let i = 1; i <= endMonth; i++) {
+                        const date = new Date(selectedYear, i - 1, 1);
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(date);
+                        bulanSelect.appendChild(option);
+                    }
+                    bulanSelect.value = endMonth;
+                }
+
+                function toggleBulanVisibility() {
+                    bulanWrapper.style.display = (periodeSelect.value === 'tahunan') ? 'none' : 'block';
+                }
+
+                periodeSelect.addEventListener('change', () => {
+                    toggleBulanVisibility();
+                    populateBulan();
+                });
+                tahunSelect.addEventListener('change', populateBulan);
+
+                tampilkanBtn.addEventListener('click', function() {
+                    const periode = periodeSelect.value;
+                    const tahun = tahunSelect.value;
+                    const bulan = bulanSelect.value;
+
+                    const previewParams = new URLSearchParams({ periode, tahun, bulan });
+                    const downloadParams = new URLSearchParams({ periode, tahun, bulan });
+
+                    previewContainer.innerHTML = '<p class="text-center p-8 text-gray-500">Memuat preview laporan...</p>';
+                    tampilkanBtn.disabled = true;
+                    tampilkanBtn.textContent = 'Memuat...';
+
+                    fetch(`{{ route('dashboard.laporan.cetak') }}?${previewParams.toString()}`)
+                        .then(response => {
+                            if (!response.ok) return response.json().then(err => { throw err; });
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.html) {
+                                previewContainer.innerHTML = data.html;
+                                const downloadBtn = document.getElementById('tombol-download-laporan');
+                                if (downloadBtn) {
+                                    downloadBtn.href = `{{ route('dashboard.laporan.download') }}?${downloadParams.toString()}`;
+                                }
+                            } else {
+                                throw new Error('Respons dari server tidak valid.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            previewContainer.innerHTML = `<div class="p-4 bg-red-100 text-red-800 rounded"><strong class="font-bold">Gagal memuat laporan!</strong><p class="mt-2">Detail: ${error.message || 'Tidak ada detail.'}</p></div>`;
+                        })
+                        .finally(() => {
+                            tampilkanBtn.disabled = false;
+                            tampilkanBtn.textContent = 'Tampilkan Preview';
+                        });
+                });
+
+                // Inisialisasi awal
+                populateTahun();
+                populateBulan();
+                toggleBulanVisibility();
+            }
+        });
     </script>
 @endsection

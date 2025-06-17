@@ -19,12 +19,12 @@ export default defineConfig({
             },
         }),
     ],
-    // server: {
-    //     // host: 'nauture_devmidtrans.test', // Ganti dengan domain Laragon Anda
-    //     host: 'nauture_devmidtrans.test', // Ganti dengan domain Laragon Anda
-    //     https: {
-    //         key: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.key'),
-    //         cert: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.crt'),
-    //     },
-    // },
+    server: {
+        host: 'nauture_devmidtrans.test', // Ganti dengan domain Laragon Anda
+        https: {
+            key: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.key'),
+            cert: fs.readFileSync('C:/Apps/laragon/etc/ssl/laragon.crt'),
+        },
+        cors: true
+    },
 });

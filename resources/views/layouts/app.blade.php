@@ -24,7 +24,7 @@
     @if (View::hasSection('show-sidebar'))
         <main class="mt-16">
             <div class="flex gap-5 mt-4">
-                <div class="">
+                <div class="z-100">
                     @include('components.sidebar')
                     <div class="hidden sm:block sm:w-55"></div>
                 </div>

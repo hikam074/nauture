@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <div class="mb-5 flex flex-col gap-5 w-full">
+    <div class="mb-5 flex flex-col gap-3 w-full">
         <div>
             <h1 class="font-bold text-4xl">Pegawai NauTure</h1>
             <p class="font-thin text-sm">Semua pegawai yang bekerja disini</p>
@@ -36,7 +36,9 @@
                 </thead>
                 <tbody>
                     @foreach ($pegawais as $index => $pegawai)
-                        <tr class="border-b-1 border-bsoft">
+                        <tr class="border-b-1 border-bsoft
+                            animasi-slide-kekanan
+                            ">
                             <td class="text-center">{{ $index + 1 }}.</td>
                             <td>
                                 <div class="flex gap-3 items-center">

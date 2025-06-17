@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\M_Lelang;
 use App\Models\M_PasangLelang;
 use App\Models\M_Saldo;
 use App\Models\M_StatusTransaksi;
 use App\Models\M_Transaksi;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class C_Dashboard extends Controller
 {
@@ -155,7 +159,7 @@ class C_Dashboard extends Controller
                     ->where('status_transaksi_id', $statusSettlement)
                     ->whereNotNull('payment_time')
                     ->orderBy('payment_time', 'asc')
-                    ->limit(10)
+                    ->limit(5)
                     ->get();
 
                 $incomeBulanIni = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
@@ -182,7 +186,7 @@ class C_Dashboard extends Controller
                 $transaksis = M_Transaksi::with(['lelang.pemenang.user'])
                     ->whereIn('status_transaksi_id', $statusTransaksiId)
                     ->orderBy('created_at', 'desc')
-                    ->limit(10)
+                    ->limit(5)
                     ->get();
 
                 $incomeBulanIni = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
@@ -211,5 +215,109 @@ class C_Dashboard extends Controller
     public function showDataLaporan($transaksis, $pasangLelangs = null, $saldo = 0, $incomeMingguIni = 0, $incomeBulanIni = 0, $weeklyIncome = null, $monthlyIncome = null, $yearlyIncome = null, $dailyIncome = null)
     {
         return view('dashboard.d-dashboard.V_HalamanLaporan', compact('transaksis', 'pasangLelangs', 'saldo', 'incomeMingguIni', 'incomeBulanIni', 'weeklyIncome', 'monthlyIncome', 'yearlyIncome', 'dailyIncome'));
+    }
+
+
+
+
+    public function cetakLaporan(Request $request)
+    {
+        try {
+            $request->validate([
+                'periode' => 'required|in:bulanan,tahunan',
+                'tahun' => 'required|integer|min:2020|max:'.date('Y'),
+                'bulan' => 'nullable|required_if:periode,bulanan|integer|min:1|max:12',
+            ]);
+
+            $periode = $request->input('periode');
+            $tahun = $request->input('tahun');
+            $bulan = $request->input('bulan');
+
+            if ($periode === 'bulanan') {
+                $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+                $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+                $judulLaporan = 'Laporan Bulanan - ' . $startDate->translatedFormat('F Y');
+            } else {
+                $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
+                $endDate = Carbon::create($tahun, 1, 1)->endOfYear();
+                $judulLaporan = 'Laporan Tahunan - ' . $tahun;
+            }
+
+            $statusTransaksiId = M_StatusTransaksi::whereIn('kode_status_transaksi', ['settlement', 'capture', 'delivering', 'delivered'])->pluck('id')->toArray();
+
+            $lelangs = M_Lelang::with('pasangLelang')->whereBetween('tanggal_ditutup', [$startDate, $endDate])->withTrashed()->orderBy('tanggal_ditutup', 'asc')->get();
+
+            $transaksis = M_Transaksi::with(['lelang.pemenang.user', 'pasangLelang.lelang'])
+                ->whereIn('status_transaksi_id', $statusTransaksiId)
+                ->whereBetween('transaksis.created_at', [$startDate, $endDate])
+                ->orderBy('transaksis.created_at', 'asc')
+                ->get();
+
+            $pendapatanKotor = $transaksis->sum('gross_amount');
+
+            $pendapatanBersih = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
+                ->whereBetween('transaksis.created_at', [$startDate, $endDate])
+                ->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')
+                ->join('lelangs', 'transaksis.lelang_id', '=', 'lelangs.id')
+                ->sum(DB::raw('pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka'));
+
+            $html = view('dashboard.d-dashboard.partials.V_PreviewCetakLaporan', compact(
+                'judulLaporan', 'lelangs', 'transaksis', 'pendapatanKotor', 'pendapatanBersih'
+            ))->render();
+
+            return response()->json(['html' => $html]);
+
+        } catch (Throwable $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
+        }
+    }
+
+    public function downloadLaporan(Request $request)
+    {
+        try {
+            $request->validate([
+                'periode' => 'required|in:bulanan,tahunan',
+                'tahun' => 'required|integer|min:2020|max:'.date('Y'),
+                'bulan' => 'nullable|required_if:periode,bulanan|integer|min:1|max:12',
+            ]);
+
+            $periode = $request->input('periode');
+            $tahun = $request->input('tahun');
+            $bulan = $request->input('bulan');
+            $namaFile = 'laporan-nauture.pdf';
+
+            if ($periode === 'bulanan') {
+                $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+                $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+                $judulLaporan = 'Laporan Bulanan - ' . $startDate->translatedFormat('F Y');
+                $namaFile = 'laporan-nauture-' . $startDate->format('Y-m') . '.pdf';
+            } else {
+                $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
+                $endDate = Carbon::create($tahun, 1, 1)->endOfYear();
+                $judulLaporan = 'Laporan Tahunan - ' . $tahun;
+                $namaFile = 'laporan-nauture-' . $tahun . '.pdf';
+            }
+
+            $statusTransaksiId = M_StatusTransaksi::whereIn('kode_status_transaksi', ['settlement', 'capture', 'delivering', 'delivered'])->pluck('id')->toArray();
+            $lelangs = M_Lelang::with('pasangLelang')->whereBetween('tanggal_ditutup', [$startDate, $endDate])->withTrashed()->orderBy('tanggal_ditutup', 'asc')->get();
+            $transaksis = M_Transaksi::with(['lelang.pemenang.user', 'pasangLelang.lelang'])->whereIn('status_transaksi_id', $statusTransaksiId)->whereBetween('transaksis.created_at', [$startDate, $endDate])->orderBy('transaksis.created_at', 'asc')->get();
+            $pendapatanKotor = $transaksis->sum('gross_amount');
+            $pendapatanBersih = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)->whereBetween('transaksis.created_at', [$startDate, $endDate])->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')->join('lelangs', 'transaksis.lelang_id', '=', 'lelangs.id')->sum(DB::raw('pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka'));
+
+            // PERBAIKAN: Menggunakan view baru yang khusus untuk PDF
+            $pdf = Pdf::loadView('dashboard.d-dashboard.partials.V_PreviewCetakLaporan_pdf', compact(
+                'judulLaporan', 'lelangs', 'transaksis', 'pendapatanKotor', 'pendapatanBersih'
+            ));
+
+            return $pdf->download($namaFile);
+
+        } catch (Throwable $e) {
+            return response("<h1>Terjadi Kesalahan saat Membuat PDF</h1><p><strong>Detail Error:</strong> " . $e->getMessage() . "</p>", 500);
+        }
     }
 }

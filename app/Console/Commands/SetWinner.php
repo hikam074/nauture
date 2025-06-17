@@ -3,12 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\C_Whatsapp;
-use App\Models\M_Lelang;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
+use Throwable;
 
 class SetWinner extends Command
 {
@@ -19,13 +18,7 @@ class SetWinner extends Command
     {
         $toggleSchedulerOn = env('TURN_ON_SCHEDULER', false);
 
-        // --- INI ADALAH LOGIKA UTAMA YANG DIPERBAIKI ---
-        // Proses akan berjalan JIKA:
-        // 1. Toggle utama di .env AKTIF.
-        // ATAU
-        // 2. Ada flag --initial-only yang dikirim (kasus untuk seeder).
         if ($toggleSchedulerOn || $this->option('initial-only')) {
-            // Jika dipanggil dari seeder dengan toggle mati, beri info khusus.
             if (!$toggleSchedulerOn && $this->option('initial-only')) {
                 $this->info('INFO: Menjalankan set-winner karena flag --initial-only (dipanggil dari seeder/manual).');
                 Log::info('INFO: Menjalankan set-winner karena flag --initial-only (dipanggil dari seeder/manual).');
@@ -42,10 +35,8 @@ class SetWinner extends Command
         Log::info('Memulai proses penentuan pemenang...');
         $this->info('Memproses penentuan pemenang...');
 
-        // 1. Selalu jalankan proses penentuan pemenang awal untuk lelang yang baru berakhir.
         $this->setInitialWinners();
 
-        // 2. Jika tidak ada opsi --initial-only, jalankan juga proses pergeseran pemenang.
         if (!$this->option('initial-only')) {
             $this->shiftOverdueWinners();
         }
@@ -57,191 +48,169 @@ class SetWinner extends Command
     private function setInitialWinners()
     {
         $now = now();
-        Log::info('Command lelang-set-winner started. step 1');
-        // Langkah 1: Menentukan pemenang pertama
+        Log::info('Langkah 1: Menentukan pemenang awal untuk lelang yang baru berakhir.');
+
         $auctionsWithoutWinner = DB::table('lelangs')
             ->where('tanggal_ditutup', '<=', $now)
-            ->whereNull('deleted_at') // Lelang yang belum dihapus
-            ->whereNull('pemenang_id') // Lelang yang belum memiliki pemenang
+            ->whereNull('deleted_at')
+            ->whereNull('pemenang_id')
             ->get();
 
         foreach ($auctionsWithoutWinner as $auction) {
-            $highestBid = DB::table('pasang_lelangs')
-                ->where('lelang_id', $auction->id)
-                ->whereNull('deleted_at')
-                ->orderBy('harga_pengajuan', 'desc')
-                ->first();
+            DB::transaction(function () use ($auction, $now) {
+                $highestBid = DB::table('pasang_lelangs')
+                    ->where('lelang_id', $auction->id)
+                    ->whereNull('deleted_at')
+                    ->orderBy('harga_pengajuan', 'desc')
+                    ->first();
 
-            if ($highestBid) {
-                // Update pemenang pertama
-                DB::table('lelangs')->where('id', $auction->id)
-                    ->update(['pemenang_id' => $highestBid->id]);
+                if ($highestBid) {
+                    DB::table('lelangs')->where('id', $auction->id)->update(['pemenang_id' => $highestBid->id]);
+                    DB::table('pasang_lelangs')->where('id', $highestBid->id)->update(['waktu_dimenangkan' => $now]);
 
-                DB::table('pasang_lelangs')->where('id', $highestBid->id)
-                    ->update(['waktu_dimenangkan' => $now]);
+                    Log::info("Pemenang awal ditetapkan untuk Lelang ID: {$auction->id}, Pemenang (pasang_lelang_id): {$highestBid->id}");
 
-                // Kirim pesan WhatsApp
-                if (!$this->option('no-notify')) {
-                    $this->sendWinnerNotification($highestBid->user_id, [
-                        'nama_produk_lelang' => $auction->nama_produk_lelang,
-                        'name' => DB::table('users')->where('id', $highestBid->user_id)->value('name'),
-                        'kode_lelang' => $auction->kode_lelang,
-                        'bid' => $highestBid->harga_pengajuan,
-                        'deadline' => $now->addHours(3)->toDateTimeString(),
-                        'url' => route('lelang.show', ['id' => $auction->id]),
-                    ]);
+                    // Kirim notifikasi setelah transaksi DB berhasil
+                    if (!$this->option('no-notify')) {
+                        $this->sendWinnerNotification($highestBid->user_id, [
+                            'nama_produk_lelang' => $auction->nama_produk_lelang,
+                            'name' => DB::table('users')->where('id', $highestBid->user_id)->value('name'),
+                            'kode_lelang' => $auction->kode_lelang,
+                            'bid' => $highestBid->harga_pengajuan,
+                            'deadline' => $now->copy()->addHours(3)->toDateTimeString(),
+                            'url' => route('lelang.show', ['id' => $auction->id]),
+                        ]);
+                    }
+                } else {
+                    DB::table('lelangs')->where('id', $auction->id)->update(['deleted_at' => $now]);
+                    Log::info("Lelang ID: {$auction->id} dihapus (soft delete) karena tidak ada penawar.");
                 }
+            });
+        }
+    }
 
-                Log::info('Pemenang pertama ditetapkan untuk lelang ID: ' . $auction->id);
-            } else {
-                // Soft delete jika tidak ada bidder sama sekali
-                DB::table('lelangs')->where('id', $auction->id)
-                    ->update(['deleted_at' => $now]);
+    /**
+     * =================================================================================
+     * FUNGSI INI TELAH DIREFAKTOR SECARA PENUH UNTUK KEAMANAN DAN KONSISTENSI DATA
+     * - Menggunakan DB::transaction untuk memastikan semua operasi atomik.
+     * - Memperbaiki logika hukuman yang hilang.
+     * - Memperjelas logika pengecekan waktu.
+     * =================================================================================
+     */
+    private function shiftOverdueWinners()
+    {
+        Log::info('Langkah 2: Memeriksa dan mengganti pemenang yang overdue.');
 
-                Log::info('Lelang dihapus karena tidak ada bidder, ID: ' . $auction->id);
+        $idSafeStatuses = DB::table('status_transaksis')->whereIn('kode_status_transaksi', ['capture', 'settlement', 'delivering', 'delivered'])->pluck('id');
+        $id_expire = DB::table('status_transaksis')->where('kode_status_transaksi', 'expire')->value('id');
+
+        $overdueAuctions = DB::table('lelangs')
+            ->join('pasang_lelangs', 'lelangs.pemenang_id', '=', 'pasang_lelangs.id')
+            ->whereNotNull('lelangs.pemenang_id')
+            ->whereNull('lelangs.deleted_at')
+            ->where('pasang_lelangs.waktu_dimenangkan', '<', now()->subHours(3)) // Pengecekan waktu lebih efisien
+            ->select('lelangs.*', 'pasang_lelangs.user_id as pemenang_user_id', 'pasang_lelangs.id as pasang_lelang_id')
+            ->get();
+
+        foreach ($overdueAuctions as $auction) {
+            // Periksa apakah ada transaksi yang sudah aman (lunas/selesai)
+            $safeTransactionExists = DB::table('transaksis')
+                ->where('lelang_id', $auction->id)
+                ->where('pasang_lelang_id', $auction->pasang_lelang_id)
+                ->whereIn('status_transaksi_id', $idSafeStatuses)
+                ->exists();
+
+            if ($safeTransactionExists) {
+                Log::info("Lelang ID: {$auction->id} memiliki transaksi yang sudah aman. Pemenang tidak diganti.");
+                continue;
+            }
+
+            Log::info("OVERDUE DITEMUKAN: Lelang ID: {$auction->id}, Pemenang saat ini (User ID): {$auction->pemenang_user_id}. Memulai proses penggantian.");
+
+            try {
+                $this->processWinnerShift($auction, $id_expire);
+            } catch (Throwable $e) {
+                Log::error("GAGAL TOTAL memproses pergeseran pemenang untuk Lelang ID: {$auction->id}. Error: " . $e->getMessage());
             }
         }
     }
 
-    private function shiftOverdueWinners()
+    private function processWinnerShift($auction, $id_expire)
     {
         $now = now();
-        // Langkah 2: Mengganti pemenang jika pemenang tidak menyelesaikan transaksi
-        $auctionsWithWinner = DB::table('lelangs')
-            ->whereNotNull('pemenang_id')
+        $currentWinnerUserId = $auction->pemenang_user_id;
+        $currentPasangLelangId = $auction->pasang_lelang_id;
+
+        // Cari bidder berikutnya di luar transaksi
+        $nextHighestBid = DB::table('pasang_lelangs')
+            ->where('lelang_id', $auction->id)
+            ->where('id', '<>', $currentPasangLelangId)
             ->whereNull('deleted_at')
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->orderBy('harga_pengajuan', 'desc')
+            ->first();
 
-        $idSafeStatuses = DB::table('status_transaksis')
-            ->whereIn('kode_status_transaksi', ['capture', 'settlement', 'delivering', 'delivered', 'expire'])
-            ->pluck('id')
-            ->toArray();
+        DB::transaction(function () use ($auction, $currentWinnerUserId, $currentPasangLelangId, $nextHighestBid, $id_expire, $now) {
+            // 1. HUKUM PEMENANG LAMA (selalu dijalankan)
+            DB::table('users')->where('id', $currentWinnerUserId)->increment('suspend_point');
+            DB::table('pasang_lelangs')->where('id', $currentPasangLelangId)->update(['deleted_at' => $now]);
+            Log::info("[TX] Lelang ID: {$auction->id} - User ID: {$currentWinnerUserId} diberi suspend point dan bid-nya dihapus.");
 
-        $idPendingStatuses = DB::table('status_transaksis')
-            ->whereIn('kode_status_transaksi', ['applying', 'pending', 'cancel', 'deny'])
-            ->pluck('id')
-            ->toArray();
+            // 2. EXPIRE TRANSAKSI LAMA (jika ada)
+            DB::table('transaksis')
+                ->where('lelang_id', $auction->id)
+                ->where('pasang_lelang_id', $currentPasangLelangId)
+                ->update(['status_transaksi_id' => $id_expire]);
+            Log::info("[TX] Lelang ID: {$auction->id} - Transaksi lama (jika ada) di-expire.");
 
-        // id expired
-        $id_expire = DB::table('status_transaksis')
-            ->where('kode_status_transaksi', 'expire')
-            ->value('id');
+            // 3. TENTUKAN NASIB LELANG
+            if ($nextHighestBid) {
+                // KASUS A: Ada pemenang berikutnya
+                DB::table('lelangs')->where('id', $auction->id)->update(['pemenang_id' => $nextHighestBid->id]);
+                DB::table('pasang_lelangs')->where('id', $nextHighestBid->id)->update(['waktu_dimenangkan' => $now]);
+                Log::info("[TX] Lelang ID: {$auction->id} - Pemenang baru ditetapkan: (pasang_lelang_id) {$nextHighestBid->id}.");
 
-        // MODE DEV ---------------------------------------------------------------------------------------------
-        // $limit = 1; // Batasi hingga x iterasi
-        // $count = 0;
-        // MODE DEV
-
-        Log::info('Command lelang-set-winner started. step 2');
-
-        foreach ($auctionsWithWinner as $auction) {
-
-            $currentWinner = DB::table('pasang_lelangs')
-                ->where('id', $auction->pemenang_id)
-                ->first();
-
-            if ($currentWinner && $currentWinner->waktu_dimenangkan && $now->diffInHours($currentWinner->waktu_dimenangkan) < -3) {
-
-                // MODE DEV ---------------------------------------------------------------------------------------------
-                // if ($count >= $limit) {
-                //     break;
-                // }
-                // MODE DEV
-
-                // Periksa status transaksi
-                $transaction = DB::table('transaksis')
-                    ->where('lelang_id', $auction->id)
-                    ->first();
-
-                if ($transaction && in_array($transaction->status_transaksi_id, $idSafeStatuses)) {
-                    Log::info('Transaksi aman untuk ID transaksi: ' . $transaction->id . ' - Tidak ada penggantian pemenang.');
-                    continue;
-                }
-
-                if (!$transaction || in_array($transaction->status_transaksi_id, $idPendingStatuses)) {
-                    Log::info('________________ OVERDUE FOUND ________________');
-                    Log::info('[1] Transaksi ini status pending atau tidak transaksi melebihi 3 jam , ID pasang_lelangs :' . $currentWinner->id . ' ID user :' . $currentWinner->user_id);
-                    // break;
-
-                    // Cari bidder berikutnya
-                    $nextHighestBid = DB::table('pasang_lelangs')
-                        ->where('lelang_id', $auction->id)
-                        ->where('id', '<>', $auction->pemenang_id)
-                        ->whereNull('deleted_at')
-                        ->orderBy('harga_pengajuan', 'desc')
-                        ->first();
-
-                    if ($nextHighestBid) {
-                        if ($transaction) {
-                            Log::info('[2] karena tidak ada transaksi maka ID pasang_lelangs :' . $currentWinner->id . ' akan diganti ke id : ' . $nextHighestBid->id);
-                        } else {
-                            Log::info('[2] karena transaksi tidak kunjung bayar maka ID pasang_lelangs :' . $currentWinner->id . ' akan diganti ke id : ' . $nextHighestBid->id);
-                        }
-
-                        // Update pemenang baru
-                        DB::table('lelangs')->where('id', $auction->id)
-                            ->update(['pemenang_id' => $nextHighestBid->id]);
-                        Log::info('[2 - 1] pemenang baru ID pasang_lelangs :' . $nextHighestBid->id);
-
-                        DB::table('pasang_lelangs')->where('id', $nextHighestBid->id)
-                            ->update(['waktu_dimenangkan' => $now]);
-                        Log::info('[2 - 2] waktu dimenangkan baru :' . $now);
-
-                        if ($transaction) {
-                            DB::table('transaksis')->where('id', $transaction->id)
-                                ->update(['status_transaksi_id' => $id_expire]); // expire
-                            Log::info('[2 - 2 - 1] karena ada transaksi maka di jadikan expire untuk ID transaksi :' . $transaction->id);
-                        }
-
-                        DB::table('users')->where('id', $currentWinner->user_id)
-                            ->increment('suspend_point');
-                        Log::info('[2 - 3] menghukum suspend point untuk ID user :' . $currentWinner->user_id);
-
-                        DB::table('pasang_lelangs')->where('id', $currentWinner->id)
-                            ->update(['deleted_at' => $now]);
-                        Log::info('[2 - 4] menghapus ID pasang_lelangs :' . $currentWinner->id);
-
-                        // Kirim pesan WhatsApp
-                        $this->sendWinnerNotification($nextHighestBid->user_id, [
-                            'nama_produk_lelang' => $auction->nama_produk_lelang,
-                            'name' => DB::table('users')->where('id', $nextHighestBid->user_id)->value('name'),
-                            'kode_lelang' => $auction->kode_lelang,
-                            'bid' => $nextHighestBid->harga_pengajuan,
-                            'deadline' => $now->addHours(3)->toDateTimeString(),
-                            'url' => route('lelang.show', ['id' => $auction->id]),
-                        ]);
-
-                        Log::info('_____ Pemenang BERHASIL diganti untuk lelang ID: ' . $auction->id . ' _____');
-                    } else {
-                        // Soft delete jika tidak ada bidder berikutnya
-                        DB::table('lelangs')->where('id', $auction->id)
-                            ->update(['deleted_at' => $now]);
-
-                        Log::info('Lelang dihapus karena tidak ada bidder berikutnya, ID LELANG: ' . $auction->id);
-                    }
-                }
-                // $count++;
+            } else {
+                // KASUS B: Tidak ada pemenang berikutnya
+                DB::table('lelangs')->where('id', $auction->id)->update(['deleted_at' => $now]);
+                Log::info("[TX] Lelang ID: {$auction->id} - Tidak ada pemenang pengganti, lelang di-soft-delete.");
             }
+        });
+
+        // Kirim notifikasi HANYA JIKA transaksi berhasil dan ada pemenang baru
+        if ($nextHighestBid && !$this->option('no-notify')) {
+            Log::info("Mengirim notifikasi ke pemenang baru Lelang ID: {$auction->id}.");
+            $this->sendWinnerNotification($nextHighestBid->user_id, [
+                'nama_produk_lelang' => $auction->nama_produk_lelang,
+                'name' => DB::table('users')->where('id', $nextHighestBid->user_id)->value('name'),
+                'kode_lelang' => $auction->kode_lelang,
+                'bid' => $nextHighestBid->harga_pengajuan,
+                'deadline' => $now->copy()->addHours(3)->toDateTimeString(),
+                'url' => route('lelang.show', ['id' => $auction->id]),
+            ]);
         }
 
-        Log::info('Command lelang-set-winner completed.');
+        Log::info("PROSES SELESAI untuk Lelang ID: {$auction->id}.");
     }
 
     private function sendWinnerNotification($userId, $params)
     {
         $user = DB::table('users')->where('id', $userId)->first();
-        $controller = new C_Whatsapp;
 
-        if ($user && $user->no_telp) {
-            $respons = $controller->sendMessage(new HttpRequest([
+        if (!$user || !$user->no_telp) {
+            Log::warning("Gagal mengirim notifikasi, nomor telepon tidak ditemukan untuk User ID: {$userId}.");
+            return;
+        }
+
+        try {
+            $controller = new C_Whatsapp;
+            $response = $controller->sendMessage(new HttpRequest([
                 'target' => $user->no_telp,
                 'template' => 'pemenang_lelang',
                 'params' => $params,
             ]));
-            Log::info($respons);
-        } else {
-            Log::warning('Gagal mengirim pesan, nomor telepon tidak ditemukan untuk user ID: ' . $userId);
+            Log::info("Respon notifikasi WhatsApp ke User ID {$userId}: " . $response);
+        } catch (Throwable $e) {
+            Log::error("Gagal mengirim notifikasi WhatsApp ke User ID {$userId}. Error: " . $e->getMessage());
         }
     }
 }

@@ -31,7 +31,9 @@
                 <tbody>
                     @foreach ($allBids as $index => $myBid)
                         @include('dashboard.d-lelang.V_FormTambahPembayaran')
-                        <tr class="border-b-1 border-bsoft">
+                        <tr class="border-b-1 border-bsoft
+                            animasi-slide-kekanan
+                            ">
                             <!-- No. -->
                             <td class="text-center">{{ ($allBids->currentPage() - 1) * $allBids->perPage() + $index + 1 }}.</td>
                             {{-- <!-- ID Tawaran -->

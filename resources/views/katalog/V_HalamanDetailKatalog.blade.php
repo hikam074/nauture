@@ -13,7 +13,7 @@
                 md:w-100 md:flex-col md:h-auto md:gap-4 md:justify-start"
                 >
                 <!-- Foto Produk -->
-                <div class="w-100 max-h-100 max-w-100">
+                <div class="w-100 max-h-100 max-w-100 animasi-slide-kekanan">
                     @if ($katalog->foto_produk)
                         <img src="{{ asset('storage/' . $katalog->foto_produk) }}" alt="Foto Produk"
                             class="w-full rounded-lg max-h-100 aspect-square object-cover border-5 border-gray-200"
@@ -145,12 +145,12 @@
                                 @for ($i = 1; $i <= 5; $i++)
                                     @if ($i <= floor($avgRating))
                                         <!-- Bintang Penuh -->
-                                        <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <svg class="w-6 h-6 text-yellow-500 animasi-fade" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.188a1 1 0 00.95.69h4.418c.969 0 1.371 1.24.588 1.81l-3.584 2.603a1 1 0 00-.364 1.118l1.357 4.188c.3.921-.755 1.688-1.539 1.118L10 14.347l-3.584 2.603c-.783.57-1.838-.197-1.539-1.118l1.357-4.188a1 1 0 00-.364-1.118L2.286 9.615c-.783-.57-.38-1.81.588-1.81h4.418a1 1 0 00.95-.69l1.357-4.188z"/>
                                         </svg>
                                     @elseif ($i - $avgRating < 1)
                                         <!-- Bintang Setengah -->
-                                        <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <svg class="w-6 h-6 text-yellow-500 animasi-fade" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                             <defs>
                                                 <linearGradient id="half">
                                                     <stop offset="50%" stop-color="currentColor"/>
@@ -161,13 +161,13 @@
                                         </svg>
                                     @else
                                         <!-- Bintang Kosong -->
-                                        <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <svg class="w-6 h-6 text-gray-300 animasi-fade" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.188a1 1 0 00.95.69h4.418c.969 0 1.371 1.24.588 1.81l-3.584 2.603a1 1 0 00-.364 1.118l1.357 4.188c.3.921-.755 1.688-1.539 1.118L10 14.347l-3.584 2.603c-.783.57-1.838-.197-1.539-1.118l1.357-4.188a1 1 0 00-.364-1.118L2.286 9.615c-.783-.57-.38-1.81.588-1.81h4.418a1 1 0 00.95-.69l1.357-4.188z"/>
                                         </svg>
                                     @endif
                                 @endfor
                             </div>
-                            <div>
+                            <div class="animasi-fade">
                                 <strong>{{ $avgRating > 0 ? "$avgRating / 5.0" : "" }}</strong>
                             </div>
                         </div>
@@ -179,7 +179,7 @@
                     <div class="overflow-y-scroll max-h-52 pr-5 border-b-10 border-white" style="box-shadow: 4px 4px 6px -1px rgba(0, 0, 0, 0.2);">
                         @foreach($ratings as $rating)
                         <!-- LI BARIS ULASAN -->
-                            <li class="py-2 border-b flex justify-between items-center"
+                            <li class="py-2 border-b flex justify-between items-center animasi-slide-kekanan"
                                 >
                                 <div class="flex items-center space-x-3">
                                     <!-- foto profil -->
@@ -248,7 +248,9 @@
                     @foreach ($lelangTerkaits->take(5) as $lelangTerkait)
                         <div class="flex flex-col w-[49%] bg-white rounded-lg shadow-lg p-4 cursor-pointer text-center gap-1
                             transform transition-transform hover:scale-102 hover:shadow-2xl
-                            sm:w-48"
+                            sm:w-48
+                            animasi-slide-kebawah
+                            "
                             onclick="window.location.href='{{ route('lelang.show', ['id' => $lelangTerkait->id]) }}'"
                             >
                             <img src="{{ asset('storage/' . $lelangTerkait->foto_produk) }}" alt="[{{ $lelangTerkait->nama_produk }}]"
@@ -260,7 +262,9 @@
                     @endforeach
                     <div class="flex flex-col justify-center items-center w-[49%] h-auto bg-white rounded-lg shadow-lg p-4 cursor-pointer text-center gap-1
                         transform transition-transform hover:scale-102 hover:shadow-2xl hover:border-1
-                        sm:w-48"
+                        sm:w-48
+                        animasi-slide-kebawah
+                        "
                         onclick="window.location.href='{{ route('lelang.index') }}'"
                         >
                         <a class="text-lg font-semibold text-gray-400">lihat lebih banyak</a>

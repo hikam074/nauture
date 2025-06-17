@@ -40,7 +40,9 @@
                 </thead>
                 <tbody>
                 @foreach ($lelangs as $index => $lelang)
-                    <tr class="border-b-1 border-bsoft w-full">
+                    <tr class="border-b-1 border-bsoft w-full
+                        animasi-slide-kekanan"
+                        >
                         <!--NO.-->
                         <td class="text-center">{{ ($lelangs->currentPage() - 1) * $lelangs->perPage() + $index + 1 }}.</td>
                         <!--NAMA PRODUK-->

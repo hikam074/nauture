@@ -34,7 +34,9 @@
                 </thead>
                 <tbody>
                     @foreach ($transaksis as $index => $transaksi)
-                        <tr class="border-b-1 border-bsoft">
+                        <tr class="border-b-1 border-bsoft
+                             animasi-slide-kekanan"
+                            >
                             <!--NO.-->
                             <td class="text-center">{{ ($transaksis->currentPage() - 1) * $transaksis->perPage() + $index + 1 }}.</td>
                             <!--NAMA USER-->
@@ -42,7 +44,7 @@
                             <!--KODE TRANSAKSI-->
                             <td class="max-w-30">{{ $transaksi->order_id }}</td>
                             <!--KODE LELANG-->
-                            <td class="max-w-20">{{ $transaksi->lelang->kode_lelang }}</td>
+                            <td class="max-w-20">{{ $transaksi->lelang_id ? $transaksi->lelang->kode_lelang : '-' }}</td>
                             <!--HARGA.-->
                             <td>Rp. {{ number_format($transaksi->gross_amount, 0, ',', '.') }}</td>
                             <!--STATUS-->

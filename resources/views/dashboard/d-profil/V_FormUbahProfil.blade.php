@@ -10,22 +10,28 @@
 
 @section('content')
 
-    <div class="mb-5 flex flex-col gap-10 w-full">
+    <div class="mb-5 flex flex-col gap-5 w-full">
         <h1 class="font-bold text-4xl">Ubah Profil Anda</h1>
-        <div class="flex justify-between items-center w-full">
+        <div class="flex justify-between items-center w-full py-5">
             <div class="flex gap-5 items-center">
                 <div>
                     <p class="mb-2">Foto Profil</p>
                     <div id="fotoProfil" class="h-24 w-24">
                         <img
                             src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : asset('images/icons/defaultAvatarDark.svg') }}"
-                            class="h-full w-full object-cover rounded-full border-2 border-white">
+                            class="h-full w-full object-cover rounded-full border-2 border-white
+                                 animasi-slide-kekanan
+                            ">
                     </div>
                 </div>
                 <div class="flex gap-5">
                     <form action="{{ route('profil.update', ['field' => 'foto_profil']) }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <label for="foto_profil" class="p-5 flex items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed text-gray-500 hover:border-blue-500">
+                        <label for="foto_profil"
+                            class="p-5 flex items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed text-gray-500
+                            hover:border-blue-500
+                             animasi-slide-kekanan
+                            ">
                             <span id="uploadPlaceholder" class="text-sm text-center">Klik untuk Upload<br>Foto Profil Baru</span>
                             <input type="file" name="foto_profil" id="foto_profil" accept="image/*" class="hidden" onchange="this.form.submit()">
                         </label>
@@ -33,7 +39,11 @@
                     <form action="{{ route('profil.update', ['field' => 'foto_profil']) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="reset" value="true">
-                        <button type="submit" class="p-5 flex items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed text-gray-500 hover:border-blue-500 text-sm text-center">
+                        <button type="submit"
+                            class="p-5 flex items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed text-gray-500
+                            hover:border-blue-500 text-sm text-center
+                             animasi-slide-kekanan
+                            ">
                             Reset<br>Foto Profil
                         </button>
                     </form>
@@ -48,7 +58,7 @@
         </div>
 
         @foreach (['name' => 'Nama lengkap', 'email' => 'Email', 'no_telp' => 'Nomor Telepon'] as $field => $label)
-        <div class="">
+        <div class=" animasi-slide-kekanan">
             <form action="{{ route('profil.update', ['field' => $field]) }}" method="POST">
                 @csrf
                 <label for="{{ $field }}">{{ $label }}</label>
@@ -74,7 +84,9 @@
         @endforeach
 
         <!--ALAMAT-->
-        <div class="border-1 p-5 border-canceledhov rounded">
+        <div class="border-1 p-5 border-canceledhov rounded
+             animasi-slide-kekanan
+            ">
             <span class="absolute -mt-9 bg-white p-1 font-medium">Alamat</span>
 
             <form action="{{ route('profil.update', ['field' => 'alamat']) }}" method="POST" id="alamatForm" class="flex flex-col gap-4">
@@ -83,7 +95,7 @@
                 <div class="flex flex-col w-full gap-5 mt-1
                     md:flex-row">
                     <div class="w-full">
-                        <label for="provinsi" class="block text-sm font-medium">Provinsi</label>
+                        <label for="provinsi">Provinsi</label>
 
                         <select name="provinsi_id" id="provinsi" class="border-1 p-2 w-full rounded" required>
                             <option value="{{ $profil->alamat_id ? $profil->alamat->city->provinsi->id : '' }}"
@@ -96,7 +108,7 @@
                         </select>
                     </div>
                     <div class="w-full">
-                        <label for="city" class="block text-sm font-medium">Kabupaten/Kota</label>
+                        <label for="city">Kabupaten/Kota</label>
                         <select name="city_id" id="city" class="border-1 p-2 w-full rounded" disabled required>
                             <option value="" {{ $profil->alamat && $profil->alamat->city ? '' : 'selected'}} disabled>Pilih Kota</option>
                             @if ($profil->alamat_id)
@@ -106,7 +118,7 @@
                     </div>
                 </div>
                 <div>
-                    <label for="detail" class="block text-sm font-medium">Detail Alamat</label>
+                    <label for="detail">Detail Alamat</label>
                     @if ($profil->alamat_id)
                     <input type="text" name="detail_alamat" id="detail" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->detail_alamat }}"
                         placeholder="Hingga tingkat kecamatan, contoh : Jl. MT. Haryono No.169, Ketawanggede, Kecamatan Lowokwaru" required
@@ -118,7 +130,7 @@
                     @endif
                 </div>
                 <div>
-                    <label for="kodePos" class="block text-sm font-medium">Kode Pos</label>
+                    <label for="kodePos">Kode Pos</label>
                     @if ($profil->alamat_id)
                     <input type="text" name="kode_pos" id="kodePos" class="border-1 p-2 w-full rounded" value="{{ $profil->alamat->kode_pos }}"
                         placeholder="Contoh : 68123" required
@@ -143,7 +155,9 @@
         </div>
 
         <!--PASSWORD-->
-        <div class="border-1 p-5 border-canceledhov rounded">
+        <div class="border-1 p-5 border-canceledhov rounded
+            animasi-slide-kekanan
+            ">
             <span class="absolute -mt-9 bg-white p-1 font-medium">Password</span>
 
             <form action="{{ route('profil.update') }}" method="POST" class="mt-1 flex flex-col gap-4">
@@ -151,14 +165,14 @@
                 <input type="hidden" name="field" value="password">
                 <!-- Password Lama (readonly) -->
                 <div>
-                    <label for="password" class="block text-sm font-medium">Password Saat Ini</label>
+                    <label for="password">Password Saat Ini</label>
                     <input type="password" name="current_password" id="password" value="********" readonly
                         class="border-1 p-2 w-full rounded bg-canceled cursor-not-allowed"
                     >
                 </div>
                 <!-- Password Baru -->
                 <div>
-                    <label for="new_password" class="block text-sm font-medium">Password Baru</label>
+                    <label for="new_password">Password Baru</label>
                     <div class="relative">
                         <input type="password" name="new_password" id="new_password" required
                             class="border-1 p-2 w-full rounded"
@@ -175,7 +189,7 @@
                 </div>
                 <!-- Konfirmasi Password Baru -->
                 <div>
-                    <label for="new_password_confirmation" class="block text-sm font-medium">Konfirmasi Password Baru</label>
+                    <label for="new_password_confirmation">Konfirmasi Password Baru</label>
                     <div class="relative">
                         <input type="password" name="new_password_confirmation" id="new_password_confirmation" required
                             class="border-1 p-2 w-full rounded"

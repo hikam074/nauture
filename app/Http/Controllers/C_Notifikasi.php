@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\M_Notifikasi;
 use Illuminate\Http\Request;
 use App\Services\OneSignalService;
+use Illuminate\Support\Facades\Log;
 
 class C_Notifikasi extends Controller
 {
@@ -31,14 +32,16 @@ class C_Notifikasi extends Controller
             $url // Opsional, URL tujuan.
         );
         if (isset($response['error'])) {
+            Log::info('INFO: GAGAL KRIM NOTIF: '.$response['error']);
             return response()->json(['status' => 'failed', 'message' => $response['error']], 500);
         }
-        M_Notifikasi::create([
+        $notif = M_Notifikasi::create([
             'lelang_id' => $lelangId,
             'title_notif' => $judul,
             'body_notif' => $isiPesan,
             'link_click_action' =>$url,
         ]);
+        Log::info('INFO: SUKSES KRIM NOTIF: '.$notif);
         return response()->json(['status' => 'success', 'data' => $response]);
     }
 }

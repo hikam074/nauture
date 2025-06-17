@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nauture: Signup</title>
-    @vite('resources/css/global.css')
+    {{-- @vite('resources/css/global.css') --}}
     @vite('resources/js/app.js')
     @vite('resources/css/app.css')
-    @include('includes.toastr')
+    {{-- @include('includes.toastr') --}}
 </head>
 <body class="h-screen flex items-center justify-center text-[#0F3714] bg-white box-border text-sm overflow-hidden">
     <div class="flex items-center justify-between h-[90vh] max-w-[80%] mx-auto">

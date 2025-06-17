@@ -12,7 +12,7 @@
             <div class="absolute inset-0 bg-[#242222] opacity-50 pointer-events-none"></div>
 
             <!-- BAR SORT & SEARCH -->
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white rounded-2xl shadow-sm p-4 flex justify-between items-center w-[90%] max-w-4xl">
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white rounded-2xl shadow-sm p-4 flex justify-between items-center w-[90%] max-w-4xl animasi-slide-keatas">
                 <!-- BAR : SORT BY -->
                 <form action="{{ route('katalog.index') }}" method="GET" class="space-y-3">
                     <input type="hidden" name="kategori" value="{{ request('kategori') }}">
@@ -138,8 +138,9 @@
                             <div onclick="window.location.href='{{ route('katalog.show', ['id' => $katalog->id]) }}'"
                                 class="flex flex-col justify-between gap-4 w-[48%] text-center text-primer bg-white rounded-lg shadow-lg p-4 cursor-pointer
                                 transition-transform transform hover:scale-102 hover:shadow-2xl
-                                sm:w-48"
-                                >
+                                sm:w-48
+                                animasi-slide-keatas
+                                ">
                                 <!-- KARDS : FOTO, JUDUL, HARGA -->
                                 <div>
                                     <img src="{{ asset('storage/' . $katalog->foto_produk) }}" alt="{{ $katalog->nama_produk }}"

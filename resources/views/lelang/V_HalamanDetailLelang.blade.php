@@ -10,7 +10,7 @@
             md:flex-row">
 
             <!-- FLEX KIRI -->
-            <div class="md:w-70 flex gap-5 md:flex-col">
+            <div class="md:w-70 flex gap-5 md:flex-col animasi-slide-kekanan">
                 <!-- Foto Produk -->
                 <div class="w-100 h-60 max-w-60">
                     @if ($lelang->foto_produk)
@@ -46,7 +46,7 @@
                         <p class="font-light mb-3 text-gray-500">Dimulai Dari Rp {{ number_format($lelang->harga_dibuka, 0, ',', '.') }}</p>
                         <!-- berat -->
                         <p class="mb-5">Kuantitas : {{ $lelang->jumlah_kg }} kg</p>
-                        <div>
+                        <div class="">
                             <!-- penawar tertinggi -->
                             @if ($topBid)
                                 <p class="p-2 flex items-center space-x-3 bg-warning">
@@ -221,7 +221,7 @@
 
 
                 <!-- Div 3: Penawar -->
-                <div class="">
+                <div class="overflow-hidden">
                     <h4 class="text-3xl mb-2">
                         Penawaran Teratas
                     </h4>
@@ -229,7 +229,7 @@
                         @if ($lelang->pasangLelang->isNotEmpty())
                         <!-- 3 penawar teratas -->
                             @foreach ($lelang->pasangLelang->sortByDesc('harga_pengajuan')->take(5) as $bid)
-                                <li class="p-2 border-b flex justify-between items-center {{ $bid->deleted_at ? 'bg-hapus' : '' }}"
+                                <li class="p-2 border-b flex justify-between items-center {{ $bid->deleted_at ? 'bg-hapus' : '' }} animasi-slide-kekanan"
                                     >
                                     <div class="flex items-center space-x-3">
                                         <!-- foto profil -->

@@ -214,9 +214,15 @@ class C_Transaksi extends Controller
 
     public function getDataTransaksiChekout($id) {
         $transaksi = M_Transaksi::with(['pasangLelang', 'lelang'])->findOrFail($id);
+        // transaksi sudah tidak dimenangkan oleh ybs
+        if( !$transaksi->lelang || ($transaksi->lelang->pemenang_id != $id) ) {
+            return redirect()->back()->with('error', 'Transaksi ini sudah tidak valid');
+        }
+        // transaksi sdh diselesaikan / batal
         if ($transaksi->status_transaksi_id != M_StatusTransaksi::where('kode_status_transaksi', 'pending')->first()->id) {
             return redirect()->back()->with('error', 'Transaksi ini sudah selesai atau dibatalkan.');
         }
+
         return $this->showHalamanChekout($id, $transaksi);
     }
 
@@ -228,7 +234,13 @@ class C_Transaksi extends Controller
 
 
     public function getDataTransaksiUserIni() {
-        $transaksis = M_Transaksi::with(['lelang', 'statusTransaksi', 'paymentMethod'])
+        $transaksis = M_Transaksi::with([
+                'lelang' => function ($query) {
+                    $query->withTrashed();
+                },
+                'statusTransaksi',
+                'paymentMethod'
+            ])
             ->whereHas('pasangLelang', function ($query) {
                 $query->where('user_id', Auth::id());
             })

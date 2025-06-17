@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class C_Lelang extends Controller
 {
@@ -228,15 +229,15 @@ class C_Lelang extends Controller
 
             // --- LOGIKA PENANGANAN GAMBAR YANG LEBIH ANDAL ---
             $fotoProdukPath = null;
-            
+
             // Prioritas 1: Cek apakah ada file baru yang diunggah.
             if ($request->hasFile('foto_produk')) {
                 $fotoProdukPath = $request->file('foto_produk')->store('lelangs', 'public');
-            } 
+            }
             // Prioritas 2: Jika tidak ada file baru, cek dari input gambar yang sudah ada (normal case).
             else if ($request->filled('current_img')) {
                 $sourceRelativePath = str_replace(url('/storage') . '/', '', $request->current_img);
-                
+
                 if (Storage::disk('public')->exists($sourceRelativePath)) {
                     // Jika gambar sudah ada di folder lelang (mode edit), jangan salin.
                     if (Str::startsWith($sourceRelativePath, 'lelangs/')) {
@@ -249,7 +250,7 @@ class C_Lelang extends Controller
                 } else {
                     throw new \Exception('File gambar referensi tidak ditemukan.');
                 }
-            } 
+            }
             // Prioritas 3: Fallback jika validasi gagal & redirect.
             // `current_img` kosong, tapi `katalog_id` ada dari `withInput()`.
             else if ($request->filled('katalog_id')) {

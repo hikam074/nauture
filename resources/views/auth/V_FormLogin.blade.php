@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NauTure | Login</title>
-    @vite('resources/css/global.css')
     @vite('resources/js/app.js')
     @vite('resources/css/app.css')
-    @include('includes.toastr')
     <style>
         body {
             background-image: url("{{ asset('images/backgrounds/signinBG.png') }}") !important;
@@ -18,46 +16,61 @@
         }
     </style>
 </head>
-<body class="flex justify-center items-center h-screen text-white">
+<body class="flex justify-center items-center h-screen text-white"
+    @if(session('success')) data-toastr-success='{{ json_encode(session('success')) }}' @endif
+    @if(session('error')) data-toastr-error='{{ json_encode(session('error')) }}' @endif
+    @if(session('info')) data-toastr-info='{{ json_encode(session('info')) }}' @endif
+    @if(session('warning')) data-toastr-warning='{{ json_encode(session('warning')) }}' @endif
+    @if($errors->any()) data-toastr-errors='{{ json_encode($errors->all()) }}' @endif
+    @if(session('alert')) data-sweetalert='{{ json_encode(session('alert')) }}' @endif
+>
 
     <div class="m-6 grid place-items-center h-[90%]">
-        {{-- ikon nauture : homepage --}}
-        <a href="{{ route('homepage') }}">
+        <!-- ikon nauture : homepage -->
+        <a href="{{ route('homepage') }}"
+            class="animasi-slide-kebawah"
+            >
             <img class="h-20 w-auto mb-8" src="images/logos/homeLogo.png" alt="[alt]NauTure-Home">
         </a>
         {{-- judul --}}
-        <h1 id="title" class="text-2xl">Log In</h1>
-        {{-- ucapan --}}
-        <p id="ucapan">Selamat Datang Kembali! Silahkan Log-in ke akun anda</p>
+        <h1 id="title" class="text-4xl animasi-fade">Log In</h1>
+        <!-- ucapan -->
+        <p id="ucapan" class="animasi-fade">Selamat Datang Kembali! Silahkan Log-in ke akun anda</p>
 
-        {{-- FORM LOGIN --}}
+        <!-- FORM LOGIN -->
         <form action="{{ route('login.process') }}" method="POST">
             @csrf
-            {{-- email --}}
+            <!-- email -->
             <div class="email mb-4">
-                <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                <label for="email" class="block text-sm font-medium mb-1 animasi-slide-kekanan">Email</label>
                 <input type="email" id="email" name="email" value="{{ old('email') }}"
                     class="w-full bg-[rgba(255,250,250,0.5)] text-white p-3 rounded-lg border-2 border-transparent
-                    focus:outline-none focus:border-white focus:shadow-lg focus:shadow-[rgba(15,55,20,0.5)]
-                    transition">
+                    focus:outline-none focus:border-white focus:shadow-lg focus:shadow-primer
+                    transition animasi-slide-kekanan">
             </div>
 
-            {{-- password --}}
+            <!-- password -->
             <div class="password mb-4">
-                <label for="password" class="block text-sm font-medium mb-1">Password</label>
+                <label for="password" class="block text-sm font-medium mb-1 animasi-slide-kekanan">Password</label>
                 <div class="relative flex items-center">
                     <input type="password" id="password" name="password"
-                        class="w-full bg-[rgba(255,250,250,0.5)] text-white p-3 rounded-lg border-2 border-transparent focus:outline-none focus:border-white transition">
-                    <span id="toggleIcon" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center w-6 h-6 hover:text-[rgba(15,55,20,1)] transition">
+                        class="w-full bg-[rgba(255,250,250,0.5)] text-white p-3 rounded-lg border-2 border-transparent
+                            focus:outline-none focus:border-white
+                            transition animasi-slide-kekanan"
+                    >
+                    <span id="toggleIcon"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center w-6 h-6
+                            hover:text-primer transition"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="eye-icon">
                             <path d="M4 10C4 10 5.6 15 12 15M12 15C18.4 15 20 10 20 10M12 15V18M18 17L16 14.5M6 17L8 14.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
                 </div>
             </div>
-            {{-- ingat saya --}}
+            <!-- ingat saya -->
             <div class="pb-4">
-                <label class="flex items-center gap-2 cursor-pointer text-base select-none">
+                <label class="flex items-center gap-2 cursor-pointer text-base select-none animasi-slide-kekanan">
                     <input
                         type="checkbox"
                         id="rememberMe"
@@ -65,22 +78,28 @@
                         class="hidden peer"
                     >
                     <span
-                        class="w-5 h-5 border border-white rounded-md relative flex-shrink-0 peer-checked:after:content-[''] peer-checked:after:absolute peer-checked:after:top-[3px] peer-checked:after:left-[7px] peer-checked:after:w-[6px] peer-checked:after:h-[12px] peer-checked:after:border-[2px] peer-checked:after:border-white peer-checked:after:border-b-2 peer-checked:after:border-r-2 peer-checked:after:transform peer-checked:after:rotate-45 transition-opacity"
+                        class="w-5 h-5 border border-white rounded-md relative flex-shrink-0
+                            peer-checked:after:content-[''] peer-checked:after:absolute peer-checked:after:top-[3px] peer-checked:after:left-[7px] peer-checked:after:w-[6px]
+                            peer-checked:after:h-[12px] peer-checked:after:border-[2px] peer-checked:after:border-white peer-checked:after:border-b-2
+                            peer-checked:after:border-r-2 peer-checked:after:transform peer-checked:after:rotate-45
+                            transition-opacity"
                     ></span>
                     <span class="text-white">Ingat Saya</span>
                 </label>
             </div>
-            {{-- submit --}}
+            <!-- submit -->
             <div class="submit">
-                <button
-                    type="submit"
-                    class="bg-[#638B35] text-white rounded-lg w-full px-5 py-3 text-base cursor-pointer border-2 border-transparent transition duration-300 ease-in-out hover:bg-[#76A74A] hover:shadow-md hover:-translate-y-1 active:bg-[#567B2A] active:shadow-sm active:translate-y-0">
+                <button type="submit"
+                    class="bg-sekunder text-white rounded-lg w-full px-5 py-3 text-base cursor-pointer border-2 border-transparent
+                        hover:bg-sekunder hover:shadow-md hover:-translate-y-1 active:bg-sekunder active:shadow-sm active:translate-y-0
+                        transition duration-300 ease-in-out animasi-slide-kekanan"
+                >
                     Log in
                 </button>
-                {{-- pengguna baru : register --}}
-                <p class="text-[#638B35] mt-3">
+                <!-- pengguna baru : register -->
+                <p class="text-sekunder mt-3 animasi-slide-keatas">
                     Pengguna Baru?
-                    <a href="{{ route('register') }}" class="text-[#0F3714] underline">Sign-up</a>
+                    <a href="{{ route('register') }}" class="text-primer underline">Sign-up</a>
                 </p>
             </div>
         </form>

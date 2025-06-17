@@ -16,7 +16,7 @@
     </div>
     <table class="w-full text-sm">
         <thead>
-            <tr class="border-b-1 border-primer py-1">
+            <tr class="border-b-1 border-primer">
                 <th>Diumumkan</th>
                 <th>Judul</th>
                 <th>Deskripsi</th>
@@ -25,7 +25,9 @@
         </thead>
         <tbody>
             @foreach ($notifs as $index => $notif)
-            <tr class="border-b-1 border-bsoft">
+            <tr class="border-b-1 border-bsoft
+                animasi-slide-kekanan
+                ">
                 <!--TANGGAL-->
                 <td>{{ $notif->created_at }}</td>
                 <!--TITLE-->

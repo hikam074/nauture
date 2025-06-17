@@ -75,6 +75,9 @@ Route::prefix('/dashboard')->group(function () {
     Route::patch('/transaksi', [C_Transaksi::class, 'updateStatusPengiriman'])->middleware('auth')->middleware('role:pegawai')->name('dashboard.updateStatsTransaksi');
     Route::patch('/transaksi-selesai', [C_Transaksi::class, 'updateDeliverySelesai'])->middleware('auth')->middleware('role:customer')->name('dashboard.pesananSelesai');
 
+    Route::get('/laporan/cetak', [C_Dashboard::class, 'cetakLaporan'])->middleware('auth')->middleware('role:owner')->name('dashboard.laporan.cetak');
+    Route::get('/laporan/download', [C_Dashboard::class, 'downloadLaporan'])->middleware('auth')->middleware('role:owner')->name('dashboard.laporan.download');
+
     Route::get('/transaksi-saya', [C_Transaksi::class, 'getDataTransaksiUserIni'])->middleware('auth')->middleware('role:customer')->name('transaksi.index'); // GET halaman transaksi saya
     Route::get('/lelang-saya', [C_PasangLelang::class, 'getDataLelangUserIni'])->middleware('auth')->middleware('role:customer')->name('lelang.saya'); // GET show bid an saya
     Route::post('/lelang-saya', [C_Transaksi::class, 'checkBatasWaktuPembayaran'])->middleware('auth')->middleware('role:customer')->name('transaksi.create'); // POST create tagihan transaksi
