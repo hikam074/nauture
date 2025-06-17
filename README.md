@@ -81,6 +81,10 @@
             <img alt="WhatsApp" class="inline-block mx-1" style="margin: 0px 2px;" 
                 src="https://img.shields.io/badge/Fonnte-25D366.svg?style=flat&logo=whatsapp&logoColor=white"
             />
+            <!-- DOMPDF -->
+            <img alt="DomPDF" class="inline-block mx-1" style="margin: 0px 2px;" 
+                src="https://img.shields.io/badge/DomPDF-3399FF.svg?style=flat&logo=collaboraoffice&logoColor=white"
+            />
             <br>
             <hr>
         </div>
