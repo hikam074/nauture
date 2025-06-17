@@ -13,7 +13,7 @@
     @if(session('error')) data-toastr-error='{{ json_encode(session('error')) }}' @endif
     @if(session('info')) data-toastr-info='{{ json_encode(session('info')) }}' @endif
     @if(session('warning')) data-toastr-warning='{{ json_encode(session('warning')) }}' @endif
-    @if($errors->any()) data-toastr-errors='{{ json_encode($errors->all()) }}' @endif
+    @if(isset($errors) && $errors->any()) data-toastr-errors='{{ json_encode($errors->all()) }}' @endif
     @if(session('alert')) data-sweetalert='{{ json_encode(session('alert')) }}' @endif
 >
 

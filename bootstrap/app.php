@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,7 +21,29 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // exception
+
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            Log::error($e);
+            // 2. Siapkan informasi debug HANYA JIKA APP_DEBUG=true
+            $debugInfo = null;
+            if (config('app.debug')) {
+                $debugInfo = [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                ];
+            }
+            $statusCode = $e instanceof HttpException
+                ? $e->getStatusCode()
+                : 500;
+            return response()->view('errors.default', [
+                'exception' => $e,
+                'debugInfo' => $debugInfo,
+            ], $statusCode);
+        });
+
     })
     ->withSchedule(function (Schedule $schedule) {
         // tentukan pemenang setiap jam
