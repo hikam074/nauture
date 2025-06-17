@@ -24,6 +24,14 @@
             <img alt="PHP" class="inline-block mx-1" style="margin: 0px 2px;"
                 src="https://img.shields.io/badge/PHP-777BB4.svg?style=flat&logo=PHP&logoColor=white"
             >
+            <!-- HTML -->
+            <img alt="HTML" class="inline-block mx-1" style="margin: 0px 2px;" 
+                src="https://img.shields.io/badge/HTML-E34F26.svg?style=flat&logo=html5&logoColor=white"
+            />
+            <!-- CSS -->
+            <img alt="CSS" class="inline-block mx-1" style="margin: 0px 2px;" 
+                src="https://img.shields.io/badge/CSS-1572B6.svg?style=flat&logo=css3&logoColor=white"
+            />
             <!-- JS -->
             <img alt="JavaScript" class="inline-block mx-1" style="margin: 0px 2px;"
                 src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black"
