@@ -89,6 +89,57 @@
                 </canvas>
             </div>
         </div>
+
+        <div class="flex gap-5 flex-wrap justify-between w-full h-full">
+            {{-- Chart Profit Harian --}}
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide-keatas"
+                >
+                <canvas id="dailyProfitChart"
+                    data-width="200px"
+                    data-height="200px"
+                    data-labels='@json($dailyProfit->pluck("date"))'
+                    data-data='@json($dailyProfit->pluck("total"))'>
+                </canvas>
+            </div>
+
+            {{-- Chart Profit Mingguan --}}
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide-keatas"
+                >
+                <canvas id="weeklyProfitChart"
+                    data-width="200px"
+                    data-height="200px"
+                    data-labels='@json($weeklyProfit->pluck("week_label"))'
+                    data-data='@json($weeklyProfit->pluck("total"))'>
+                </canvas>
+            </div>
+
+            {{-- Chart Profit Bulanan --}}
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide-keatas"
+                >
+                <canvas id="monthlyProfitChart"
+                    data-width="200px"
+                    data-height="200px"
+                    data-labels='@json($monthlyProfit->pluck("month_label"))'
+                    data-data='@json($monthlyProfit->pluck("total"))'>
+                </canvas>
+            </div>
+
+            {{-- Chart Profit Tahunan --}}
+            <div class="flex-1 min-w-50 max-w-[100%] h-full aspect-square border rounded shadow p-2
+                chart-container animasi-fade animasi-slide-keatas"
+                >
+                <canvas id="yearlyProfitChart"
+                    data-width="200px"
+                    data-height="200px"
+                    data-labels='@json($yearlyProfit->pluck("year"))'
+                    data-data='@json($yearlyProfit->pluck("total"))'>
+                </canvas>
+            </div>
+        </div>
+
         @endif
         <div class="w-full border-1 border-canceled rounded shadow-lg p-4
             animasi-fade animasi-slide-keatas"

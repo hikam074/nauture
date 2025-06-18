@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class C_RajaOngkir extends Controller
 {
     public function cariDestination(Request $request) {
-        Log::info('mencari destinasi');
+        Log::info('RAJAONGKIR - mencari destinasi');
         try {
             $response = Http::withHeaders([
                 'key' => config('rajaongkir.cost_key')
@@ -21,7 +21,7 @@ class C_RajaOngkir extends Controller
             ]);
             // Cek jika respons berhasil
             if ($response->successful() && isset($response->json()['data'])) {
-                Log::info($response['data']);
+                Log::info('RAJAONGKIR - data didapatkan');
                 return response()->json($response->json()['data']);
             }
             return response()->json(['error' => 'Failed to fetch locations'], $response->status());
@@ -33,7 +33,7 @@ class C_RajaOngkir extends Controller
 
     public function hitungOngkir(Request $request) {
         try {
-            Log::info('cek validitas untuk hitung ongkir');
+            Log::info('RAJAONGKIR - cek validitas untuk hitung ongkir');
             $validator = Validator::make($request->all(), [
                 'destination' => 'required|integer',
                 'weight' => 'required|numeric|min:1',
@@ -43,21 +43,19 @@ class C_RajaOngkir extends Controller
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 400);
             }
-            Log::info('aman validitas untuk hitung ongkir');
+            Log::info('RAJAONGKIR - aman validitas untuk hitung ongkir');
             $response = Http::withHeaders([
                 'key' => config('rajaongkir.cost_key')
             ])->asForm()->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
                 'origin' => config('rajaongkir.origin'),
                 'destination' => $request->destination,
                 'weight' => ($request->weight)*1000,
-                // 'weight' => 100000,
                 'courier' => $request->courier,
             ]);
-            Log::info($response);
-            Log::info('coba akses api untuk hitung ongkir');
+            Log::info('RAJAONGKIR - coba akses api untuk hitung ongkir');
             // Cek jika respons berhasil
             if ($response->successful() && isset($response->json()['data'])) {
-                Log::info($response['data']);
+                Log::info('RAJAONGKIR - berhasil dapatkan data ongkir');
                 return response()->json($response->json()['data']);
             }
             return response()->json(['error' => 'Failed to fetch locations'], $response->status());

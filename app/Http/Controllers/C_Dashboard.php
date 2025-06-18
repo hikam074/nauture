@@ -56,6 +56,95 @@ class C_Dashboard extends Controller
         }
         elseif (($userRole === 'owner') || ($userRole === 'pegawai'))
         {
+            // // Tentukan periode 10 hari terakhir
+            // $startDate = Carbon::now()->subDays(9);
+            // $endDate = Carbon::now();
+            // // Buat koleksi tanggal dalam format Y-m-d
+            // $dates = collect(CarbonPeriod::create($startDate, $endDate)->toArray())
+            //     ->map(fn ($date) => $date->format('Y-m-d'));
+            // // Ambil data transaksi, key by tanggal dengan format Y-m-d
+            // $dailyIncomeRaw = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
+            //     ->selectRaw('DATE(created_at) as date, SUM(gross_amount) as total')
+            //     ->groupBy('date')
+            //     ->get()
+            //     ->keyBy(fn($item) => Carbon::parse($item->date)->format('Y-m-d'));
+            // // Gabungkan data transaksi dengan list tanggal agar selalu ada datanya
+            // $dailyIncome = $dates->map(fn ($date) => [
+            //     'date' => $date,
+            //     'label' => Carbon::parse($date)->translatedFormat('l, d F Y'),
+            //     'total' => data_get($dailyIncomeRaw, "$date.total", 0),
+            // ]);
+
+            // // Tentukan 5 minggu terakhir termasuk minggu ini
+            // $startDate = Carbon::now()->startOfWeek()->subWeeks(4);
+            // $weeks = collect(range(0, 4))->map(function ($week) use ($startDate) {
+            //     $weekDate = $startDate->copy()->addWeeks($week);
+            //     return [
+            //         'week' => $weekDate->isoWeek(),
+            //         'year' => $weekDate->year,
+            //     ];
+            // });
+            // // Ambil data dari database
+            // $weeklyIncomeRaw = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
+            //     ->selectRaw('YEAR(created_at) as year, WEEK(created_at, 1) as week, SUM(gross_amount) as total')
+            //     ->groupBy('year', 'week')
+            //     ->get()
+            //     ->keyBy(fn($item) => "{$item->year}-{$item->week}");
+            // // Gabungkan data dengan default 0 untuk minggu tanpa transaksi
+            // $weeklyIncome = $weeks->map(function ($week) use ($weeklyIncomeRaw) {
+            //     $weekStart = Carbon::now()->setISODate($week['year'], $week['week'])->startOfWeek();
+            //     $monthStart = $weekStart->copy()->startOfMonth();
+            //     $weekOfMonth = intval($monthStart->diffInWeeks($weekStart)) + 1;
+            //     $monthLabel = $weekStart->translatedFormat('F');
+            //     $weekKey = "{$week['year']}-{$week['week']}";
+            //     return [
+            //         'year' => $week['year'],
+            //         'week' => $week['week'],
+            //         'week_label' => "Minggu $weekOfMonth $monthLabel",
+            //         'total' => data_get($weeklyIncomeRaw, "$weekKey.total", 0),
+            //     ];
+            // });
+
+            // // Tentukan 12 bulan terakhir
+            // $startMonth = Carbon::now()->startOfMonth()->subMonths(11);
+            // $months = collect(range(0, 11))->map(function ($month) use ($startMonth) {
+            //     $monthDate = $startMonth->copy()->addMonths($month);
+            //     return [
+            //         'month' => $monthDate->month,
+            //         'year' => $monthDate->year,
+            //         'month_label' => $monthDate->format('F'),
+            //     ];
+            // });
+            // // Ambil data dari database
+            // $monthlyIncomeRaw = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
+            //     ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(gross_amount) as total')
+            //     ->groupBy('month', 'year')
+            //     ->get()
+            //     ->keyBy(fn ($item) => "{$item->year}-{$item->month}");
+            // // Gabungkan data dengan default 0
+            // $monthlyIncome = $months->map(fn ($month) => [
+            //     'year' => $month['year'],
+            //     'month' => $month['month'],
+            //     'month_label' => $month['month_label'],
+            //     'total' => data_get($monthlyIncomeRaw, "{$month['year']}-{$month['month']}.total", 0),
+            // ]);
+
+            // // Tentukan 3 tahun terakhir
+            // $startYear = Carbon::now()->subYears(2)->year;
+            // $years = collect(range($startYear, Carbon::now()->year));
+            // // Ambil data dari database
+            // $yearlyIncomeRaw = M_Transaksi::whereIn('status_transaksi_id', $statusTransaksiId)
+            //     ->selectRaw('YEAR(created_at) as year, SUM(gross_amount) as total')
+            //     ->groupBy('year')
+            //     ->get()
+            //     ->keyBy('year');
+            // // Gabungkan data dengan default 0
+            // $yearlyIncome = $years->map(fn ($year) => [
+            //     'year' => $year,
+            //     'total' => data_get($yearlyIncomeRaw, "$year.total", 0),
+            // ]);
+
+            // ------------- Data Penghasilan Harian (Bruto) -------------
             // Tentukan periode 10 hari terakhir
             $startDate = Carbon::now()->subDays(9);
             $endDate = Carbon::now();
@@ -75,11 +164,22 @@ class C_Dashboard extends Controller
                 'total' => data_get($dailyIncomeRaw, "$date.total", 0),
             ]);
 
-            // Log::info('Daily Income Raw:', $dailyIncomeRaw->toArray());
-            // Log::info('Dates:', $dates->toArray());
-            // Log::info('Daily Income:', $dailyIncome->toArray());
+            // ------------- Data Keuntungan Harian (Netto) -------------
+            $dailyProfitRaw = M_Transaksi::whereIn('transaksis.status_transaksi_id', $statusTransaksiId)
+                ->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')
+                ->join('lelangs', 'pasang_lelangs.lelang_id', '=', 'lelangs.id')
+                ->selectRaw('DATE(transaksis.created_at) as date, SUM(pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka) as profit')
+                ->groupBy('date')
+                ->get()
+                ->keyBy(fn($item) => Carbon::parse($item->date)->format('Y-m-d'));
 
+            $dailyProfit = $dates->map(fn ($date) => [
+                'date' => $date,
+                'label' => Carbon::parse($date)->translatedFormat('l, d F Y'),
+                'total' => data_get($dailyProfitRaw, "$date.profit", 0),
+            ]);
 
+            // ------------- Data Penghasilan Mingguan (Bruto) -------------
             // Tentukan 5 minggu terakhir termasuk minggu ini
             $startDate = Carbon::now()->startOfWeek()->subWeeks(4);
             $weeks = collect(range(0, 4))->map(function ($week) use ($startDate) {
@@ -110,9 +210,30 @@ class C_Dashboard extends Controller
                 ];
             });
 
-            // Log::info('Weekly Income Raw:', $weeklyIncomeRaw->toArray());
-            // Log::info('Weekly Income:', $weeklyIncome->toArray());
+            // ------------- Data Keuntungan Mingguan (Netto) -------------
+            $weeklyProfitRaw = M_Transaksi::whereIn('transaksis.status_transaksi_id', $statusTransaksiId)
+                ->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')
+                ->join('lelangs', 'pasang_lelangs.lelang_id', '=', 'lelangs.id')
+                ->selectRaw('YEAR(transaksis.created_at) as year, WEEK(transaksis.created_at, 1) as week, SUM(pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka) as profit')
+                ->groupBy('year', 'week')
+                ->get()
+                ->keyBy(fn($item) => "{$item->year}-{$item->week}");
 
+            $weeklyProfit = $weeks->map(function ($week) use ($weeklyProfitRaw) {
+                $weekStart = Carbon::now()->setISODate($week['year'], $week['week'])->startOfWeek();
+                $monthStart = $weekStart->copy()->startOfMonth();
+                $weekOfMonth = intval($monthStart->diffInWeeks($weekStart)) + 1;
+                $monthLabel = $weekStart->translatedFormat('F');
+                $weekKey = "{$week['year']}-{$week['week']}";
+                return [
+                    'year' => $week['year'],
+                    'week' => $week['week'],
+                    'week_label' => "Minggu $weekOfMonth $monthLabel",
+                    'total' => data_get($weeklyProfitRaw, "$weekKey.profit", 0),
+                ];
+            });
+
+            // ------------- Data Penghasilan Bulanan (Bruto) -------------
             // Tentukan 12 bulan terakhir
             $startMonth = Carbon::now()->startOfMonth()->subMonths(11);
             $months = collect(range(0, 11))->map(function ($month) use ($startMonth) {
@@ -137,6 +258,23 @@ class C_Dashboard extends Controller
                 'total' => data_get($monthlyIncomeRaw, "{$month['year']}-{$month['month']}.total", 0),
             ]);
 
+            // ------------- Data Keuntungan Bulanan (Netto) -------------
+            $monthlyProfitRaw = M_Transaksi::whereIn('transaksis.status_transaksi_id', $statusTransaksiId)
+                ->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')
+                ->join('lelangs', 'pasang_lelangs.lelang_id', '=', 'lelangs.id')
+                ->selectRaw('MONTH(transaksis.created_at) as month, YEAR(transaksis.created_at) as year, SUM(pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka) as profit')
+                ->groupBy('month', 'year')
+                ->get()
+                ->keyBy(fn ($item) => "{$item->year}-{$item->month}");
+
+            $monthlyProfit = $months->map(fn ($month) => [
+                'year' => $month['year'],
+                'month' => $month['month'],
+                'month_label' => $month['month_label'],
+                'total' => data_get($monthlyProfitRaw, "{$month['year']}-{$month['month']}.profit", 0),
+            ]);
+
+            // ------------- Data Penghasilan Tahunan (Bruto) -------------
             // Tentukan 3 tahun terakhir
             $startYear = Carbon::now()->subYears(2)->year;
             $years = collect(range($startYear, Carbon::now()->year));
@@ -150,6 +288,20 @@ class C_Dashboard extends Controller
             $yearlyIncome = $years->map(fn ($year) => [
                 'year' => $year,
                 'total' => data_get($yearlyIncomeRaw, "$year.total", 0),
+            ]);
+
+            // ------------- Data Keuntungan Tahunan (Netto) -------------
+            $yearlyProfitRaw = M_Transaksi::whereIn('transaksis.status_transaksi_id', $statusTransaksiId)
+                ->join('pasang_lelangs', 'transaksis.pasang_lelang_id', '=', 'pasang_lelangs.id')
+                ->join('lelangs', 'pasang_lelangs.lelang_id', '=', 'lelangs.id')
+                ->selectRaw('YEAR(transaksis.created_at) as year, SUM(pasang_lelangs.harga_pengajuan - lelangs.harga_dibuka) as profit')
+                ->groupBy('year')
+                ->get()
+                ->keyBy('year');
+
+            $yearlyProfit = $years->map(fn ($year) => [
+                'year' => $year,
+                'total' => data_get($yearlyProfitRaw, "$year.profit", 0),
             ]);
 
             if ($userRole === 'pegawai')
@@ -176,7 +328,11 @@ class C_Dashboard extends Controller
 
                 $saldo = M_Saldo::find(1);
 
-                return $this->showDataLaporan($transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
+                return $this->showDataLaporan(
+                    $transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni,
+                    $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome,
+                    $weeklyProfit, $monthlyProfit, $yearlyProfit, $dailyProfit
+                );
 
             }
 
@@ -203,7 +359,11 @@ class C_Dashboard extends Controller
 
                 $saldo = M_Saldo::find(1);
 
-                return $this->showDataLaporan($transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni, $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome);
+                return $this->showDataLaporan(
+                    $transaksis, $pasangLelangs = null, $saldo, $incomeMingguIni, $incomeBulanIni,
+                    $weeklyIncome, $monthlyIncome, $yearlyIncome, $dailyIncome,
+                    $weeklyProfit, $monthlyProfit, $yearlyProfit, $dailyProfit
+                );
             }
         }
         else
@@ -212,9 +372,19 @@ class C_Dashboard extends Controller
         }
     }
 
-    public function showDataLaporan($transaksis, $pasangLelangs = null, $saldo = 0, $incomeMingguIni = 0, $incomeBulanIni = 0, $weeklyIncome = null, $monthlyIncome = null, $yearlyIncome = null, $dailyIncome = null)
+    public function showDataLaporan(
+        $transaksis, $pasangLelangs = null, $saldo = 0, $incomeMingguIni = 0, $incomeBulanIni = 0,
+        $weeklyIncome = null, $monthlyIncome = null, $yearlyIncome = null, $dailyIncome = null,
+        $weeklyProfit = null, $monthlyProfit = null, $yearlyProfit = null, $dailyProfit = null
+        )
     {
-        return view('dashboard.d-dashboard.V_HalamanLaporan', compact('transaksis', 'pasangLelangs', 'saldo', 'incomeMingguIni', 'incomeBulanIni', 'weeklyIncome', 'monthlyIncome', 'yearlyIncome', 'dailyIncome'));
+        return view(
+            'dashboard.d-dashboard.V_HalamanLaporan',
+            compact(
+                'transaksis', 'pasangLelangs', 'saldo', 'incomeMingguIni', 'incomeBulanIni',
+                'weeklyIncome', 'monthlyIncome', 'yearlyIncome', 'dailyIncome',
+                'weeklyProfit', 'monthlyProfit', 'yearlyProfit', 'dailyProfit'
+            ));
     }
 
 

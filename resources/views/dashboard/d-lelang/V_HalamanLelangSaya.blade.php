@@ -35,8 +35,8 @@
                             ">
                             <!-- No. -->
                             <td class="text-center">{{ ($allBids->currentPage() - 1) * $allBids->perPage() + $index + 1 }}.</td>
-                            {{-- <!-- ID Tawaran -->
-                            <td>{{ $myBid->id }}</td> --}}
+                            <!-- ID Tawaran -->
+                            {{-- <td>{{ $myBid->id }}</td> --}}
                             <!-- Kode Lelang -->
                             <td>{{ $myBid->lelang->kode_lelang }}</td>
                             <!-- Judul Lelang -->

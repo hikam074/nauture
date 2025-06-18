@@ -25,7 +25,7 @@ class C_Midtrans extends Controller
         }
 
         $payload = $request->all();
-        Log::info('incoming-midtrans', ['payload' => $payload]);
+        Log::info('MIDTRANS - incoming : ', ['payload' => $payload]);
 
         try
         {
@@ -41,7 +41,7 @@ class C_Midtrans extends Controller
             $signature = hash('sha512', $orderId.$status.$grossAmount.config('midtrans.serverKey'));
 
             if ($signature !== ($payload['signature_key'] ?? '')) {
-                Log::error('Invalid signature key', [
+                Log::error('MIDTRANS - Invalid signature key', [
                     'received' => $payload['signature_key'] ?? '',
                     'calculated' => $signature
                 ]);
@@ -60,7 +60,7 @@ class C_Midtrans extends Controller
                 $selectedPaymentMethod = M_PaymentMethod::where('kode_payment_method', $paymentmethod)->first()->id;
                 $order->payment_method_id = $selectedPaymentMethod;
             } catch (Exception $e) {
-                Log::error('Error cari payment method: ' . $e->getMessage());
+                Log::error('MIDTRANS - Error cari payment method: ' . $e->getMessage());
             }
 
             // Update status transaksi berdasarkan status dari Midtrans
@@ -74,7 +74,7 @@ class C_Midtrans extends Controller
                         $saldo->saldo += $order->gross_amount;
                         $saldo->save();
                     } catch (Exception $e) {
-                        Log::error('Error tambah saldo: ' . $e->getMessage());
+                        Log::error('MIDTRANS - Error tambah saldo: ' . $e->getMessage());
                     }
                     break;
                 case 'settlement':
@@ -86,7 +86,7 @@ class C_Midtrans extends Controller
                         $saldo->saldo += $order->gross_amount;
                         $saldo->save();
                     } catch (Exception $e) {
-                        Log::error('Error tambah saldo: ' . $e->getMessage());
+                        Log::error('MIDTRANS - Error tambah saldo: ' . $e->getMessage());
                     }
                     break;
                 case 'pending':
@@ -107,10 +107,11 @@ class C_Midtrans extends Controller
 
             $order->save();
 
+            Log::info('MIDTRANS - Transaction status updated successfully');
             return response()->json(['message' => 'Transaction status updated successfully']);
         }
         catch (Exception $e) {
-            Log::error('Error processing Midtrans notification: ' . $e->getMessage());
+            Log::error('MIDTRANS - Error processing Midtrans notification: ' . $e->getMessage());
             return response()->json(['message' => 'errorr']);
         }
     }
