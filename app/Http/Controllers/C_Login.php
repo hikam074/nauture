@@ -53,6 +53,12 @@ class C_Login extends Controller
             }
             else
             {
+                if ($userAda->suspend_point >= 3) {
+                    return redirect()->back()->with('error', [
+                        'title' => 'Gagal',
+                        'message'  => 'Akun anda dibekukan karena melebihi batas 3 kali mangkir dari pemenangan lelang!'
+                    ])->withInput($request->except('password'));
+                }
                 return $this->login($id, $role, $request);
             }
         }
