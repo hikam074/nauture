@@ -110,7 +110,7 @@
                 </ul>
             <hr>
             <h2>Overview</h2>
-            <p>NauTure is a powerful developer tool designed to streamline the development process for Laravel applications, enhancing productivity and code quality.</p>
+            <p>NauTure is a web application for agriculture auction and management.</p>
             <p><strong>Why NauTure?</strong></p>
             <p>This project empowers developers with essential features that simplify workflows and ensure robust application performance. The core features include:</p>
             <ul class="list-disc pl-4 my-0">
